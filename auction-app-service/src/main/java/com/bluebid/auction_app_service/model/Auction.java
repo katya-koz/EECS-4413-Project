@@ -1,0 +1,76 @@
+package com.bluebid.auction_app_service.model;
+
+
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+
+import java.time.LocalDateTime;
+
+@Document(collection = "auctions")
+public class Auction {
+
+    @Id
+    private String id; // auction id in mongo (primary key)
+    private String sellerID;
+    private String catalogueID;
+    private double basePrice;
+    private LocalDateTime auctionStartTime;
+    private LocalDateTime auctionEndTime;
+    private boolean isOpen;
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getSellerID() {
+        return sellerID;
+    }
+
+    public void setSellerID(String sellerID) {
+        this.sellerID = sellerID;
+    }
+
+    public String getCatalogueID() {
+        return catalogueID;
+    }
+
+    public void setCatalogueID(String catalogueID) {
+        this.catalogueID = catalogueID;
+    }
+
+    public double getBasePrice() {
+        return basePrice;
+    }
+
+    public void setBasePrice(double basePrice) {
+        this.basePrice = basePrice;
+    }
+
+    public LocalDateTime getAuctionStartTime() {
+        return auctionStartTime;
+    }
+
+    public void setAuctionStartTime(LocalDateTime auctionStartTime) {
+        this.auctionStartTime = auctionStartTime;
+    }
+
+    public LocalDateTime getAuctionEndTime() {
+        return auctionEndTime;
+    }
+
+    public void setAuctionEndTime(LocalDateTime auctionEndTime) {
+        this.auctionEndTime = auctionEndTime;
+    }
+
+    public boolean isOpen() {
+        return isOpen;
+    }
+
+    public void setOpen(boolean open) {
+        isOpen = open;
+    }
+}
