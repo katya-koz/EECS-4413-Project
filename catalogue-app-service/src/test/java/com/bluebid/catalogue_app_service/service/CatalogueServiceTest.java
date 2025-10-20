@@ -39,7 +39,6 @@ public class CatalogueServiceTest {
 
     @Test
     void getAllItems_shouldReturnAllAvailableItems() {
-        // Only items with auctionEndDate > now should be returned
         when(_catalogueRepository.findByAuctionEndDateAfter(any())).thenReturn(List.of(cat0, cat1));
 
         List<CatalogueItem> result = _catalogueService.getAllAvailableItems(0);

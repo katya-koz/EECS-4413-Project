@@ -7,16 +7,30 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bluebid.payment_app_service.dto.AttemptPaymentRequest;
+import com.bluebid.payment_app_service.service.PaymentService;
 
 @RestController
 @RequestMapping("payment")
 public class PaymentController {
 	
+	private final PaymentService _paymentService;
+	
+	public PaymentController(PaymentService paymentService) {
+		this._paymentService= paymentService;
+	}
+	
 	@PostMapping("/attempt-payment")
 	public ResponseEntity<Boolean> attemptPayment(@RequestBody AttemptPaymentRequest attemptPaymentRequest){
 	
-		
-		return ResponseEntity.ok(true);
+		String cardNumber = attemptPaymentRequest.getCardNumber();
+
+        if (_paymentService.isValidCreditCard(cardNumber)) {
+          
+        	// not really validating actual payment info so this is a placeholder
+            return ResponseEntity.ok(true);
+        } else {
+            return ResponseEntity.ok(false);
+        }
 	}
 
 }
