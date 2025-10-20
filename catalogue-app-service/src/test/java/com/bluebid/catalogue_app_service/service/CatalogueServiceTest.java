@@ -3,6 +3,7 @@ package com.bluebid.catalogue_app_service.service;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.time.LocalDateTime;
@@ -39,7 +40,7 @@ public class CatalogueServiceTest {
     @Test
     void getAllItems_shouldReturnAllAvailableItems() {
         // Only items with auctionEndDate > now should be returned
-        when(_catalogueRepository.findAll()).thenReturn(List.of(cat0, cat1, cat2));
+        when(_catalogueRepository.findByAuctionEndDateAfter(any())).thenReturn(List.of(cat0, cat1));
 
         List<CatalogueItem> result = _catalogueService.getAllAvailableItems(0);
 
@@ -47,6 +48,11 @@ public class CatalogueServiceTest {
         assertEquals(2, result.size());
         assertEquals("cat0", result.get(0).getItemID());
         assertEquals("cat1", result.get(1).getItemID());
+        
+        
+        verify(_catalogueRepository).findByAuctionEndDateAfter(any());
+        
+       
     }
 
     @Test
@@ -57,14 +63,15 @@ public class CatalogueServiceTest {
         CatalogueItem dvd1 = new CatalogueItem("cat1","50 First Dates DVD", LocalDateTime.now().plusDays(2));
         CatalogueItem dvd2 = new CatalogueItem("cat2","The Devil Wears Prada DVD", LocalDateTime.now().minusDays(3));
 
-        when(_catalogueRepository.findByItemNameContainingAndAuctionEndDateAfter(
-                eq(keyword), any(LocalDateTime.class)
-        )).thenReturn(List.of(dvd0, dvd1)); // only active items
+        when(_catalogueRepository.findByItemNameContainingAndAuctionEndDateAfter(eq(keyword), any())).thenReturn(List.of(dvd0, dvd1)); // only active items
 
         List<CatalogueItem> result = _catalogueService.searchAvailableItems(keyword, 0);
 
         assertEquals(2, result.size());
         assertEquals("cat0", result.get(0).getItemID());
         assertEquals("cat1", result.get(1).getItemID());
+        
+        // verify mock
+        verify(_catalogueRepository).findByItemNameContainingAndAuctionEndDateAfter(eq(keyword), any());
     }
 }
