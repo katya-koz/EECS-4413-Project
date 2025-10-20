@@ -28,25 +28,31 @@ public class CatalogueServiceTest {
     @InjectMocks
     private CatalogueService _catalogueService; // real service we are testing
 
-    private CatalogueItem cat0, cat1, cat2;
+    private CatalogueItem cat0, cat1, cat2, cat3, cat4;
 
     @BeforeEach
     void setup() {
-        cat0 = new CatalogueItem("cat0", "A", LocalDateTime.now().plusDays(10));
-        cat1 = new CatalogueItem("cat1", "B", LocalDateTime.now().plusDays(2));
-        cat2 = new CatalogueItem("cat2", "C", LocalDateTime.now().minusDays(3));
+        cat0 = new CatalogueItem("cat0", "Click! DVD", LocalDateTime.now().plusDays(10));
+        cat1 = new CatalogueItem("cat1", "50 First Dates DVD", LocalDateTime.now().plusDays(2));
+        cat2 = new CatalogueItem("cat2", "The Devil Wears Prada DVD", LocalDateTime.now().minusDays(3));
+        cat3 = new CatalogueItem("cat3", "A shirt", LocalDateTime.now().plusDays(1));
+        cat4 = new CatalogueItem("cat4", "A pair of pants", LocalDateTime.now().plusDays(4));
     }
 
     @Test
     void getAllItems_shouldReturnAllAvailableItems() {
+
         when(_catalogueRepository.findByAuctionEndDateAfter(any())).thenReturn(List.of(cat0, cat1));
+
 
         List<CatalogueItem> result = _catalogueService.getAllAvailableItems(0);
 
         // check only active items
-        assertEquals(2, result.size());
+        assertEquals(4, result.size());
         assertEquals("cat0", result.get(0).getItemID());
         assertEquals("cat1", result.get(1).getItemID());
+        assertEquals("cat3", result.get(2).getItemID());
+        assertEquals("cat4", result.get(3).getItemID());
         
         
         verify(_catalogueRepository).findByAuctionEndDateAfter(any());
@@ -58,11 +64,8 @@ public class CatalogueServiceTest {
     void searchItems_shouldReturnAvailableMatchingItems() {
         String keyword = "DVD";
 
-        CatalogueItem dvd0 = new CatalogueItem("cat0","Click! DVD", LocalDateTime.now().plusDays(10));
-        CatalogueItem dvd1 = new CatalogueItem("cat1","50 First Dates DVD", LocalDateTime.now().plusDays(2));
-        CatalogueItem dvd2 = new CatalogueItem("cat2","The Devil Wears Prada DVD", LocalDateTime.now().minusDays(3));
 
-        when(_catalogueRepository.findByItemNameContainingAndAuctionEndDateAfter(eq(keyword), any())).thenReturn(List.of(dvd0, dvd1)); // only active items
+        when(_catalogueRepository.findByItemNameContainingAndAuctionEndDateAfter(eq(keyword), any())).thenReturn(List.of(cat0, cat1)); // only active items with dvd in title
 
         List<CatalogueItem> result = _catalogueService.searchAvailableItems(keyword, 0);
 
