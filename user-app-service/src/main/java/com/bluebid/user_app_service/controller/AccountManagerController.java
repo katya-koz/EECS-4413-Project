@@ -11,17 +11,31 @@ import org.springframework.web.bind.annotation.RestController;
 import com.bluebid.user_app_service.dto.CreateSellerProfileRequest;
 import com.bluebid.user_app_service.dto.CreateUserProfileRequest;
 import com.bluebid.user_app_service.dto.ResetPasswordRequest;
+import com.bluebid.user_app_service.model.Customer;
+import com.bluebid.user_app_service.model.Seller;
+import com.bluebid.user_app_service.model.User;
+import com.bluebid.user_app_service.security.JWTTokenManager;
+import com.bluebid.user_app_service.service.EmailService;
+import com.bluebid.user_app_service.service.UserService;
 
 @RestController
 @RequestMapping("/account")
 public class AccountManagerController {
 	
-	@GetMapping("/check-username")
-	public ResponseEntity<Boolean> checkIsUsernameAvailable(@RequestParam String username){
-		// when creating an account check to see that the username has not been taken
-		
-		return ResponseEntity.ok(true);
+	private final UserService _userService;
+	private final EmailService _emailService;
+	
+	public AccountManagerController(UserService userService, EmailService emailService) {
+	    this._userService = userService;
+	    this._emailService = emailService;
 	}
+	
+//	@GetMapping("/check-username")
+//	public ResponseEntity<Boolean> checkIsUsernameAvailable(@RequestParam String username){
+//		// when creating an account check to see that the username has not been taken
+//		
+//		return ResponseEntity.ok(true);
+//	}
 	
 	@GetMapping("/validate-username")
 	public ResponseEntity<Boolean> validateUsername(@RequestParam String username){
@@ -34,13 +48,44 @@ public class AccountManagerController {
 	@PostMapping("/create-user-profile")
 	public ResponseEntity<Boolean> createUserProfile(@RequestBody CreateUserProfileRequest createProfileRequest){
 		// attempt to save new user to db
-		return ResponseEntity.ok(true); // return profile creation success or failure
+		 try {
+		        Customer user = new Customer();
+		        user.setUsername(createProfileRequest.getUsername());
+		        user.setPassword(createProfileRequest.getPassword());
+		        user.setFirstName(createProfileRequest.getFirstName());
+		        user.setLastName(createProfileRequest.getLastName());
+		        user.setStreetName(createProfileRequest.getStreetName());
+		        user.setStreetNum(createProfileRequest.getStreetNum());
+		        user.setCity(createProfileRequest.getCity());
+		        user.setPostalCode(createProfileRequest.getPostalCode());
+		        user.setCountry(createProfileRequest.getCountry());
+		        user.setUserType("CUSTOMER");
+
+		        _userService.createUser(user);
+
+		        return ResponseEntity.ok(true);
+		    } catch (RuntimeException e) {
+		        return ResponseEntity.status(400).body(false); // username exists or other error
+		    }
+		
 	}
 	
 	@PostMapping("/create-seller-profile")
 	public ResponseEntity<Boolean> createSellerProfile(@RequestBody CreateSellerProfileRequest createProfileRequest){
 		// attempt to save new user to db
-		return ResponseEntity.ok(true); // return profile creation success or failure
+		try {
+	        Seller user = new Seller();
+	        user.setUsername(createProfileRequest.getUsername());
+	        user.setPassword(createProfileRequest.getPassword());
+	        user.setFirstName(createProfileRequest.getFirstName());
+	        user.setLastName(createProfileRequest.getLastName());
+	        user.setUserType("SELLER");
+	        _userService.createUser(user);
+
+	        return ResponseEntity.ok(true);
+	    } catch (RuntimeException e) {
+	        return ResponseEntity.status(400).body(false); // username exists or other error
+	    }
 	}
 	
 	@PostMapping("/reset-passsword")
