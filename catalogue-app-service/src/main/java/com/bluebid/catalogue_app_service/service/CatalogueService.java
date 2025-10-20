@@ -1,5 +1,6 @@
 package com.bluebid.catalogue_app_service.service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -16,14 +17,14 @@ public class CatalogueService {
         this._catalogueRepository = catalogueRepository;
     }
 	
-	public List<CatalogueItem> getAllItems(int page) {
-		// implement page...
-        return _catalogueRepository.findAll();
+	public List<CatalogueItem> getAllAvailableItems(int page) {
+        return _catalogueRepository.findByAuctionEndDateAfter(LocalDateTime.now());
     }
 
-    public List<CatalogueItem> searchItems(String keyword, int page) {
-    	// implement page...
-        return _catalogueRepository.findByItemNameContaining(keyword);
+    public List<CatalogueItem> searchAvailableItems(String keyword, int page) {
+    	// we only want items that are still up for auction
+    	
+        return _catalogueRepository.findByItemNameContainingAndAuctionEndDateAfter(keyword, LocalDateTime.now());
     }
     
 }

@@ -14,11 +14,9 @@ public class User {
     private String password; // should be hashed
     private String firstName;
     private String lastName;
-	private String streetName;
-	private String streetNum;
-	private String city;
-	private String postalCode;
-	private String country;
+    private String userType;
+    private String email;
+	
     private LocalDateTime dateRegistered;
 
     public String getId() {
@@ -38,45 +36,7 @@ public class User {
     }
 
 
-    public String getStreetName() {
-		return streetName;
-	}
-
-	public void setStreetName(String streetName) {
-		this.streetName = streetName;
-	}
-
-	public String getStreetNum() {
-		return streetNum;
-	}
-
-	public void setStreetNum(String streetNum) {
-		this.streetNum = streetNum;
-	}
-
-	public String getCity() {
-		return city;
-	}
-
-	public void setCity(String city) {
-		this.city = city;
-	}
-
-	public String getPostalCode() {
-		return postalCode;
-	}
-
-	public void setPostalCode(String postalCode) {
-		this.postalCode = postalCode;
-	}
-
-	public String getCountry() {
-		return country;
-	}
-
-	public void setCountry(String country) {
-		this.country = country;
-	}
+  
 
 	public String getPassword() {
         return password;
@@ -109,5 +69,21 @@ public class User {
     public void setDateRegistered(LocalDateTime dateRegistered) {
         this.dateRegistered = dateRegistered;
     }
+
+	public String getUserType() {
+		return userType;
+	}
+
+	public void setUserType(String userType) {
+		this.userType = userType;
+	}
+
+	public String getEmail() {
+		return email;
+	}
+
+	public void setEmail(String email) {
+		this.email = email;
+	}
 
 }

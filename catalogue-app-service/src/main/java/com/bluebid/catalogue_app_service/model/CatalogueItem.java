@@ -21,6 +21,14 @@ public class CatalogueItem {
     private String itemDescription;
     private String shippingDays;
 
+    
+    public CatalogueItem(String itemID, String itemName, LocalDateTime auctionEnd) {
+    	this.itemName = itemName;
+    	this.itemID = itemID;
+    	this.auctionEndTime = auctionEnd;
+    	
+    }
+    
     public String getItemID() {
         return itemID;
     }

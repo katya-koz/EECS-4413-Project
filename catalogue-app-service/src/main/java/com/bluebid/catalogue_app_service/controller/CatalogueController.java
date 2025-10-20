@@ -25,14 +25,12 @@ public class CatalogueController {
 	
 	@GetMapping
 	public ResponseEntity<List<CatalogueItem>> getCatalogue(@RequestParam(required = false) String keyword, @RequestParam int page) {
-	
-	   
 	    List<CatalogueItem> catalogue;
 		if (keyword != null && !keyword.isBlank()) {
-	        catalogue = _catalogueService.searchItems(keyword, page);
+	        catalogue = _catalogueService.searchAvailableItems(keyword, page);
 	    } else {
 	        // get all catalogue items
-	    	catalogue = _catalogueService.getAllItems(page);
+	    	catalogue = _catalogueService.getAllAvailableItems(page);
 	    }
 	
 	    return ResponseEntity.ok(catalogue);
@@ -40,8 +38,10 @@ public class CatalogueController {
 	
 	@PostMapping("/post-catalogue-item")
 	public ResponseEntity<Boolean> postCatalogueItem(@RequestBody PostNewItemRequest newItemRequest){
-		return ResponseEntity.ok(true);
 		
+		
+		
+		return ResponseEntity.ok(true);
 	}
 
 }
