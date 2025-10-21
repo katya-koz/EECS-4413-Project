@@ -23,8 +23,11 @@ public class PaymentController {
 	public ResponseEntity<Boolean> attemptPayment(@RequestBody AttemptPaymentRequest attemptPaymentRequest){
 	
 		String cardNumber = attemptPaymentRequest.getCardNumber();
+		String expiryMonth = attemptPaymentRequest.getExpiryMonth();
+		String expiryYear = attemptPaymentRequest.getExpiryYear();
+		String cvv = attemptPaymentRequest.getSecurityCode();
 
-        if (_paymentService.isValidCreditCard(cardNumber)) {
+        if (_paymentService.isValidCard(cardNumber, expiryMonth, expiryYear, cvv)) {
           
         	// not really validating actual payment info so this is a placeholder
             return ResponseEntity.ok(true);
