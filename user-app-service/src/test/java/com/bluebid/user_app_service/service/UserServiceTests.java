@@ -1,8 +1,7 @@
 package com.bluebid.user_app_service.service;
 import com.bluebid.user_app_service.model.Seller;
 import com.bluebid.user_app_service.model.User;
-
-import repository.UserRepository;
+import com.bluebid.user_app_service.repository.UserRepository;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -29,7 +28,7 @@ public class UserServiceTests {
 	    private UserService _userService;
 	    
 	    @Test
-	    public void testCreateUser_success() {
+	    public void create_User_With_New_Username_Should_Be_A_Success() {
 	        User user = new User();
 	        user.setUsername("testuser");
 	        user.setPassword("password");
@@ -48,7 +47,7 @@ public class UserServiceTests {
 	    }
 
 	    @Test
-	    public void testCreateUser_usernameExists() {
+	    public void  username_Not_Taken_Exists() {
 	        User user = new User();
 	        user.setUsername("existingUsername");
 
@@ -59,7 +58,7 @@ public class UserServiceTests {
 	    }
 
 	    @Test
-	    public void testCreateSeller_success() {
+	    public void create_Seller_With_New_Username_Should_Be_A_Success() {
 	    	Seller user = new Seller();
 			user.setUsername("testuser");
 			user.setPassword("password");
@@ -78,7 +77,7 @@ public class UserServiceTests {
 	    }
 
 	    @Test
-	    public void testValidateCredentials_success() {
+	    public void successful_Validation_Matches_Passwords() {
 	        User user = new User();
 	        user.setUsername("user1");
 	        user.setPassword("hashedpassword"); 
@@ -98,7 +97,7 @@ public class UserServiceTests {
 	    }
 
 	    @Test
-	    public void testValidateCredentials_invalidPassword() {
+	    public void unsuccessful_Validation_Not_Matches_Passwords() {
 	        User user = new User();
 	        user.setUsername("user1");
 	        user.setPassword("password");
@@ -110,7 +109,7 @@ public class UserServiceTests {
 	    }
 
 	    @Test
-	    public void testValidateCredentials_userNotFound() {
+	    public void unsuccessful_Validation_No_User_Found() {
 	        when(_userRepository.findByUsername("missing")).thenReturn(Optional.empty());
 
 	        RuntimeException ex = assertThrows(RuntimeException.class, () -> _userService.validateCredentials("missing", "pass"));
@@ -118,7 +117,7 @@ public class UserServiceTests {
 	    }
 
 	    @Test
-	    public void testResetPassword_success() {
+	    public void successful_Password_Reset() {
 	        User user = new User();
 	        user.setId("123");
 	        user.setPassword("oldpass");
@@ -134,7 +133,7 @@ public class UserServiceTests {
 	    }
 
 	    @Test
-	    public void testResetPassword_userNotFound() {
+	    public void unsuccessful_Password_Reset() {
 	        when(_userRepository.findById("999")).thenReturn(Optional.empty());
 
 	        RuntimeException ex = assertThrows(RuntimeException.class, () -> _userService.resetPassword("999", "newpass"));

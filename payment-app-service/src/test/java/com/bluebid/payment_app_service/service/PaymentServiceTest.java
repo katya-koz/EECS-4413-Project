@@ -16,7 +16,7 @@ public class PaymentServiceTest {
     }
 
 	@Test
-	void attemptPayment_shouldReturnTrue_whenCardIsValid() {
+	void attempting_Payment_should_Return_True_If_Card_Is_Valid() {
 		String validCardNumber = "4903506535"; // generated from https://www.dcode.fr/luhn-algorithm
 		String validExpiryMonth = "1";
 		String validExpiryYear = LocalDate.now().plusYears(2).getYear() + "";
@@ -26,7 +26,7 @@ public class PaymentServiceTest {
 	}
 	
 	@Test
-	void attemptPayment_shouldReturnFalse_whenCardIsInvalid() {
+	void attempting_Payment_should_Return_False_If_Card_Is_Invalid() {
 		String invalidCardNumber = "3903506535"; 
 		String invalidExpiryMonth = "1";
 		String invalidExpiryYear = LocalDate.now().plusYears(2).getYear() + "";
@@ -36,7 +36,7 @@ public class PaymentServiceTest {
 	 
 	
 	@Test
-	void attemptPayment_shouldReturnFalse_whenBadInput() {
+	void attempting_Payment_should_Return_False_If_Bad_Input() {
 		String badNumber = "bad"; 
 		assertFalse(_paymentService.isValidCard(badNumber, "1", "2025", "123")); 
 	}

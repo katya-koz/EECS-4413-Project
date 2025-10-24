@@ -5,9 +5,9 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import com.bluebid.user_app_service.model.Seller;
 import com.bluebid.user_app_service.model.User;
+import com.bluebid.user_app_service.repository.UserRepository;
 
 import java.time.LocalDateTime;
-import repository.UserRepository;
 
 @Service
 public class UserService {

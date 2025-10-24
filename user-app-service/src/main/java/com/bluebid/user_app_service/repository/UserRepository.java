@@ -1,4 +1,4 @@
-package repository;
+package com.bluebid.user_app_service.repository;
 
 import java.util.Optional;
 
