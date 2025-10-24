@@ -40,7 +40,7 @@ public class CatalogueServiceTest {
     }
 
     @Test
-    void getAllItems_shouldReturnAllAvailableItems() {
+    void getting_All_Items_Should_Return_All_Available_Items() {
 
         when(_catalogueRepository.findByAuctionEndDateAfter(any())).thenReturn(List.of(cat0, cat1));
 
@@ -61,7 +61,7 @@ public class CatalogueServiceTest {
     }
 
     @Test
-    void searchItems_shouldReturnAvailableMatchingItems() {
+    void searching_Items_By_Keyword_Should_Return_All_Available_Items_With_Matching_Keyword() {
         String keyword = "DVD";
 
 
