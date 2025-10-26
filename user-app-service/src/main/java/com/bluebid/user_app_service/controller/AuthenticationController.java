@@ -13,7 +13,7 @@ import com.bluebid.user_app_service.service.UserService;
 
 
 @RestController
-@RequestMapping("/account")
+@RequestMapping("/authentication")
 public class AuthenticationController {
 	private final UserService _userService;
 	private final JWTTokenManager _jwtManager;
@@ -23,7 +23,7 @@ public class AuthenticationController {
 	    this._jwtManager = tokenManager;
 	}
 	
-	@PostMapping("/validate-credentials")
+	@PostMapping("/login")
 	public ResponseEntity<String> validateUserCredentials(@RequestBody LoginRequest loginRequest){
 		// validate user
 		// the passwords are hashed in database

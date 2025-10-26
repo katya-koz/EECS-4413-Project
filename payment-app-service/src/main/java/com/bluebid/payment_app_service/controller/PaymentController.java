@@ -19,7 +19,7 @@ public class PaymentController {
 		this._paymentService= paymentService;
 	}
 	
-	@PostMapping("/attempt-payment")
+	@PostMapping("/payment")
 	public ResponseEntity<Boolean> attemptPayment(@RequestBody AttemptPaymentRequest attemptPaymentRequest){
 	
 		String cardNumber = attemptPaymentRequest.getCardNumber();

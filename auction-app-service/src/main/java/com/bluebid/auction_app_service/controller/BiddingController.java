@@ -22,7 +22,7 @@ public class BiddingController {
 		this._auctionService = auctionService;
 	}
 	
-	@PostMapping("/attempt-bid")
+	@PostMapping("/place-bid")
 	public ResponseEntity<String> attemptBid(@RequestBody AttemptBidRequest attemptBidRequest) {
 		//attempt to bid. if bid is valid (over highest bid or higher than base price - if there are no bids), then save to database. return bool based on database save status
 		

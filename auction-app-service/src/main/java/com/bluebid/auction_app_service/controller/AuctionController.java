@@ -11,7 +11,7 @@ import com.bluebid.auction_app_service.service.AuctionService;
 
 
 @RestController
-@RequestMapping("/api/auctions")
+@RequestMapping("/api/auction")
 @Validated
 public class AuctionController {
 
@@ -27,7 +27,7 @@ public class AuctionController {
 		
 	}
 	
-	@PostMapping("/start-new-auction")
+	@PostMapping("/new-auction")
 	public ResponseEntity<Boolean> startNewAuction(@RequestBody NewAuctionRequest newAuctionRequest){
 		LocalDateTime startTime = LocalDateTime.now();
 		LocalDateTime endTime = newAuctionRequest.getAuctionEndTime();
