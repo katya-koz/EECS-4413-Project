@@ -8,8 +8,17 @@ import org.springframework.stereotype.Service;
 public class PaymentService {
 	
 	
-	public boolean isValidCard(String cardNumber, String expiryMonth, String expiryYear, String cvv)
+	public boolean isValidPaymentInfo(String cardNumber, String expiryMonth, String expiryYear, String cvv)
 	{
+		try {
+		Integer.parseInt(expiryMonth);
+		Integer.parseInt(expiryYear);
+		Integer.parseInt(cvv);
+		Integer.parseInt(cardNumber);
+		}catch(NumberFormatException e) {
+			throw new IllegalArgumentException("Payment information contains non-numeric characters.");
+		}
+		
 		if (validateCardNumber(cardNumber) && validateExpirationDate(expiryMonth, expiryYear) && validateCvv(cvv))
 		{
 			return true;
