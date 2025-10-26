@@ -18,13 +18,14 @@ public class CatalogueService {
     }
 	
 	public List<CatalogueItem> getAllAvailableItems(int page) {
-        return _catalogueRepository.findByAuctionEndDateAfter(LocalDateTime.now());
+        return _catalogueRepository.findByIsActive(true);
     }
 
     public List<CatalogueItem> searchAvailableItems(String keyword, int page) {
     	// we only want items that are still up for auction
     	
-        return _catalogueRepository.findByItemNameContainingAndAuctionEndDateAfter(keyword, LocalDateTime.now());
+        return _catalogueRepository.findByKeywordQuery(keyword ); // case insensitive search
+        
     }
     
 }

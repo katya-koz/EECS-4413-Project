@@ -52,6 +52,7 @@ public class UserService {
 	
 	
 	public User validateCredentials(String username, String password) {
+		System.out.println("looking for user: " + username +  " and password: " + password);
 		
 		User user = _userRepository.findByUsername(username).orElseThrow(() -> new RuntimeException("User not found"));
 

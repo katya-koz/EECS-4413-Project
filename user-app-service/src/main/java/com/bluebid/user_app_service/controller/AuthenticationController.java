@@ -23,7 +23,7 @@ public class AuthenticationController {
 	    this._jwtManager = tokenManager;
 	}
 	
-	@PostMapping("/validate-credentials")
+	@PostMapping("/login")
 	public ResponseEntity<String> validateUserCredentials(@RequestBody LoginRequest loginRequest){
 		// validate user
 		// the passwords are hashed in database

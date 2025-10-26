@@ -27,7 +27,7 @@ public class AuctionController {
 		
 	}
 	
-	@PostMapping("/start-new-auction")
+	@PostMapping("/new-auction")
 	public ResponseEntity<Boolean> startNewAuction(@RequestBody NewAuctionRequest newAuctionRequest){
 		LocalDateTime startTime = LocalDateTime.now();
 		LocalDateTime endTime = newAuctionRequest.getAuctionEndTime();

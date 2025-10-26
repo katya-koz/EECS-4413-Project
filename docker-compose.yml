@@ -1,4 +1,9 @@
 services:
+  ## ZOOKEEPER
+  
+  ## KAFKA
+
+	
   ## GATEWAY
   gateway:
     build: ./gateway-app-service
@@ -8,9 +13,9 @@ services:
       - payment-service
       - auction-service
     ports:
-      - "8080:8080"
+      - "8080:8080" # expose to host
     networks:
-      - backend
+      - backend-net
   # USER SERVICE
   user-service:
      build:
@@ -21,7 +26,8 @@ services:
      environment:
        SPRING_DATA_MONGODB_URI: mongodb://root:secret@user-db:27017/userdb?authSource=admin
      networks:
-        - backend
+        - backend-net
+        - kafka-net
 
   user-db:
     image: mongo
@@ -34,7 +40,7 @@ services:
       - user-db:/data/db
       - ./init-scripts/init-userdb.js:/docker-entrypoint-initdb.d/init-userdb.js:ro ## initialize user db
     networks:
-      - backend
+      - backend-net
 
   # PAYMENT SERVICE
   payment-service:
@@ -42,7 +48,8 @@ services:
       context: ./payment-app-service
       dockerfile: Dockerfile
     networks:
-      - backend
+      - backend-net
+      - kafka-net
 
   # AUCTION SERVICE #
   auction-service:
@@ -52,9 +59,10 @@ services:
     depends_on:
       - auction-db
     environment:
-      SPRING_DATA_MONGODB_URI: mongodb://root:secret@auction-db:27027/auctiondb?authSource=admin
+      SPRING_DATA_MONGODB_URI: mongodb://root:secret@auction-db:27017/auctiondb?authSource=admin
     networks:
-      - backend
+      - backend-net
+      - kafka-net
 
   auction-db:
     image: mongo
@@ -67,7 +75,7 @@ services:
       - auction-db:/data/db
       - ./init-scripts/init-auctiondb.js:/docker-entrypoint-initdb.d/init-auctiondb.js:ro
     networks:
-        - backend
+        - backend-net
 
   # CATALOGUE SERVICE
   catalogue-service:
@@ -77,9 +85,10 @@ services:
     depends_on:
       - catalogue-db
     environment:
-      SPRING_DATA_MONGODB_URI: mongodb://root:secret@catalogue-db:27037/cataloguedb?authSource=admin
+      SPRING_DATA_MONGODB_URI: mongodb://root:secret@catalogue-db:27017/cataloguedb?authSource=admin
     networks:
-      - backend
+      - backend-net
+      - kafka-net
 
   catalogue-db:
     image: mongo
@@ -92,10 +101,12 @@ services:
       - catalogue-db:/data/db
       - ./init-scripts/init-cataloguedb.js:/docker-entrypoint-initdb.d/init-cataloguedb.js:ro
     networks:
-      - backend
+      - backend-net
 
 networks:
-  backend:
+  backend-net:
+    driver: bridge
+  kafka-net:
     driver: bridge
 
 volumes:

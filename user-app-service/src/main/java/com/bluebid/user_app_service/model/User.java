@@ -7,9 +7,9 @@ import java.time.LocalDateTime;
 
 @Document(collection = "users")
 public class User {
-//
-//    @Id
-//    private String id; // db id (primary key)
+
+    @Id
+    private String id; // db id (primary key)
     private String username;
     private String password; // should be hashed
     private String firstName;
