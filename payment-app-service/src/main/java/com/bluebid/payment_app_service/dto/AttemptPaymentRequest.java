@@ -5,6 +5,8 @@ public class AttemptPaymentRequest {
 	String cardNumber;
 	String securityCode;
 	String expiryMonth;
+	String expiryYear;
+	String price;
 	public String getExpiryMonth() {
 		return expiryMonth;
 	}
@@ -17,8 +19,7 @@ public class AttemptPaymentRequest {
 	public void setExpiryYear(String expiryYear) {
 		this.expiryYear = expiryYear;
 	}
-	String expiryYear;
-	String price;
+
 	public String getCardNumber() {
 		return cardNumber;
 	}
