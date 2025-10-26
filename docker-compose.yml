@@ -1,0 +1,116 @@
+services:
+  ## ZOOKEEPER
+  
+  ## KAFKA
+
+	
+  ## GATEWAY
+  gateway:
+    build: ./gateway-app-service
+    depends_on:
+      - user-service
+      - catalogue-service
+      - payment-service
+      - auction-service
+    ports:
+      - "8080:8080" # expose to host
+    networks:
+      - backend-net
+  # USER SERVICE
+  user-service:
+     build:
+       context: ./user-app-service
+       dockerfile: Dockerfile
+     depends_on:
+       - user-db
+     environment:
+       SPRING_DATA_MONGODB_URI: mongodb://root:secret@user-db:27017/userdb?authSource=admin
+     networks:
+        - backend-net
+        - kafka-net
+
+  user-db:
+    image: mongo
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: secret
+      MONGO_INITDB_DATABASE: userdb
+    volumes:
+      - user-db:/data/db
+      - ./init-scripts/init-userdb.js:/docker-entrypoint-initdb.d/init-userdb.js:ro ## initialize user db
+    networks:
+      - backend-net
+
+  # PAYMENT SERVICE
+  payment-service:
+    build:
+      context: ./payment-app-service
+      dockerfile: Dockerfile
+    networks:
+      - backend-net
+      - kafka-net
+
+  # AUCTION SERVICE #
+  auction-service:
+    build:
+      context: ./auction-app-service
+      dockerfile: Dockerfile
+    depends_on:
+      - auction-db
+    environment:
+      SPRING_DATA_MONGODB_URI: mongodb://root:secret@auction-db:27017/auctiondb?authSource=admin
+    networks:
+      - backend-net
+      - kafka-net
+
+  auction-db:
+    image: mongo
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: secret
+      MONGO_INITDB_DATABASE: auctiondb
+    volumes:
+      - auction-db:/data/db
+      - ./init-scripts/init-auctiondb.js:/docker-entrypoint-initdb.d/init-auctiondb.js:ro
+    networks:
+        - backend-net
+
+  # CATALOGUE SERVICE
+  catalogue-service:
+    build:
+      context: ./catalogue-app-service
+      dockerfile: Dockerfile
+    depends_on:
+      - catalogue-db
+    environment:
+      SPRING_DATA_MONGODB_URI: mongodb://root:secret@catalogue-db:27017/cataloguedb?authSource=admin
+    networks:
+      - backend-net
+      - kafka-net
+
+  catalogue-db:
+    image: mongo
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: secret
+      MONGO_INITDB_DATABASE: cataloguedb
+    volumes:
+      - catalogue-db:/data/db
+      - ./init-scripts/init-cataloguedb.js:/docker-entrypoint-initdb.d/init-cataloguedb.js:ro
+    networks:
+      - backend-net
+
+networks:
+  backend-net:
+    driver: bridge
+  kafka-net:
+    driver: bridge
+
+volumes:
+  user-db:
+  auction-db:
+  bid-db:
+  catalogue-db:

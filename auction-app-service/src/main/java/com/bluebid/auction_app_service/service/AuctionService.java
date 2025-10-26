@@ -1,7 +1,7 @@
 
 package com.bluebid.auction_app_service.service;
 
-import org.springframework.messaging.simp.SimpMessageSendingOperations;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 import com.bluebid.auction_app_service.dto.AuctionNotification;
@@ -18,10 +18,10 @@ public class AuctionService {
 
 	private final AuctionRepository _auctionRepository;
 	private final BidRepository _bidRepository;
-	private final SimpMessageSendingOperations  _messagingTemplate;
+	private final SimpMessagingTemplate  _messagingTemplate;
 	//private final SimpMessagingTemplate _messagingTemplate;
 	//, SimpMessagingTemplate template
-	public AuctionService(AuctionRepository auctionRepository, BidRepository bidRepository, SimpMessageSendingOperations  messagingTemplate) {
+	public AuctionService(AuctionRepository auctionRepository, BidRepository bidRepository, SimpMessagingTemplate  messagingTemplate) {
 		this._messagingTemplate = messagingTemplate;
 		this._auctionRepository = auctionRepository;
 		this._bidRepository = bidRepository;

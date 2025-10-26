@@ -23,20 +23,21 @@ public class CatalogueController {
 	    this._catalogueService = catalogueService;
 	}
 	
-	@GetMapping
+	@GetMapping("/items")
 	public ResponseEntity<List<CatalogueItem>> getCatalogue(@RequestParam(required = false) String keyword, @RequestParam int page) {
 	    List<CatalogueItem> catalogue;
 		if (keyword != null && !keyword.isBlank()) {
 	        catalogue = _catalogueService.searchAvailableItems(keyword, page);
 	    } else {
 	        // get all catalogue items
+	    	System.out.println("getting all items");
 	    	catalogue = _catalogueService.getAllAvailableItems(page);
 	    }
 	
 	    return ResponseEntity.ok(catalogue);
 	}
 	
-	@PostMapping("/post-catalogue-item")
+	@PostMapping("/item")
 	public ResponseEntity<Boolean> postCatalogueItem(@RequestBody PostNewItemRequest newItemRequest){
 		
 		

@@ -4,13 +4,16 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.data.mongodb.repository.Query;
 
 import com.bluebid.catalogue_app_service.model.CatalogueItem;
 
 public interface CatalogueRepository extends MongoRepository<CatalogueItem, String> {
 	
-	// custom query
-	List<CatalogueItem> findByItemNameContainingAndAuctionEndDateAfter(String keyword, LocalDateTime now);
+	//List<CatalogueItem> findByItemNameContaining(String keyword);
 
-	List<CatalogueItem> findByAuctionEndDateAfter(LocalDateTime now);
+	List<CatalogueItem> findByIsActive(boolean b);
+
+	@Query("{ 'itemName': { $regex: ?0, $options: 'i' }, 'isActive': true }") // case insensitive
+	List<CatalogueItem> findByKeywordQuery(String keyword);
 }
