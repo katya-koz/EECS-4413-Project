@@ -7,8 +7,8 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document(collection = "auctions")
 public class Auction {
-	@Id
-	private String id; // auction id in mongo (primary key)
+//	@Id
+//	private String id; // auction id in mongo (primary key)
 	private String sellerID;
 	private String catalogueID;
 	private double basePrice;
@@ -16,12 +16,12 @@ public class Auction {
 	private LocalDateTime auctionEndTime;
 	private boolean status;
 	
-	public String getId() {
-		return id;
-	}
-	public void setId(String id) {
-		this.id = id;
-	}
+//	public String getId() {
+//		return id;
+//	}
+//	public void setId(String id) {
+//		this.id = id;
+//	}
 	public String getSellerID() {
 		return sellerID;
 	}

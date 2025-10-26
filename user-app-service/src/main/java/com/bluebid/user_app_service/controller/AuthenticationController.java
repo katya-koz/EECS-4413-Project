@@ -13,7 +13,7 @@ import com.bluebid.user_app_service.service.UserService;
 
 
 @RestController
-@RequestMapping("/account")
+@RequestMapping("/authentication")
 public class AuthenticationController {
 	private final UserService _userService;
 	private final JWTTokenManager _jwtManager;

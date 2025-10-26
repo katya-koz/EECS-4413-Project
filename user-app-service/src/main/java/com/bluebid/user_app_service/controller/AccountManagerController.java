@@ -36,6 +36,11 @@ public class AccountManagerController {
 //		
 //		return ResponseEntity.ok(true);
 //	}
+	@GetMapping("/test")
+	public ResponseEntity<String> test(){
+		
+		return ResponseEntity.ok("hello");
+	}
 	
 	@GetMapping("/validate-username")
 	public ResponseEntity<Boolean> validateUsername(@RequestParam String username){

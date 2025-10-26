@@ -8,16 +8,16 @@ import java.time.LocalDateTime;
 @Document(collection = "bids")
 public class Bid {
 
-    @Id
-    private String id; // bid id in mongo (primary key)
+//    @Id
+//    private String id; // bid id in mongo (primary key)
     private String auctionID;
     private String bidderID;
     private double amount;
     private LocalDateTime bidTime;
     
-    public String getId() {
-        return id;
-    }
+//    public String getId() {
+//        return id;
+//    }
 
 //    public void setId(String id) {
 //        this.id = id;
