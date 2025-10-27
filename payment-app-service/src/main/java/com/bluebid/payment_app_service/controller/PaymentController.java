@@ -20,20 +20,24 @@ public class PaymentController {
 	}
 	
 	@PostMapping("/payment")
-	public ResponseEntity<Boolean> attemptPayment(@RequestBody AttemptPaymentRequest attemptPaymentRequest){
+	public ResponseEntity<?> attemptPayment(@RequestBody AttemptPaymentRequest attemptPaymentRequest){
 	
 		String cardNumber = attemptPaymentRequest.getCardNumber();
 		String expiryMonth = attemptPaymentRequest.getExpiryMonth();
 		String expiryYear = attemptPaymentRequest.getExpiryYear();
 		String cvv = attemptPaymentRequest.getSecurityCode();
 
-        if (_paymentService.isValidCard(cardNumber, expiryMonth, expiryYear, cvv)) {
-          
-        	// not really validating actual payment info so this is a placeholder
-            return ResponseEntity.ok(true);
-        } else {
-            return ResponseEntity.ok(false);
-        }
+		try {
+			if (_paymentService.isValidPaymentInfo(cardNumber, expiryMonth, expiryYear, cvv)) {
+	        	// not really validating actual payment info so this is a placeholder
+	            return ResponseEntity.ok(true);
+	        } else {
+	            return ResponseEntity.ok(false);
+	        }
+		}
+		catch(IllegalArgumentException e) {
+			return ResponseEntity.badRequest().body(e.getMessage());
+		}
 	}
 
 }
