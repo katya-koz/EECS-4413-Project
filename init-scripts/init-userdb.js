@@ -16,7 +16,6 @@ db.users.insertMany([
         password: "hashedpassword1",
         firstName: "John",
         lastName: "Doe",
-        userType: "CUSTOMER",
         email: "jdoe@example.com",
         dateRegistered: new Date("2025-10-01T10:00:00Z"),
         streetName: "Maple Street",
@@ -30,7 +29,6 @@ db.users.insertMany([
         password: "hashedpassword2",
         firstName: "Alice",
         lastName: "Smith",
-        userType: "CUSTOMER",
         email: "asmith@example.com",
         dateRegistered: new Date("2025-10-05T15:30:00Z"),
         streetName: "Oak Avenue",
@@ -41,7 +39,7 @@ db.users.insertMany([
     }
 ]);
 // sellers
-db.users.insertMany([
+/*db.users.insertMany([
     {
         username: "seller1",
         password: "hashedpassword3",
@@ -61,3 +59,4 @@ db.users.insertMany([
         dateRegistered: new Date("2025-09-25T12:15:00Z")
     }
 ]);
+*/

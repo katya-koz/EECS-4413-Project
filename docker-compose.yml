@@ -1,9 +1,26 @@
 services:
-  ## ZOOKEEPER
-  
   ## KAFKA
-
-	
+  kafka:
+      image: confluentinc/cp-kafka:latest
+      container_name: kafka
+      environment:
+        KAFKA_NODE_ID: 1
+        KAFKA_BROKER_ID: 1
+        KAFKA_PROCESS_ROLES: 'broker,controller'
+        KAFKA_CONTROLLER_QUORUM_VOTERS: '1@kafka:9093'
+        KAFKA_LISTENERS: 'PLAINTEXT://kafka:9092,CONTROLLER://kafka:9093'
+        KAFKA_ADVERTISED_LISTENERS: 'PLAINTEXT://kafka:9092'
+        KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: 'CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT'
+        KAFKA_CONTROLLER_LISTENER_NAMES: 'CONTROLLER'
+        KAFKA_INTER_BROKER_LISTENER_NAME: 'PLAINTEXT'
+        KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+        KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+        KAFKA_DEFAULT_REPLICATION_FACTOR: 1 # we are just making a POC so no need for replications 
+        KAFKA_MIN_INSYNC_REPLICAS: 1 # see above
+      ports:
+        - "9092:9092"
+      networks:
+        - kafka-net
   ## GATEWAY
   gateway:
     build: ./gateway-app-service
@@ -40,16 +57,33 @@ services:
       - user-db:/data/db
       - ./init-scripts/init-userdb.js:/docker-entrypoint-initdb.d/init-userdb.js:ro ## initialize user db
     networks:
-      - backend-net
+      - kafka-net
 
   # PAYMENT SERVICE
   payment-service:
     build:
       context: ./payment-app-service
       dockerfile: Dockerfile
+    depends_on:
+      - payment-db
+    environment:
+      SPRING_DATA_MONGODB_URI: mongodb://root:secret@payment-db:27017/paymentdb?authSource=admin
     networks:
       - backend-net
       - kafka-net
+
+  payment-db:
+    image: mongo
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: secret
+      MONGO_INITDB_DATABASE: paymentdb
+    volumes:
+      - payment-db:/data/db
+      - ./init-scripts/init-payment.js:/docker-entrypoint-initdb.d/init-paymentdb.js:ro ## initialize user db
+    networks:
+        - backend-net
 
   # AUCTION SERVICE #
   auction-service:
@@ -110,6 +144,7 @@ networks:
     driver: bridge
 
 volumes:
+  payment-db:
   user-db:
   auction-db:
   bid-db:

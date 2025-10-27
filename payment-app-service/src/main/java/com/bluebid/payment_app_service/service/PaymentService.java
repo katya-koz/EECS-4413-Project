@@ -1,25 +1,137 @@
 package com.bluebid.payment_app_service.service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.Optional;
 
+import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
+
+import com.bluebid.payment_app_service.dto.CatalogueItemReadyEvent;
+import com.bluebid.payment_app_service.dto.ItemReserveFailedEvent;
+import com.bluebid.payment_app_service.dto.PaymentInitiatedEvent;
+import com.bluebid.payment_app_service.dto.UserInfoFailedEvent;
+import com.bluebid.payment_app_service.dto.UserInfoReadyEvent;
+import com.bluebid.payment_app_service.model.Receipt;
+import com.bluebid.payment_app_service.repository.PaymentRepository;
 
 @Service
 public class PaymentService {
+	//private final Double SALES_TAX_RATE = 0.13;
+	private final KafkaTemplate<String, Object> _kafkaTemplate;
+	private final PaymentRepository _paymentRepository;
+
 	
-	
-	public boolean isValidPaymentInfo(String cardNumber, String expiryMonth, String expiryYear, String cvv)
-	{
-		if (validateCardNumber(cardNumber) && validateExpirationDate(expiryMonth, expiryYear) && validateCvv(cvv))
-		{
-			return true;
-		}
-		else
-		{
-			return false;
-		}
+	public PaymentService(KafkaTemplate<String, Object> kafkaTemplate, PaymentRepository paymentRepository) {
+		_paymentRepository = paymentRepository;
+		_kafkaTemplate = kafkaTemplate;
 	}
 	
+	
+	
+	// kafka listeners
+	
+	@KafkaListener(topics = "catalogue.catalogue-topic", groupId = "payment-group")
+    public void handleCatalogueSuccess(CatalogueItemReadyEvent event) {
+        Optional<Receipt> optionalReceipt = _paymentRepository.findByPaymentId(event.getPaymentID());
+
+        Receipt receipt = optionalReceipt.get(); // it exists since initializepayment is not called unless a reciept is successfully saved
+
+        // update or overwrite cat. info
+        receipt.setItemId(event.getCatalogueID());
+        receipt.setItemName(event.getItemName());
+        receipt.setItemCost(event.getItemCost());
+        receipt.setShippingCost(event.getShippingCost());
+        
+        receipt.setStatus("CATALOGUE_RESERVED");
+        // save
+        _paymentRepository.save(receipt);
+    }
+
+    @KafkaListener(topics = "catalogue.item-failed-topic", groupId = "payment-group")
+    public void handleCatalogueFailure(ItemReserveFailedEvent event) {
+    	 Optional<Receipt> optionalReceipt = _paymentRepository.findByPaymentId(event.getPaymentID());
+
+         Receipt receipt = optionalReceipt.get(); // it exists since initializepayment is not called unless a reciept is successfully saved
+
+         // update status
+         receipt.setFailureReason(event.getMessage());
+         receipt.setStatus("CATALOGUE_FAILED");
+         
+         // save
+         _paymentRepository.save(receipt);
+    }
+
+    @KafkaListener(topics = "user.user-info-topic", groupId = "payment-group")
+    public void handleUserSuccess(UserInfoReadyEvent event) {
+    	Optional<Receipt> optionalReceipt = _paymentRepository.findByPaymentId(event.getPaymentId());
+
+        Receipt receipt = optionalReceipt.get(); // it exists since initializepayment is not called unless a reciept is successfully saved
+
+        // update or overwrite cat. info
+        receipt.setBuyerFirstName(event.getFirstName());
+        receipt.setBuyerLastName(event.getLastName());
+        receipt.setBuyerStreetName(event.getStreetName());
+        receipt.setBuyerStreetNum(event.getStreetNum());
+        receipt.setBuyerCity(event.getCity());
+        receipt.setBuyerPostalCode(event.getPostalCode());
+        receipt.setBuyerCountry(event.getCountry());
+        receipt.setStatus("USER_FOUND");
+        // save
+        _paymentRepository.save(receipt);
+    }
+
+    @KafkaListener(topics = "user.user-info-failed-topic", groupId = "payment-group")
+    public void handleUserFailure(UserInfoFailedEvent event) {
+   	 Optional<Receipt> optionalReceipt = _paymentRepository.findByPaymentId(event.getPaymentId());
+
+     Receipt receipt = optionalReceipt.get(); // it exists since initializepayment is not called unless a reciept is successfully saved
+
+     // update status
+     receipt.setFailureReason(event.getFailureReason());
+     receipt.setStatus("USER_FAILED");
+     
+     // save
+     _paymentRepository.save(receipt);
+    }
+    
+	// logical methods
+    public String isValidPaymentInfo(String cardNumber, String expiryMonth, String expiryYear, String cvv, String userID, String sellerID, String itemID, LocalDateTime timestamp, Boolean isExpedited, Double itemPrice, Double shippingCost) {
+        boolean paymentValid = (validateCardNumber(cardNumber) && validateExpirationDate(expiryMonth, expiryYear) && validateCvv(cvv));
+                
+        if(paymentValid){
+            // returns receipt ID
+            return this.initiatePayment(userID, sellerID, itemID, timestamp, isExpedited, itemPrice, shippingCost);
+        } else {
+            return null;
+        }
+    }
+	
+	private String initiatePayment(String userID, String sellerID, String itemID, LocalDateTime timestamp, Boolean isExpedited, Double itemPrice, Double shippingCost) {
+	    PaymentInitiatedEvent event = new PaymentInitiatedEvent(userID, sellerID, itemID, timestamp, isExpedited, itemPrice, shippingCost); 
+	    
+	    Receipt receipt = new Receipt(
+	        event.getId(),  
+	        userID,
+	        sellerID,
+	        itemID,
+	        itemPrice,
+	        isExpedited,
+	        shippingCost,  
+	        "PENDING",
+	        timestamp
+	    );
+	    
+	    // save partial receipt
+	    _paymentRepository.save(receipt);
+	    
+	    // publish event
+	    _kafkaTemplate.send("payment.payment-initiated", event);
+	    
+	    return receipt.getId(); // return the payment id
+	}
+
 	private boolean validateCardNumber(String cardNumber)
 	{
 		boolean isCardValid;
@@ -127,5 +239,11 @@ public class PaymentService {
 			
 		}
 		return total;
+	}
+
+
+
+	public Receipt getReceiptByPaymentId(String paymentId) {
+		return _paymentRepository.findByPaymentId(paymentId).orElse(null);
 	}
 }

@@ -2,6 +2,7 @@ package com.bluebid.catalogue_app_service.repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
@@ -16,4 +17,12 @@ public interface CatalogueRepository extends MongoRepository<CatalogueItem, Stri
 
 	@Query("{ 'itemName': { $regex: ?0, $options: 'i' }, 'isActive': true }") // case insensitive
 	List<CatalogueItem> findByKeywordQuery(String keyword);
+
+	Optional<CatalogueItem> findByIdAndIsActive(String catalogueID, boolean b);
+	
+	// mark item as inactive once sold
+
+	
+	
+	//get item info for reciept
 }
