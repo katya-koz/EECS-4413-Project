@@ -27,17 +27,24 @@ public class PaymentController {
 		String expiryYear = attemptPaymentRequest.getExpiryYear();
 		String cvv = attemptPaymentRequest.getSecurityCode();
 
-		try {
-			if (_paymentService.isValidPaymentInfo(cardNumber, expiryMonth, expiryYear, cvv)) {
-	        	// not really validating actual payment info so this is a placeholder
-	            return ResponseEntity.ok(true);
-	        } else {
-	            return ResponseEntity.ok(false);
-	        }
+		// validate all characters are numeric
+		
+		if (!cardNumber.matches("\\d+") || !expiryMonth.matches("\\d+") || !expiryYear.matches("\\d+") || !cvv.matches("\\d+")) {
+		    return ResponseEntity
+		            .badRequest()
+		            .body("Payment information contains non numeric characters.");
 		}
-		catch(IllegalArgumentException e) {
-			return ResponseEntity.badRequest().body(e.getMessage());
-		}
+		
+	
+		if (_paymentService.isValidPaymentInfo(cardNumber, expiryMonth, expiryYear, cvv)) {
+        	// not really validating actual payment info so this is a placeholder
+            return ResponseEntity.ok(true);
+        } else {
+            return ResponseEntity.ok(false);
+        }
+		
+		
+        
 	}
 
 }
