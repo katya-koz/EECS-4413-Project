@@ -1,5 +1,6 @@
 package com.bluebid.user_app_service.controller;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -9,11 +10,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.bluebid.user_app_service.dto.CreateSellerProfileRequest;
 import com.bluebid.user_app_service.dto.CreateUserProfileRequest;
 import com.bluebid.user_app_service.dto.ResetPasswordRequest;
-import com.bluebid.user_app_service.model.Customer;
-import com.bluebid.user_app_service.model.Seller;
 import com.bluebid.user_app_service.model.User;
 import com.bluebid.user_app_service.security.JWTTokenManager;
 //import com.bluebid.user_app_service.service.EmailService;
@@ -51,11 +49,11 @@ public class AccountManagerController {
 		return ResponseEntity.ok(true);
 	}
 	
-	@PostMapping("/customer-profile")
-	public ResponseEntity<Boolean> createUserProfile(@RequestBody CreateUserProfileRequest createProfileRequest){
+	@PostMapping("/signup")
+	public ResponseEntity<?> createUserProfile(@RequestBody CreateUserProfileRequest createProfileRequest){
 		// attempt to save new user to db
 		 try {
-		        Customer user = new Customer();
+		        User user = new User();
 		        user.setUsername(createProfileRequest.getUsername());
 		        user.setPassword(createProfileRequest.getPassword());
 		        user.setFirstName(createProfileRequest.getFirstName());
@@ -65,34 +63,35 @@ public class AccountManagerController {
 		        user.setCity(createProfileRequest.getCity());
 		        user.setPostalCode(createProfileRequest.getPostalCode());
 		        user.setCountry(createProfileRequest.getCountry());
-		        user.setUserType("CUSTOMER");
 
 		        _userService.createUser(user);
 
-		        return ResponseEntity.ok(true);
+		        return ResponseEntity.ok("New user, "+ user.getUsername() +" successfully created!");
 		    } catch (RuntimeException e) {
-		        return ResponseEntity.status(400).body(false); // username exists or other error
+		    	return ResponseEntity
+			            .status(HttpStatus.CONFLICT)
+			            .body("Username already exits."); // username exists or other error
 		    }
 		
 	}
 	
-	@PostMapping("/seller-profile")
-	public ResponseEntity<Boolean> createSellerProfile(@RequestBody CreateSellerProfileRequest createProfileRequest){
-		// attempt to save new user to db
-		try {
-	        Seller user = new Seller();
-	        user.setUsername(createProfileRequest.getUsername());
-	        user.setPassword(createProfileRequest.getPassword());
-	        user.setFirstName(createProfileRequest.getFirstName());
-	        user.setLastName(createProfileRequest.getLastName());
-	        user.setUserType("SELLER");
-	        _userService.createUser(user);
-
-	        return ResponseEntity.ok(true);
-	    } catch (RuntimeException e) {
-	        return ResponseEntity.status(400).body(false); // username exists or other error
-	    }
-	}
+//	@PostMapping("/seller-profile")
+//	public ResponseEntity<Boolean> createSellerProfile(@RequestBody CreateSellerProfileRequest createProfileRequest){
+//		// attempt to save new user to db
+//		try {
+//	        Seller user = new Seller();
+//	        user.setUsername(createProfileRequest.getUsername());
+//	        user.setPassword(createProfileRequest.getPassword());
+//	        user.setFirstName(createProfileRequest.getFirstName());
+//	        user.setLastName(createProfileRequest.getLastName());
+//	        user.setUserType("SELLER");
+//	        _userService.createUser(user);
+//
+//	        return ResponseEntity.ok(true);
+//	    } catch (RuntimeException e) {
+//	        return ResponseEntity.status(400).body(false); // username exists or other error
+//	    }
+//	}
 	
 	@PutMapping("/password")
 	public ResponseEntity<Boolean> createUserProfile(@RequestBody ResetPasswordRequest resetPasswordRequest){

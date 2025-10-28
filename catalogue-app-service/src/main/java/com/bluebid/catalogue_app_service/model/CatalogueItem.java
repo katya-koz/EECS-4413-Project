@@ -9,8 +9,9 @@ import java.time.LocalDateTime;
 public class CatalogueItem {
 
     @Id
-    private String itemID; // mongo id
-    private String sellerID;
+    private String id; // mongo id
+    
+	private String sellerID;
     private String highestBidderID;
     private String itemName;
     private double currentBiddingPrice;
@@ -21,6 +22,7 @@ public class CatalogueItem {
     private double expeditedShippingCost;
     private String itemDescription;
     private int shippingDays;
+    private int expeditedShippingDays;
     private Boolean isActive;
 
     
@@ -29,6 +31,15 @@ public class CatalogueItem {
 //    	this.auctionEndDate = auctionEnd;
 //    	
 //    }
+    
+    public String getId() {
+		return id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
+	}
+
 
     public String getSellerID() {
         return sellerID;
@@ -116,6 +127,14 @@ public class CatalogueItem {
 
 	public void setIsActive(Boolean isActive) {
 		this.isActive = isActive;
+	}
+
+	public int getExpeditedShippingDays() {
+		return expeditedShippingDays;
+	}
+
+	public void setExpeditedShippingDays(int expeditedShippingDays) {
+		this.expeditedShippingDays = expeditedShippingDays;
 	}
 
 //	public LocalDateTime getAuctionStartDate() {
