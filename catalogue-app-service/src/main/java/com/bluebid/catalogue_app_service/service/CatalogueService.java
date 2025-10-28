@@ -34,9 +34,11 @@ public class CatalogueService {
         
     }
     
-    @KafkaListener(topics= "payment.payment-topic", groupId = "catalogue-group")
+    @KafkaListener(topics= "payment.payment-initiated-topic", groupId = "catalogue-group", containerFactory = "paymentInitiatedListenerContainerFactory")
     public void reserveItemForPurchase(PaymentInitiatedEvent event) {
     	// once a payment event has been received for an item, it must be set to inactive in the db, and information for the receipt must be fetched and published	
+    	
+    	
     	String itemId = event.getCatalogueID();
     	Optional<CatalogueItem> optionalItem = _catalogueRepository.findByIdAndIsActive(itemId, true);
         if (optionalItem.isPresent()) {

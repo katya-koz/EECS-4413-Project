@@ -7,7 +7,7 @@ public class PaymentResponse {
 	
 		this.message = message;
 		this.paymentAmount = paymentAmount;
-		this.paymentSuccess = paymentSuccess;
+		this.paymentSubmitSuccess = paymentSuccess;
 		this.setPaymentId(paymentId);
 	}
 	public String getMessage() {
@@ -23,10 +23,10 @@ public class PaymentResponse {
 		this.paymentAmount = paymentAmount;
 	}
 	public Boolean getPaymentSuccess() {
-		return paymentSuccess;
+		return paymentSubmitSuccess;
 	}
 	public void setPaymentSuccess(Boolean paymentSuccess) {
-		this.paymentSuccess = paymentSuccess;
+		this.paymentSubmitSuccess = paymentSuccess;
 	}
 	public String getPaymentId() {
 		return paymentId;
@@ -36,6 +36,6 @@ public class PaymentResponse {
 	}
 	String message;
 	Double paymentAmount;
-	Boolean paymentSuccess;
+	Boolean paymentSubmitSuccess;
 
 }

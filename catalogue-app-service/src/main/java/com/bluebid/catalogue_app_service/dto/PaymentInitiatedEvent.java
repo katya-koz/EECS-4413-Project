@@ -4,12 +4,16 @@ import java.time.LocalDateTime;
 
 import org.apache.kafka.common.Uuid;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 public class PaymentInitiatedEvent {
 	// publish this event when a payment has been made
 	private String id; 
 	private String userID; // user making purchase
 	private String sellerID; // seller selling item
 	private String catalogueID; // item id in catalogue
+	
+	@JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
 	private LocalDateTime paymentTime;
 	private Boolean isExpedited;
 	private Double expectedItemCost; // this is the amount the user expects to pay
@@ -25,6 +29,8 @@ public class PaymentInitiatedEvent {
 		this.expectedShippingCost = expectedShippingCost;
 		this.setId(Uuid.randomUuid().toString());
 	}
+	
+	public PaymentInitiatedEvent() {}
 	
 	public Double getExpectedItemCost() {
 		return expectedItemCost;
@@ -73,7 +79,7 @@ public class PaymentInitiatedEvent {
 		return id;
 	}
 
-	private void setId(String id) {
+	public void setId(String id) {
 		this.id = id;
 	}
 

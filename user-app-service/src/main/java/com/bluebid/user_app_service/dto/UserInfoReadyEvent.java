@@ -1,6 +1,7 @@
 package com.bluebid.user_app_service.dto;
 
 public class UserInfoReadyEvent {
+
     private String paymentId;
     private String firstName;
     private String lastName;
@@ -9,6 +10,8 @@ public class UserInfoReadyEvent {
     private String city;
     private String postalCode;
     private String country;
+
+    public UserInfoReadyEvent() {}
 
     public UserInfoReadyEvent(String paymentId, String firstName, String lastName,
                               String streetName, String streetNum, String city,

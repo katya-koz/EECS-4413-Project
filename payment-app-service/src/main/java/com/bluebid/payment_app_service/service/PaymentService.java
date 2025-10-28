@@ -32,7 +32,7 @@ public class PaymentService {
 	
 	// kafka listeners
 	
-	@KafkaListener(topics = "catalogue.catalogue-topic", groupId = "payment-group")
+	@KafkaListener(topics = "catalogue.catalogue-topic", groupId = "payment-group", containerFactory = "catalogueItemReadyListenerFactory")
     public void handleCatalogueSuccess(CatalogueItemReadyEvent event) {
         Optional<Receipt> optionalReceipt = _paymentRepository.findByPaymentId(event.getPaymentID());
 
@@ -49,7 +49,7 @@ public class PaymentService {
         _paymentRepository.save(receipt);
     }
 
-    @KafkaListener(topics = "catalogue.item-failed-topic", groupId = "payment-group")
+    @KafkaListener(topics = "catalogue.item-failed-topic", groupId = "payment-group", containerFactory = "itemReserveFailedListenerFactory")
     public void handleCatalogueFailure(ItemReserveFailedEvent event) {
     	 Optional<Receipt> optionalReceipt = _paymentRepository.findByPaymentId(event.getPaymentID());
 
@@ -63,7 +63,7 @@ public class PaymentService {
          _paymentRepository.save(receipt);
     }
 
-    @KafkaListener(topics = "user.user-info-topic", groupId = "payment-group")
+    @KafkaListener(topics = "user.user-info-topic", groupId = "payment-group", containerFactory = "userInfoReadyListenerFactory")
     public void handleUserSuccess(UserInfoReadyEvent event) {
     	Optional<Receipt> optionalReceipt = _paymentRepository.findByPaymentId(event.getPaymentId());
 
@@ -82,7 +82,7 @@ public class PaymentService {
         _paymentRepository.save(receipt);
     }
 
-    @KafkaListener(topics = "user.user-info-failed-topic", groupId = "payment-group")
+    @KafkaListener(topics = "user.user-info-failed-topic", groupId = "payment-group" , containerFactory = "userInfoFailedListenerFactory")
     public void handleUserFailure(UserInfoFailedEvent event) {
    	 Optional<Receipt> optionalReceipt = _paymentRepository.findByPaymentId(event.getPaymentId());
 
@@ -101,7 +101,7 @@ public class PaymentService {
         boolean paymentValid = (validateCardNumber(cardNumber) && validateExpirationDate(expiryMonth, expiryYear) && validateCvv(cvv));
                 
         if(paymentValid){
-            // returns receipt ID
+            // returns payment id
             return this.initiatePayment(userID, sellerID, itemID, timestamp, isExpedited, itemPrice, shippingCost);
         } else {
             return null;
@@ -127,9 +127,9 @@ public class PaymentService {
 	    _paymentRepository.save(receipt);
 	    
 	    // publish event
-	    _kafkaTemplate.send("payment.payment-initiated", event);
+	    _kafkaTemplate.send("payment.payment-initiated-topic", event);
 	    
-	    return receipt.getId(); // return the payment id
+	    return receipt.getPaymentId(); // return the payment id
 	}
 
 	private boolean validateCardNumber(String cardNumber)

@@ -8,7 +8,7 @@ import com.bluebid.payment_app_service.model.Receipt;
 
 public interface PaymentRepository extends MongoRepository<Receipt, String> {
 
-	Optional<Receipt> findByPaymentId(String paymentID);
+	Optional<Receipt> findByPaymentId(String paymentId);
 	
 	
 }

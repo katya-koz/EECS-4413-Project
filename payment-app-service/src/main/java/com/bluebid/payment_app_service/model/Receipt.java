@@ -7,6 +7,9 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document(collection = "receipts")
 public class Receipt {
+	
+	public Receipt() {}
+	
 	public Receipt(String paymentId, String userId, String sellerID,String itemId, Double itemCost,
 			Boolean isExpedited, Double shippingCost, String status, LocalDateTime timestamp) {
 		this.paymentId = paymentId;

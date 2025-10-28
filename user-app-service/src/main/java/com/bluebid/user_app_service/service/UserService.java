@@ -64,7 +64,7 @@ public class UserService {
 		_userRepository.save(user);
 	}
 	
-    @KafkaListener(topics= "payment.payment-topic", groupId = "user-group")
+    @KafkaListener(topics= "payment.payment-initiated-topic", groupId = "user-group", containerFactory = "paymentInitiatedListenerContainerFactory")
 	    public void handleCatalogueSuccess(PaymentInitiatedEvent event) {
 	        Optional<User> optionalUser = _userRepository.findById(event.getUserID());
 

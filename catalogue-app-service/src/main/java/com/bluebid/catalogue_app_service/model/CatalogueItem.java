@@ -10,7 +10,8 @@ public class CatalogueItem {
 
     @Id
     private String id; // mongo id
-    private String sellerID;
+    
+	private String sellerID;
     private String highestBidderID;
     private String itemName;
     private double currentBiddingPrice;
@@ -30,6 +31,15 @@ public class CatalogueItem {
 //    	this.auctionEndDate = auctionEnd;
 //    	
 //    }
+    
+    public String getId() {
+		return id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
+	}
+
 
     public String getSellerID() {
         return sellerID;
