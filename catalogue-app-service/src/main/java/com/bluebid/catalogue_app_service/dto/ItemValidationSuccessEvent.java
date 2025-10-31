@@ -1,25 +1,27 @@
 package com.bluebid.catalogue_app_service.dto;
 
-public class CatalogueItemReadyEvent {
+public class ItemValidationSuccessEvent {
 
     private String catalogueID; // item id in catalogue
     private String itemName;
     private Double shippingCost;
     private Double itemCost;
     private int shippingTime; // days to ship
-    private String paymentID;
+    private String producerEventID;
+   
 
-    public CatalogueItemReadyEvent() {}
+    public ItemValidationSuccessEvent() {}
 
-    public CatalogueItemReadyEvent(String catalogueID, String itemName, int shippingTime, Double itemCost, Double shippingCost, String paymentID) {
+    public ItemValidationSuccessEvent(String catalogueID, String itemName, int shippingTime, Double itemCost, Double shippingCost, String producerEventID) {
         this.catalogueID = catalogueID;
         this.itemName = itemName;
         this.shippingTime = shippingTime;
         this.shippingCost = shippingCost;
         this.itemCost = itemCost;
-        this.paymentID = paymentID;
+        this.setProducerEventID(producerEventID);
+        
     }
-
+  
     public String getCatalogueID() { return catalogueID; }
     public void setCatalogueID(String catalogueID) { this.catalogueID = catalogueID; }
 
@@ -35,6 +37,11 @@ public class CatalogueItemReadyEvent {
     public int getShippingTime() { return shippingTime; }
     public void setShippingTime(int shippingTime) { this.shippingTime = shippingTime; }
 
-    public String getPaymentID() { return paymentID; }
-    public void setPaymentID(String paymentID) { this.paymentID = paymentID; }
+	public String getProducerEventID() {
+		return producerEventID;
+	}
+
+	public void setProducerEventID(String producerEventID) {
+		this.producerEventID = producerEventID;
+	}
 }

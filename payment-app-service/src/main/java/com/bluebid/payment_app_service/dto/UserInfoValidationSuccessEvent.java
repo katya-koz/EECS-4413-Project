@@ -1,8 +1,9 @@
 package com.bluebid.payment_app_service.dto;
 
-public class UserInfoReadyEvent {
+public class UserInfoValidationSuccessEvent {
 
-    private String paymentId;
+    private String producerID;
+    private String userID;
     private String firstName;
     private String lastName;
     private String streetName;
@@ -11,12 +12,12 @@ public class UserInfoReadyEvent {
     private String postalCode;
     private String country;
 
-    public UserInfoReadyEvent() {}
+    public UserInfoValidationSuccessEvent() {}
 
-    public UserInfoReadyEvent(String paymentId, String firstName, String lastName,
+    public UserInfoValidationSuccessEvent(String userID, String producerID, String firstName, String lastName,
                               String streetName, String streetNum, String city,
                               String postalCode, String country) {
-        this.paymentId = paymentId;
+        this.producerID = producerID;
         this.firstName = firstName;
         this.lastName = lastName;
         this.streetName = streetName;
@@ -24,10 +25,14 @@ public class UserInfoReadyEvent {
         this.city = city;
         this.postalCode = postalCode;
         this.country = country;
+        this.userID = userID;
+       
     }
+    
 
-    public String getPaymentId() { return paymentId; }
-    public void setPaymentId(String paymentId) { this.paymentId = paymentId; }
+
+    public String getProducerID() { return producerID; }
+    public void setProducerID(String paymentId) { this.producerID = paymentId; }
 
     public String getFirstName() { return firstName; }
     public void setFirstName(String firstName) { this.firstName = firstName; }
@@ -49,4 +54,13 @@ public class UserInfoReadyEvent {
 
     public String getCountry() { return country; }
     public void setCountry(String country) { this.country = country; }
+
+	public String getUserID() {
+		return userID;
+	}
+
+	public void setUserID(String userID) {
+		this.userID = userID;
+	}
+
 }

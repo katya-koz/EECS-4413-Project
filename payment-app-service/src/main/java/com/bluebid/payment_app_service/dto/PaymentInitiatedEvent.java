@@ -26,6 +26,17 @@ public class PaymentInitiatedEvent {
 		this.setId(Uuid.randomUuid().toString());
 	}
 	
+	public PaymentInitiatedEvent(String id, String userID, String sellerID, String catalogueID, LocalDateTime paymentTime, Boolean isExpedited, Double expectedItemCost,  Double expectedShippingCost) {
+		this.userID = userID;
+		this.sellerID = sellerID;
+		this.catalogueID = catalogueID;
+		this.paymentTime = paymentTime;
+		this.isExpedited = isExpedited;
+		this.expectedItemCost = expectedItemCost;
+		this.expectedShippingCost = expectedShippingCost;
+		this.setId(id);
+	}
+	
 	public Double getExpectedItemCost() {
 		return expectedItemCost;
 	}

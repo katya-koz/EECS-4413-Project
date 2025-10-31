@@ -12,6 +12,8 @@ public interface BidRepository extends MongoRepository<Bid, String>{
 	// return list of bids by auction id in descending order - highest bid is at the top
 	List<Bid> findByAuctionIDOrderByAmountDesc(String auctionId);
 
+	List<Bid> findByAuctionIDAndIsValidTrueOrderByAmountDesc(String auctionId);
+
 }
 
 
