@@ -28,6 +28,8 @@ public class BidInitiatedEvent {
 		this.setId(id);
 	}
 	
+	public BidInitiatedEvent() {} // json deserial
+	
 
 	public String getUserID() {
 		return userID;
