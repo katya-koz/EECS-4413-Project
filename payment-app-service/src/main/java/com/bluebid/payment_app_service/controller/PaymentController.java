@@ -79,9 +79,9 @@ public class PaymentController {
 	}
 	
 	
-	@GetMapping("/receipt/{paymentId}")
-	public ResponseEntity<?> getReceipt(@PathVariable String paymentId) {
-	    Receipt receipt = _paymentService.getReceiptByPaymentId(paymentId);
+	@GetMapping("/receipt/{receiptId}")
+	public ResponseEntity<?> getReceipt(@PathVariable String receiptId) {
+	    Receipt receipt = _paymentService.getReceiptById(receiptId);
 	    if (receipt != null) {
 	        return ResponseEntity.ok(receipt);
 	    } else {

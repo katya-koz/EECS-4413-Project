@@ -5,9 +5,10 @@ import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
+import com.bluebid.user_app_service.dto.BidInitiatedEvent;
 import com.bluebid.user_app_service.dto.PaymentInitiatedEvent;
-import com.bluebid.user_app_service.dto.UserInfoFailedEvent;
-import com.bluebid.user_app_service.dto.UserInfoReadyEvent;
+import com.bluebid.user_app_service.dto.UserInfoValidationFailureEvent;
+import com.bluebid.user_app_service.dto.UserInfoValidationSuccessEvent;
 import com.bluebid.user_app_service.model.User;
 import com.bluebid.user_app_service.repository.UserRepository;
 
@@ -64,13 +65,14 @@ public class UserService {
 		_userRepository.save(user);
 	}
 	
-    @KafkaListener(topics= "payment.payment-initiated-topic", groupId = "user-group", containerFactory = "paymentInitiatedListenerContainerFactory")
+    @KafkaListener(topics= "payment.user-validation-topic", groupId = "user-group", containerFactory = "paymentInitiatedListenerContainerFactory")
 	    public void handleCatalogueSuccess(PaymentInitiatedEvent event) {
 	        Optional<User> optionalUser = _userRepository.findById(event.getUserID());
 
 	        if (optionalUser.isPresent()) {
 	            User user = optionalUser.get();
-	            UserInfoReadyEvent userInfoEvent = new UserInfoReadyEvent(
+	            UserInfoValidationSuccessEvent userInfoEvent = new UserInfoValidationSuccessEvent(
+	            	event.getUserID(),
 					event.getId(),
 					user.getFirstName(),
 					user.getLastName(),
@@ -81,16 +83,51 @@ public class UserService {
 					user.getCountry()
 	            );
 
-	            _kafkaTemplate.send("user.user-info-topic", userInfoEvent);
+	            _kafkaTemplate.send("user.payment-user-validation-success-topic", userInfoEvent);
 
 	        } else {
 	            // if user not found, publish a failure
-	            UserInfoFailedEvent failEvent = new UserInfoFailedEvent(
-	                    "User not found in database.",
-	                    event.getId()
+	        	UserInfoValidationFailureEvent failEvent = new UserInfoValidationFailureEvent(
+	            		event.getUserID(),
+	        			event.getId(),
+	                    "User #"+event.getUserID() +" not found in database."
+	                    
 	            );
-	            _kafkaTemplate.send("user.user-info-failed-topic", failEvent);
+	            _kafkaTemplate.send("user.payment-validation-failed-topic", failEvent);
 	        }
 	    }
+    
+    
+    @KafkaListener(topics= "bid.user-validation-topic", groupId = "user-group", containerFactory = "bidInitiatedListenerContainerFactory")
+    public void handleCatalogueSuccess(BidInitiatedEvent event) {
+        Optional<User> optionalUser = _userRepository.findById(event.getUserID());
+
+        if (optionalUser.isPresent()) {
+            User user = optionalUser.get();
+            UserInfoValidationSuccessEvent userInfoEvent = new UserInfoValidationSuccessEvent(
+            	event.getUserID(),
+				event.getId(),
+				user.getFirstName(),
+				user.getLastName(),
+				user.getStreetName(),
+				user.getStreetNum(),
+				user.getCity(),
+				user.getPostalCode(),
+				user.getCountry()
+            );
+
+            _kafkaTemplate.send("user.bid-user-validation-success-topic", userInfoEvent);
+
+        } else {
+            // if user not found, publish a failure
+        	UserInfoValidationFailureEvent failEvent = new UserInfoValidationFailureEvent(
+            		event.getUserID(),
+        			event.getId(),
+                    "User #"+event.getUserID() +" not found in database."
+                    
+            );
+            _kafkaTemplate.send("user.bid-validation-failed-topic", failEvent);
+        }
+    }
 	
 }

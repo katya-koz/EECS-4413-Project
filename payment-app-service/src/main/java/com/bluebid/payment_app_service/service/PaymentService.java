@@ -8,11 +8,11 @@ import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
-import com.bluebid.payment_app_service.dto.CatalogueItemReadyEvent;
-import com.bluebid.payment_app_service.dto.ItemReserveFailedEvent;
+import com.bluebid.payment_app_service.dto.ItemValidationFailureEvent;
+import com.bluebid.payment_app_service.dto.ItemValidationSuccessEvent;
 import com.bluebid.payment_app_service.dto.PaymentInitiatedEvent;
-import com.bluebid.payment_app_service.dto.UserInfoFailedEvent;
-import com.bluebid.payment_app_service.dto.UserInfoReadyEvent;
+import com.bluebid.payment_app_service.dto.UserInfoValidationFailureEvent;
+import com.bluebid.payment_app_service.dto.UserInfoValidationSuccessEvent;
 import com.bluebid.payment_app_service.model.Receipt;
 import com.bluebid.payment_app_service.repository.PaymentRepository;
 
@@ -32,9 +32,9 @@ public class PaymentService {
 	
 	// kafka listeners
 	
-	@KafkaListener(topics = "catalogue.catalogue-topic", groupId = "payment-group", containerFactory = "catalogueItemReadyListenerFactory")
-    public void handleCatalogueSuccess(CatalogueItemReadyEvent event) {
-        Optional<Receipt> optionalReceipt = _paymentRepository.findByPaymentId(event.getPaymentID());
+	@KafkaListener(topics = "catalogue.payment-item-validation-success-topic", groupId = "payment-group", containerFactory = "itemValidationSuccessListenerFactory")
+    public void handleCatalogueSuccess( ItemValidationSuccessEvent event) {
+        Optional<Receipt> optionalReceipt = _paymentRepository.findByPaymentId(event.getProducerEventID());
 
         Receipt receipt = optionalReceipt.get(); // it exists since initializepayment is not called unless a reciept is successfully saved
 
@@ -44,14 +44,14 @@ public class PaymentService {
         receipt.setItemCost(event.getItemCost());
         receipt.setShippingCost(event.getShippingCost());
         
-        receipt.setStatus("CATALOGUE_RESERVED");
+        receipt.setStatus("Catalogue item reserved successfully.");
         // save
         _paymentRepository.save(receipt);
     }
 
-    @KafkaListener(topics = "catalogue.item-failed-topic", groupId = "payment-group", containerFactory = "itemReserveFailedListenerFactory")
-    public void handleCatalogueFailure(ItemReserveFailedEvent event) {
-    	 Optional<Receipt> optionalReceipt = _paymentRepository.findByPaymentId(event.getPaymentID());
+    @KafkaListener(topics = "catalogue.payment-item-validation-failed-topic", groupId = "payment-group", containerFactory = "itemValidationFailureListenerFactory")
+    public void handleCatalogueFailure( ItemValidationFailureEvent event) {
+    	 Optional<Receipt> optionalReceipt = _paymentRepository.findByPaymentId(event.getProducerEventID());
 
          Receipt receipt = optionalReceipt.get(); // it exists since initializepayment is not called unless a reciept is successfully saved
 
@@ -63,9 +63,9 @@ public class PaymentService {
          _paymentRepository.save(receipt);
     }
 
-    @KafkaListener(topics = "user.user-info-topic", groupId = "payment-group", containerFactory = "userInfoReadyListenerFactory")
-    public void handleUserSuccess(UserInfoReadyEvent event) {
-    	Optional<Receipt> optionalReceipt = _paymentRepository.findByPaymentId(event.getPaymentId());
+    @KafkaListener(topics = "user.payment-user-validation-success-topic", groupId = "payment-group", containerFactory = "userValidationSuccessListenerFactory")
+    public void handleUserSuccess(UserInfoValidationSuccessEvent event) {
+    	Optional<Receipt> optionalReceipt = _paymentRepository.findByPaymentId(event.getProducerID());
 
         Receipt receipt = optionalReceipt.get(); // it exists since initializepayment is not called unless a reciept is successfully saved
 
@@ -77,31 +77,36 @@ public class PaymentService {
         receipt.setBuyerCity(event.getCity());
         receipt.setBuyerPostalCode(event.getPostalCode());
         receipt.setBuyerCountry(event.getCountry());
-        receipt.setStatus("USER_FOUND");
+        receipt.setStatus("User successfully validated.");
         // save
         _paymentRepository.save(receipt);
+        
+        // send for catalogue. now catalogue will validate the payment request.
+        _kafkaTemplate.send("payment.item-validation-topic", new PaymentInitiatedEvent(event.getProducerID(), event.getUserID(), receipt.getSellerId(), receipt.getItemId(), receipt.getTimestamp(), receipt.getIsExpedited(), receipt.getItemCost(), receipt.getShippingCost()));
+        
+        
     }
 
-    @KafkaListener(topics = "user.user-info-failed-topic", groupId = "payment-group" , containerFactory = "userInfoFailedListenerFactory")
-    public void handleUserFailure(UserInfoFailedEvent event) {
-   	 Optional<Receipt> optionalReceipt = _paymentRepository.findByPaymentId(event.getPaymentId());
+    @KafkaListener(topics = "user.payment-validation-failed-topic", groupId = "payment-group" , containerFactory = "userValidationFailureListenerFactory")
+    public void handleUserFailure(UserInfoValidationFailureEvent event) {
+   	 Optional<Receipt> optionalReceipt = _paymentRepository.findByPaymentId(event.getProducerEventID());
 
      Receipt receipt = optionalReceipt.get(); // it exists since initializepayment is not called unless a reciept is successfully saved
 
      // update status
-     receipt.setFailureReason(event.getFailureReason());
+     receipt.setFailureReason(event.getMessage());
      receipt.setStatus("USER_FAILED");
      
      // save
      _paymentRepository.save(receipt);
     }
-    
+//    
 	// logical methods
     public String isValidPaymentInfo(String cardNumber, String expiryMonth, String expiryYear, String cvv, String userID, String sellerID, String itemID, LocalDateTime timestamp, Boolean isExpedited, Double itemPrice, Double shippingCost) {
         boolean paymentValid = (validateCardNumber(cardNumber) && validateExpirationDate(expiryMonth, expiryYear) && validateCvv(cvv));
                 
         if(paymentValid){
-            // returns payment id
+            // returns receipt id
             return this.initiatePayment(userID, sellerID, itemID, timestamp, isExpedited, itemPrice, shippingCost);
         } else {
             return null;
@@ -126,10 +131,10 @@ public class PaymentService {
 	    // save partial receipt
 	    _paymentRepository.save(receipt);
 	    
-	    // publish event
-	    _kafkaTemplate.send("payment.payment-initiated-topic", event);
+	    // publish event for user first
+	    _kafkaTemplate.send("payment.user-validation-topic", event);
 	    
-	    return receipt.getPaymentId(); // return the payment id
+	    return receipt.getId(); // return the receipt id
 	}
 
 	private boolean validateCardNumber(String cardNumber)
@@ -245,5 +250,9 @@ public class PaymentService {
 
 	public Receipt getReceiptByPaymentId(String paymentId) {
 		return _paymentRepository.findByPaymentId(paymentId).orElse(null);
+	}
+	
+	public Receipt getReceiptById(String receiptId) {
+		return _paymentRepository.findById(receiptId).orElse(null);
 	}
 }

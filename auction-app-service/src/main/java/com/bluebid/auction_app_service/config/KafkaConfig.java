@@ -1,4 +1,4 @@
-package com.bluebid.payment_app_service.config;
+package com.bluebid.auction_app_service.config;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -18,10 +18,11 @@ import org.apache.kafka.common.serialization.StringSerializer;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
 import org.springframework.kafka.support.serializer.JsonSerializer;
 
-import com.bluebid.payment_app_service.dto.ItemValidationFailureEvent;
-import com.bluebid.payment_app_service.dto.ItemValidationSuccessEvent;
-import com.bluebid.payment_app_service.dto.UserInfoValidationFailureEvent;
-import com.bluebid.payment_app_service.dto.UserInfoValidationSuccessEvent;
+import com.bluebid.auction_app_service.dto.ItemValidationFailureEvent;
+import com.bluebid.auction_app_service.dto.ItemValidationSuccessEvent;
+import com.bluebid.auction_app_service.dto.UserInfoValidationFailureEvent;
+import com.bluebid.auction_app_service.dto.UserInfoValidationSuccessEvent;
+
 @Configuration
 public class KafkaConfig {
 	
