@@ -52,15 +52,15 @@ public class CatalogueService {
             if(!event.getUserID().equals(highestBidderUserId)) {
             	// return a fail if the user who is attempting to purchase the item is not the one who won the bid
             	_kafkaTemplate.send("catalogue.payment-item-validation-failed-topic", new ItemValidationFailureEvent(event.getCatalogueID(),event.getId(), "Nice try, punk... that requested user ID is not the same as the auction winner." ));
-            }
-            
-            if (Math.abs(itemCost - event.getExpectedItemCost()) < 0.0001 && Math.abs(shippingCost - event.getExpectedShippingCost()) < 0.0001) { // tolerance for double math
-                _kafkaTemplate.send("catalogue.payment-item-validation-success-topic", new ItemValidationSuccessEvent(itemId, itemName, shipping, shippingCost, itemCost, event.getId()));
-                item.setIsActive(false); // set item to be inactive
-                _catalogueRepository.save(item);
             }else {
-            	_kafkaTemplate.send("catalogue.payment-item-validation-failed-topic", new ItemValidationFailureEvent(event.getCatalogueID(),event.getId(), "The item and/or shipping cost in the backend is different than what the payment was initiated for."));
-            }
+            
+	            if (Math.abs(itemCost - event.getExpectedItemCost()) < 0.0001 && Math.abs(shippingCost - event.getExpectedShippingCost()) < 0.0001) { // tolerance for double math
+	                _kafkaTemplate.send("catalogue.payment-item-validation-success-topic", new ItemValidationSuccessEvent(itemId, itemName, shipping, shippingCost, itemCost, event.getId()));
+	                item.setIsActive(false); // set item to be inactive
+	                _catalogueRepository.save(item);
+	            }else {
+	            	_kafkaTemplate.send("catalogue.payment-item-validation-failed-topic", new ItemValidationFailureEvent(event.getCatalogueID(),event.getId(), "The item and/or shipping cost in the backend is different than what the payment was initiated for."));
+	            }  }
         }else {
         	// keep choreography events from hanging. publish failed response.
         	_kafkaTemplate.send("catalogue.payment-item-validation-failed-topic", new ItemValidationFailureEvent(event.getCatalogueID(),event.getId(),"This item was not found to be active in our database." ));
