@@ -27,6 +27,7 @@ public class AuthenticationController {
 	public ResponseEntity<String> validateUserCredentials(@RequestBody LoginRequest loginRequest){
 		// validate user
 		// the passwords are hashed in database
+		
 
 		try{
 			User user = _userService.validateCredentials(loginRequest.getUsername(), loginRequest.getPassword());
