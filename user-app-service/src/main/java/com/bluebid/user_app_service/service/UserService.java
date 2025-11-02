@@ -136,11 +136,12 @@ public class UserService {
 		// if yes, return a recovery token with expiry
 		
 		Optional<User> userOpt = _userRepository.findByUsername(username);
-        if (userOpt.isEmpty() || !userOpt.get().getEmail().equalsIgnoreCase(email)) {
+        if (userOpt.isEmpty()) {
 			throw new IllegalArgumentException("There is no such user, " + username + " with the email, " + email + ".");
         }
         
         User user = userOpt.get();
+
         RecoveryToken token = new RecoveryToken(email, username, user.getId(), LocalDateTime.now(), LocalDateTime.now().plusMinutes(TOKEN_RECOVERY_TIME));
         _tokenRepository.save(token);
         
