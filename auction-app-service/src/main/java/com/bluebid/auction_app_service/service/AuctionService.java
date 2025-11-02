@@ -11,13 +11,13 @@ import com.bluebid.auction_app_service.dto.BidInitiatedEvent;
 import com.bluebid.auction_app_service.dto.BidResponse;
 import com.bluebid.auction_app_service.dto.ItemValidationFailureEvent;
 import com.bluebid.auction_app_service.dto.ItemValidationSuccessEvent;
+import com.bluebid.auction_app_service.dto.NewAuctionRequest;
 import com.bluebid.auction_app_service.dto.UserInfoValidationFailureEvent;
 import com.bluebid.auction_app_service.dto.UserInfoValidationSuccessEvent;
 import com.bluebid.auction_app_service.model.Auction;
 import com.bluebid.auction_app_service.model.Bid;
 import com.bluebid.auction_app_service.repository.AuctionRepository;
 import com.bluebid.auction_app_service.repository.BidRepository;
-
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -146,6 +146,18 @@ public class AuctionService {
 		// save
 		_bidRepository.save(bid);
     }
+    
+    @KafkaListener(topics="new-auction-item-topic", groupId = "auction-upload-group")
+    public void saveNewAuctionItem(NewAuctionRequest event)
+    {
+    	
+    	System.out.println("CONSUMER RECEIVED EVENT for Catalogue ID: " + event.getCatalogueID());
+    	//convert the event into an Auction
+    	Auction newAuction = convertToAuctionObject(event);
+    	
+    	//add the auction item to the db
+    	_auctionRepository.save(newAuction);
+    }
 
   public void endAuction(String auctionId) {
 	  // assume we have a timer or some external event tracker to track when this ends, then the endpoint is called
@@ -189,6 +201,19 @@ public class AuctionService {
 
   public Bid getBidById(String bidId) {
 	  return _bidRepository.findById(bidId).orElse(null);
+  }
+  
+  private Auction convertToAuctionObject(NewAuctionRequest request)
+  {
+	  Auction auction = new Auction();
+	  auction.setSellerID(request.getSellerID());
+	  auction.setCatalogueID(request.getCatalogueID());
+	  auction.setAuctionType("FORWARD");
+	  
+	  String priceAsString = request.getBasePrice();
+	  auction.setBasePrice(Integer.parseInt(priceAsString));
+	  
+	  return auction;
   }
 
 }

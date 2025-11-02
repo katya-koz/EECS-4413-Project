@@ -59,6 +59,8 @@ public class Auction {
 	public void setAuctionType(String auctionType) {
 		this.auctionType = auctionType;
 	}
+	
+	
 
  
 }
