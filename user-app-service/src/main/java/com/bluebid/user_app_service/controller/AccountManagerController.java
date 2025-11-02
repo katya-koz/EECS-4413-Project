@@ -1,19 +1,25 @@
 package com.bluebid.user_app_service.controller;
 
+import java.time.LocalDateTime;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.bluebid.user_app_service.dto.CreateUserProfileRequest;
+import com.bluebid.user_app_service.dto.ForgotPasswordRequest;
+import com.bluebid.user_app_service.dto.ForgotPasswordResponse;
+import com.bluebid.user_app_service.dto.PasswordResetRequest;
 import com.bluebid.user_app_service.dto.ResetPasswordRequest;
+import com.bluebid.user_app_service.dto.ResetPasswordResponse;
+import com.bluebid.user_app_service.model.RecoveryToken;
 import com.bluebid.user_app_service.model.User;
-import com.bluebid.user_app_service.security.JWTTokenManager;
 //import com.bluebid.user_app_service.service.EmailService;
 import com.bluebid.user_app_service.service.UserService;
 
@@ -26,34 +32,51 @@ public class AccountManagerController {
 	
 	public AccountManagerController(UserService userService) {
 	    this._userService = userService;
-//	    this._emailService = emailService;
+//	    this._emailService = emailService; to be implemented!
 	}
 	
-//	@GetMapping("/check-username")
-//	public ResponseEntity<Boolean> checkIsUsernameAvailable(@RequestParam String username){
-//		// when creating an account check to see that the username has not been taken
-//		
-//		return ResponseEntity.ok(true);
-//	}
-//	@GetMapping("/test")
-//	public ResponseEntity<String> test(){
-//		
-//		return ResponseEntity.ok("hello");
-//	}
-//	
-	@GetMapping("/validate")
-	public ResponseEntity<Boolean> validateUsername(@RequestParam String username){
-		// when attempting to reset an account password, check db to see if the username is valid
-		// potentially return the user's security questions here? if that's the route for forgot password. just an idea... some food for thought....
+	
+	@PostMapping("/forgot-password")
+	public ResponseEntity<ForgotPasswordResponse> forgotPassword(@RequestBody ForgotPasswordRequest req){
+		// initial request where a user sends an email and username to request a code to change their password
+		 try {
+			 
+			RecoveryToken token =  _userService.createRecoveryToken(req.getEmail(), req.getUsername());
+			 
+			return ResponseEntity.ok(new ForgotPasswordResponse("An email with a recovery token has been sent to " + req.getEmail()  +
+					". For testing purposes, I am returning that recovery token link to you, in this response here: " + 
+					"http://localhost:8080/api/account/reset-password/" + token.getId(),
+					token.getId(), token.getDateExpired() ));
+			
+		 }catch(Exception e) {
+			 return ResponseEntity
+		                .status(HttpStatus.BAD_REQUEST)
+		                .body(new ForgotPasswordResponse(e.getMessage(), null, null));
+		 }
 		
-		return ResponseEntity.ok(true);
+		
 	}
+	
+	@PutMapping("/reset-password/{tokenId}")
+	public ResponseEntity<ResetPasswordResponse> resetUserPassword(@RequestBody ResetPasswordRequest resetPasswordRequest, @PathVariable String tokenId) {
+
+	    try {
+	        _userService.resetPassword(tokenId, resetPasswordRequest.getNewPassword());
+	        return ResponseEntity.ok(new ResetPasswordResponse( "Password reset successful", LocalDateTime.now()
+	        ));
+	    } catch (IllegalArgumentException e) {
+	        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+	                .body(new ResetPasswordResponse(e.getMessage(), null));
+	    }
+	}
+
 	
 	@PostMapping("/signup")
 	public ResponseEntity<?> createUserProfile(@RequestBody CreateUserProfileRequest createProfileRequest){
 		// attempt to save new user to db
 		 try {
 		        User user = new User();
+		        user.setEmail(createProfileRequest.getEmail());
 		        user.setUsername(createProfileRequest.getUsername());
 		        user.setPassword(createProfileRequest.getPassword());
 		        user.setFirstName(createProfileRequest.getFirstName());
@@ -67,37 +90,17 @@ public class AccountManagerController {
 		        _userService.createUser(user);
 
 		        return ResponseEntity.ok("New user, "+ user.getUsername() +" successfully created!");
-		    } catch (RuntimeException e) {
-		    	return ResponseEntity
-			            .status(HttpStatus.CONFLICT)
-			            .body("Username already exits."); // username exists or other error
+		    } catch (IllegalArgumentException e) {
+		        return ResponseEntity
+		                .status(HttpStatus.BAD_REQUEST)
+		                .body(e.getMessage());
 		    }
 		
 	}
 	
-//	@PostMapping("/seller-profile")
-//	public ResponseEntity<Boolean> createSellerProfile(@RequestBody CreateSellerProfileRequest createProfileRequest){
-//		// attempt to save new user to db
-//		try {
-//	        Seller user = new Seller();
-//	        user.setUsername(createProfileRequest.getUsername());
-//	        user.setPassword(createProfileRequest.getPassword());
-//	        user.setFirstName(createProfileRequest.getFirstName());
-//	        user.setLastName(createProfileRequest.getLastName());
-//	        user.setUserType("SELLER");
-//	        _userService.createUser(user);
-//
-//	        return ResponseEntity.ok(true);
-//	    } catch (RuntimeException e) {
-//	        return ResponseEntity.status(400).body(false); // username exists or other error
-//	    }
-//	}
+
 	
-	@PutMapping("/password")
-	public ResponseEntity<Boolean> createUserProfile(@RequestBody ResetPasswordRequest resetPasswordRequest){
-		// somehow after validating the user, the user will return the new password they want to set.
-		return ResponseEntity.ok(true); // return password reset success or failure
-	}
+
 	
 
 

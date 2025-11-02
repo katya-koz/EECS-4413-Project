@@ -1,15 +1,16 @@
 package com.bluebid.user_app_service.dto;
 
 public class CreateUserProfileRequest {
-	String username;
-	String password;
-	String firstName;
-	String lastName;
-	String streetName;
-	String streetNum;
-	String city;
-	String postalCode;
-	String country;
+	private String username;
+	private String password;
+	private String firstName;
+	private String lastName;
+	private String streetName;
+	private String streetNum;
+	private String city;
+	private String postalCode;
+	private String country;
+	private String email;
 	
 	public String getUsername() {
 		return username;
@@ -64,6 +65,12 @@ public class CreateUserProfileRequest {
 	}
 	public void setCountry(String country) {
 		this.country = country;
+	}
+	public String getEmail() {
+		return email;
+	}
+	public void setEmail(String email) {
+		this.email = email;
 	}
 
 }
