@@ -4,6 +4,9 @@ public class ForgotPasswordRequest {
 	
 	private String email;
 	private String username;
+	
+	
+	
 	public String getEmail() {
 		return email;
 	}
