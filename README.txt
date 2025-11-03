@@ -1,5 +1,5 @@
 Instructions on how to run using docker compose:
-
+pull from repo
 navigate to root directory (directory where docker-compose.yml is)
 if on windows and not on wsl, make sure docker desktop is open
 docker compose build
