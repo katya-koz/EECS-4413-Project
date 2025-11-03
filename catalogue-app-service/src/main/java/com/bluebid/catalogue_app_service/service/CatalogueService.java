@@ -47,7 +47,7 @@ public class CatalogueService {
     }
     
     //############################## PAY FOR ITEM USE CASE ###########################
-    @KafkaListener(topics= "payment.item-validation-topic", groupId = "catalogue-group", containerFactory = "paymentInitiatedListenerContainerFactory")
+    @KafkaListener(topics= "payment.item-validation-topic", groupId = "catalogue-payment-group", containerFactory = "paymentInitiatedListenerContainerFactory")
     public void reserveItemForPurchase(PaymentInitiatedEvent event) {
     	// once a payment event has been received for an item, and the user is validated, it must be set to inactive in the db, and information for the receipt must be fetched and published	
     	
@@ -62,7 +62,7 @@ public class CatalogueService {
             String highestBidderUserId = item.getHighestBidderID();
             LocalDateTime auctionEnd = item.getAuctionEndTime();
             
-            
+            System.out.println("received validation req");
             if(event.getPaymentTime().isBefore(auctionEnd)) {
             	_kafkaTemplate.send("catalogue.payment-item-validation-failed-topic", new ItemValidationFailureEvent(event.getCatalogueID(),event.getId(),"This auction is not yet over." ));
 
@@ -80,6 +80,7 @@ public class CatalogueService {
 	                _kafkaTemplate.send("catalogue.payment-item-validation-success-topic", new ItemValidationSuccessEvent(itemId, itemName, shipping, shippingCost, itemCost, event.getId()));
 	                item.setIsActive(false); // set item to be inactive
 	                _catalogueRepository.save(item);
+	                
 	            }else {
 	            	_kafkaTemplate.send("catalogue.payment-item-validation-failed-topic", new ItemValidationFailureEvent(event.getCatalogueID(),event.getId(), "The item and/or shipping cost in the backend is different than what the payment was initiated for."));
 	            }  }
@@ -92,7 +93,7 @@ public class CatalogueService {
     
     
   //############################## BID ON ITEM USE CASE ###########################
-    @KafkaListener(topics= "bid.item-validation-topic", groupId = "catalogue-group", containerFactory = "bidInitiatedListenerContainerFactory")
+    @KafkaListener(topics= "bid.item-validation-topic", groupId = "catalogue-bidding-group", containerFactory = "bidInitiatedListenerContainerFactory")
     public void validateItemBidAmount(BidInitiatedEvent event) {
     	// once a payment event has been received for an item, and the user is validated, it must be set to inactive in the db, and information for the receipt must be fetched and published	
     	
@@ -120,7 +121,7 @@ public class CatalogueService {
     	
     }
   //############################## NEW AUCTION USE CASE ###########################
-    @KafkaListener(topics = "auction.validation-topic", groupId = "catalogue-group", containerFactory = "auctionInitiatedListenerContainerFactory")
+    @KafkaListener(topics = "auction.validation-topic", groupId = "catalogue-auction-group", containerFactory = "auctionInitiatedListenerContainerFactory")
     public String addToCatalogue(UploadCatalogueItemEvent event)
   	{
 		String itemName= event.getItemName();
