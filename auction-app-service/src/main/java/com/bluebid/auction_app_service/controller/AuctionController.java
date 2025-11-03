@@ -28,13 +28,20 @@ public class AuctionController {
 		this._auctionService = auctionService;
 
 	}
+	
+
 
 	@PostMapping("/new-auction")
-	public ResponseEntity<?> startNewAuction(@RequestBody NewAuctionRequest newAuctionRequest){
+	public ResponseEntity<?> startNewAuction(@RequestBody NewAuctionRequest newAuctionRequest,
+		@RequestHeader(value = "X-User-Id", required = false) String sellerId){
 
+		if (sellerId == null || sellerId.isBlank()) {
+			 return ResponseEntity .badRequest().body("Missing user id header.");
+
+		 }
+		
 		String itemName = newAuctionRequest.getItemName();
 		String itemDescription = newAuctionRequest.getItemDescription();
-		String sellerID = newAuctionRequest.getSellerID();
 		double basePrice = newAuctionRequest.getBasePrice();
 		int secondsDuration = newAuctionRequest.getSeconds();
 		
@@ -96,7 +103,7 @@ public class AuctionController {
 		//attempt to initiate auction
 		try
 		{
-			auctionID = _auctionService.initiateAuction(itemName, itemDescription, sellerID,basePrice, secondsDuration);
+			auctionID = _auctionService.initiateAuction(itemName, itemDescription, sellerId,basePrice, secondsDuration);
 		}
 		
 		catch(IllegalArgumentException e)
