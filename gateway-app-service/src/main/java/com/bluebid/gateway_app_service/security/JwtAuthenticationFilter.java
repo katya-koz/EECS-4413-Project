@@ -22,7 +22,7 @@ public class JwtAuthenticationFilter  implements GatewayFilter {
     
     private static final List<String> PUBLIC_ENDPOINTS = List.of( // this may not be the best way to do this, but we need certain endpoints to be exposed publicly without authorization (for example, forgot password, log in, etc).
     	    "/api/authentication/login",
-    	    "/api/authentication/signup",
+    	    "/api/account/signup",
     	    "/api/account/forgot-password",
     	    "/api/account/reset-password"
     	);
