@@ -208,7 +208,7 @@ public class CatalogueService {
 
 	public Optional<CatalogueItem> getItemById(String itemId) {
 		return _catalogueRepository.findById(itemId);
-		return null;
+		
 	}
   	
 
