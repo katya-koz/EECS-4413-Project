@@ -54,7 +54,7 @@ public class AuctionController {
 		String auctionID = null;
 
 		//initial validations
-		if (itemName == null)
+		if (itemName == null || itemName.isBlank() || itemName.isEmpty())
 		{
 			return ResponseEntity
 					.badRequest()

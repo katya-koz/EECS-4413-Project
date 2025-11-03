@@ -66,6 +66,10 @@ public class AuctionService {
 		// round highest bid down to 2 decimal places
 
 		currentHighestBidValue = Math.round(currentHighestBidValue * 100.0) / 100.0;
+		
+		if(auction.getSellerID().equals(userId)) {
+			return new BidResponse(auction.getCatalogueID(), userId, bidValue, auctionId, null,"A seller may not bid on their own items! Bid not placed.", false); 
+		}
 
 		if(bidValue > currentHighestBidValue) {
 			Bid newBid = new Bid();
@@ -168,6 +172,7 @@ public class AuctionService {
 		Auction auction = auctionOptional.get();
 		
 		//update the status
+		auction.setCatalogueID(event.getCatalogueID());
 		auction.setStatus(true);
 		auction.setAuctionStatus("item validated");
 		auction.setValid(true);
