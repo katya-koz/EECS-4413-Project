@@ -2,7 +2,6 @@ package com.bluebid.catalogue_app_service.dto;
 
 import java.time.LocalDateTime;
 
-import org.apache.kafka.common.Uuid;
 
 public class BidInitiatedEvent {
 	// publish this event when a bid request has been made
@@ -12,14 +11,6 @@ public class BidInitiatedEvent {
 	private LocalDateTime bidTime;
 	private Double bidAmount;
 
-//	public BidInitiatedEvent(String userID,String catalogueID, LocalDateTime bidTime, Double bidAmount) {
-//		this.userID = userID;
-//		this.catalogueID = catalogueID;
-//		this.bidTime = bidTime;
-//		this.setBidAmount(bidAmount);
-//		this.setId(Uuid.randomUuid().toString());
-//	}
-	
 	public BidInitiatedEvent(String id, String userID,String catalogueID, LocalDateTime bidTime, Double bidAmount) {
 		this.userID = userID;
 		this.catalogueID = catalogueID;

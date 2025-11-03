@@ -3,16 +3,16 @@ package com.bluebid.auction_app_service.dto;
 public class ItemValidationFailureEvent {
 
     private String catalogueId; // item id in catalogue
-    private String auctionId;
+    private String producerId;
     private String message;
    
 
     public ItemValidationFailureEvent() {}
 
 
-    public ItemValidationFailureEvent(String catalogueId, String auctionId, String message) {
+    public ItemValidationFailureEvent(String catalogueId, String producerId, String message) {
         this.catalogueId = catalogueId;
-        this.auctionId = auctionId;
+        this.producerId = producerId;
         this.setMessage(message);
     }
 
@@ -34,12 +34,12 @@ public class ItemValidationFailureEvent {
 	}
 
 
-	public String getAuctionId() {
-		return auctionId;
+	public String getProducerId() {
+		return producerId;
 	}
 
 
-	public void setAuctionId(String auctionId) {
-		this.auctionId = auctionId;
+	public void setProducerId(String producerId) {
+		this.producerId = producerId;
 	}
 }

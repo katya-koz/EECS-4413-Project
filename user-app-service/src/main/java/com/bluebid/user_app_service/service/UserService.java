@@ -97,38 +97,38 @@ public class UserService {
 	        }
 	    }
     
-    
-    @KafkaListener(topics= "bid.user-validation-topic", groupId = "user-bid-validation-group", containerFactory = "bidInitiatedListenerContainerFactory")
-    public void handleCatalogueSuccess(BidInitiatedEvent event) {
-        Optional<User> optionalUser = _userRepository.findById(event.getUserID());
-
-        if (optionalUser.isPresent()) {
-            User user = optionalUser.get();
-            UserInfoValidationSuccessEvent userInfoEvent = new UserInfoValidationSuccessEvent(
-            	event.getUserID(),
-				event.getId(),
-				user.getFirstName(),
-				user.getLastName(),
-				user.getStreetName(),
-				user.getStreetNum(),
-				user.getCity(),
-				user.getPostalCode(),
-				user.getCountry()
-            );
-
-            _kafkaTemplate.send("user.bid-user-validation-success-topic", userInfoEvent);
-
-        } else {
-            // if user not found, publish a failure
-        	UserInfoValidationFailureEvent failEvent = new UserInfoValidationFailureEvent(
-            		event.getUserID(),
-        			event.getId(),
-                    "User #"+event.getUserID() +" not found in database."
-                    
-            );
-            _kafkaTemplate.send("user.bid-validation-failed-topic", failEvent);
-        }
-    }
+ // since we are using jwt tokens there is not really a need to check if the user exists at every step.
+//    @KafkaListener(topics= "bid.user-validation-topic", groupId = "user-bid-validation-group", containerFactory = "bidInitiatedListenerContainerFactory")
+//    public void handleCatalogueSuccess(BidInitiatedEvent event) {
+//        Optional<User> optionalUser = _userRepository.findById(event.getUserID());
+//
+//        if (optionalUser.isPresent()) {
+//            User user = optionalUser.get();
+//            UserInfoValidationSuccessEvent userInfoEvent = new UserInfoValidationSuccessEvent(
+//            	event.getUserID(),
+//				event.getId(),
+//				user.getFirstName(),
+//				user.getLastName(),
+//				user.getStreetName(),
+//				user.getStreetNum(),
+//				user.getCity(),
+//				user.getPostalCode(),
+//				user.getCountry()
+//            );
+//
+//            _kafkaTemplate.send("user.bid-user-validation-success-topic", userInfoEvent);
+//
+//        } else {
+//            // if user not found, publish a failure
+//        	UserInfoValidationFailureEvent failEvent = new UserInfoValidationFailureEvent(
+//            		event.getUserID(),
+//        			event.getId(),
+//                    "User #"+event.getUserID() +" not found in database."
+//                    
+//            );
+//            _kafkaTemplate.send("user.bid-validation-failed-topic", failEvent);
+//        }
+//    }
 
 
 	public RecoveryToken createRecoveryToken(String email, String username) {

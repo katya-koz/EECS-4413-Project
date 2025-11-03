@@ -81,6 +81,7 @@ public class AuctionService {
 			newBid.setAmount(bidValue);
 			newBid.setAuctionID(auctionId);
 			newBid.setBidTime(LocalDateTime.now());
+			newBid.setCatalogueID(auction.getCatalogueID());
 			newBid.setBidderID(userId);
 			newBid.setValid(false); // false for now, until we can validate the user and catalogue item
 
@@ -88,7 +89,9 @@ public class AuctionService {
 
 
 			// trigger catalogue to update item bidding price
-			_kafkaTemplate.send("bid.user-validation-topic", new BidInitiatedEvent(newBid.getId(), userId, auction.getCatalogueID(), LocalDateTime.now(), bidValue )); // id will be same as bid id in db
+			_kafkaTemplate.send("bid.item-validation-topic", new BidInitiatedEvent(newBid.getId(), newBid.getBidderID(), newBid.getCatalogueID(), newBid.getBidTime(), newBid.getAmount() )); // can turn this into a copy construtor
+
+//			_kafkaTemplate.send("bid.user-validation-topic", new BidInitiatedEvent(newBid.getId(), userId, auction.getCatalogueID(), LocalDateTime.now(), bidValue )); // id will be same as bid id in db
 
 			return new BidResponse(auction.getCatalogueID(), userId, bidValue, auctionId, newBid.getId(),"Bid request placed on auction " + auctionId + " for $" + bidValue + " successfully!", true ); 
 		}
@@ -107,6 +110,7 @@ public class AuctionService {
 
 		// update or overwrite cat. info
 		bid.setStatus("Bid sucessful.");
+		
 
 		// this is the last step int he saga, so if this is successful, than the bid is valid
 		bid.setValid(true);
@@ -117,7 +121,7 @@ public class AuctionService {
 
 	@KafkaListener(topics = "catalogue.bid-item-validation-failed-topic", groupId = "bid-item-fail-group", containerFactory = "itemValidationFailureListenerFactory")
 	public void handleCatalogueFailure( ItemValidationFailureEvent event) {
-		Optional<Bid> optionalBid = _bidRepository.findById(event.getAuctionId());
+		Optional<Bid> optionalBid = _bidRepository.findById(event.getProducerId());
 
 		Bid bid = optionalBid.get(); 
 
@@ -127,39 +131,39 @@ public class AuctionService {
 		// save
 		_bidRepository.save(bid);
 	}
-	//
-	@KafkaListener(topics = "user.bid-user-validation-success-topic", groupId = "bid-user-success-group", containerFactory = "userValidationSuccessListenerFactory")
-	public void handleUserSuccess(UserInfoValidationSuccessEvent event) {
-		Optional<Bid> optionalBid = _bidRepository.findById(event.getProducerID());
-
-		Bid bid = optionalBid.get();
-
-		// update or overwrite bid info
-		bid.setStatus("USER_VALIDATED");
-		bid.setValid(true);
-
-		// save
-		_bidRepository.save(bid);
-
-		// once user is validated, then we can send a catalogue validation request.
-		_kafkaTemplate.send("bid.item-validation-topic", new BidInitiatedEvent(bid.getId(), bid.getBidderID(), bid.getCatalogueID(), bid.getBidTime(), bid.getAmount() )); // can turn this into a copy construtor
-
-
-	}
-
-	@KafkaListener(topics = "user.bid-validation-failed-topic", groupId = "bid-user-fail-group" , containerFactory = "userValidationFailureListenerFactory")
-	public void handleUserFailure(UserInfoValidationFailureEvent event) {
-		Optional<Bid> optionalBid = _bidRepository.findById(event.getProducerEventID());
-		Bid bid = optionalBid.get();
-
-		// update or overwrite bid info
-		bid.setStatus(event.getMessage());
-		bid.setValid(false);
-
-
-		// save
-		_bidRepository.save(bid);
-	}
+	//we dont need to validate the userid for this since we are using jwt tokens.
+//	@KafkaListener(topics = "user.bid-user-validation-success-topic", groupId = "bid-user-success-group", containerFactory = "userValidationSuccessListenerFactory")
+//	public void handleUserSuccess(UserInfoValidationSuccessEvent event) {
+//		Optional<Bid> optionalBid = _bidRepository.findById(event.getProducerID());
+//
+//		Bid bid = optionalBid.get();
+//
+//		// update or overwrite bid info
+//		bid.setStatus("USER_VALIDATED");
+//		
+//
+//		// save
+//		_bidRepository.save(bid);
+//
+//		// once user is validated, then we can send a catalogue validation request.
+//		_kafkaTemplate.send("bid.item-validation-topic", new BidInitiatedEvent(bid.getId(), bid.getBidderID(), bid.getCatalogueID(), bid.getBidTime(), bid.getAmount() )); // can turn this into a copy construtor
+//
+//
+//	}
+//
+//	@KafkaListener(topics = "user.bid-validation-failed-topic", groupId = "bid-user-fail-group" , containerFactory = "userValidationFailureListenerFactory")
+//	public void handleUserFailure(UserInfoValidationFailureEvent event) {
+//		Optional<Bid> optionalBid = _bidRepository.findById(event.getProducerEventID());
+//		Bid bid = optionalBid.get();
+//
+//		// update or overwrite bid info
+//		bid.setStatus(event.getMessage());
+//		bid.setValid(false);
+//
+//
+//		// save
+//		_bidRepository.save(bid);
+//	}
 	
 	public Bid getBidById(String bidId) {
 		return _bidRepository.findById(bidId).orElse(null);

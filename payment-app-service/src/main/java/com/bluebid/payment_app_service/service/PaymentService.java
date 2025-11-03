@@ -134,6 +134,9 @@ public class PaymentService {
 	    _paymentRepository.save(receipt);
 	    
 	    // publish event for user first
+//	    _kafkaTemplate.send("payment.user-validation-topic", event);
+	    
+	    // publish event for catalogue
 	    _kafkaTemplate.send("payment.user-validation-topic", event);
 	    
 	    return receipt.getId(); // return the receipt id
