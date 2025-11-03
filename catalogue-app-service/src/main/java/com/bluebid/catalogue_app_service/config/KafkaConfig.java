@@ -19,6 +19,7 @@ import org.springframework.kafka.support.serializer.JsonDeserializer;
 import org.springframework.kafka.support.serializer.JsonSerializer;
 
 import com.bluebid.catalogue_app_service.dto.BidInitiatedEvent;
+import com.bluebid.catalogue_app_service.dto.InitiateAuctionEvent;
 import com.bluebid.catalogue_app_service.dto.PaymentInitiatedEvent;
 @Configuration
 public class KafkaConfig {
@@ -91,6 +92,29 @@ public class KafkaConfig {
     public ConcurrentKafkaListenerContainerFactory<String, BidInitiatedEvent> bidInitiatedListenerContainerFactory() {
         ConcurrentKafkaListenerContainerFactory<String, BidInitiatedEvent> factory = new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(bidConsumerFactory());
+        return factory;
+    }
+    
+    // auction initiated event
+    @Bean
+    public ConsumerFactory<String, InitiateAuctionEvent> auctionConsumerFactory() {
+        Map<String, Object> config = new HashMap<>();
+        config.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "kafka:9092");
+        config.put(ConsumerConfig.GROUP_ID_CONFIG, "catalogue-group");
+        config.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
+        config.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class);
+
+        return new DefaultKafkaConsumerFactory<>(
+            config,
+            new StringDeserializer(),
+            new JsonDeserializer<>(InitiateAuctionEvent.class, false) 
+        );
+    }
+    
+    @Bean
+    public ConcurrentKafkaListenerContainerFactory<String, InitiateAuctionEvent> auctionInitiatedListenerContainerFactory() {
+        ConcurrentKafkaListenerContainerFactory<String, InitiateAuctionEvent> factory = new ConcurrentKafkaListenerContainerFactory<>();
+        factory.setConsumerFactory(auctionConsumerFactory());
         return factory;
     }
 }

@@ -7,7 +7,7 @@ public class PostNewItemRequest {
 	String sellerID;
 	LocalDateTime postedDate;
 	LocalDateTime auctionEndDate;
-	String basePrice;
+	double basePrice;
 	String itemName;
 	String itemDescription;
 
@@ -23,7 +23,7 @@ public class PostNewItemRequest {
 //		this.itemDescription = itemDescription;
 //	}
 	
-	public PostNewItemRequest(String sellerID, String basePrice, String itemName, String itemDescription)
+	public PostNewItemRequest(String itemName, String itemDescription, String sellerID, double basePrice)
 	{
 		this.sellerID = sellerID;
 		this.basePrice = basePrice;
@@ -56,11 +56,11 @@ public class PostNewItemRequest {
 		this.auctionEndDate = auctionEndDate;
 	}
 
-	public String getBasePrice() {
+	public double getBasePrice() {
 		return basePrice;
 	}
 
-	public void setBasePrice(String basePrice) {
+	public void setBasePrice(double basePrice) {
 		this.basePrice = basePrice;
 	}
 
