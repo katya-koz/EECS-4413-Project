@@ -1,0 +1,2882 @@
+{
+	"info": {
+		"_postman_id": "17285936-ea24-4af2-85ef-da1f0602259e",
+		"name": "Deliverable 2 API Tests",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "48296943"
+	},
+	"item": [
+		{
+			"name": "signup-newuser",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Account created successfully\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"Response contains username\", function () {\r",
+							"    const jsonData = pm.response.text();\r",
+							"    pm.expect(jsonData).to.contain(\"bigseller\");\r",
+							"});\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"username\": \"bigseller\",\r\n  \"password\": \"password\",\r\n  \"email\": \"chelsea@gmail.com\",\r\n  \"firstName\": \"Chelsea\",\r\n  \"lastName\": \"Jackson\",\r\n  \"streetName\": \"Main Street\",\r\n  \"streetNum\": \"42\",\r\n  \"city\": \"New York City\",\r\n  \"postalCode\": \"12345\",\r\n  \"country\": \"USA\"\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/account/signup",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"account",
+						"signup"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "signup-takenusername",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status is 400\", function () {\r",
+							"    pm.response.to.have.status(400);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Username already exists error\", function () {\r",
+							"    const jsonData = pm.response.text();\r",
+							"     pm.expect(jsonData).to.eql(\"Username already exists.\");\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"username\": \"bigseller\",\r\n  \"password\": \"password\",\r\n  \"email\": \"otherchelsea@gmail.com\",\r\n  \"firstName\": \"Chelsea2\",\r\n  \"lastName\": \"Jackson\",\r\n  \"streetName\": \"Main Street\",\r\n  \"streetNum\": \"42\",\r\n  \"city\": \"New York City\",\r\n  \"postalCode\": \"12345\",\r\n  \"country\": \"USA\"\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/account/signup",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"account",
+						"signup"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "signup-takenemail",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status is 400\", function () {\r",
+							"    pm.response.to.have.status(400);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Email already exists error\", function () {\r",
+							"    const jsonData = pm.response.text();\r",
+							"    pm.expect(jsonData).to.eql(\"Email can't be used for more than one account.\");\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"username\": \"smallseller\",\r\n  \"password\": \"password\",\r\n  \"email\": \"chelsea@gmail.com\",\r\n  \"firstName\": \"Chelsea3\",\r\n  \"lastName\": \"Jackson\",\r\n  \"streetName\": \"Main Street\",\r\n  \"streetNum\": \"42\",\r\n  \"city\": \"New York City\",\r\n  \"postalCode\": \"12345\",\r\n  \"country\": \"USA\"\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/account/signup",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"account",
+						"signup"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "invalidcredentials-wrongpassword",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status is 401 (Unauthorized)\", function () {\r",
+							"    pm.response.to.have.status(401);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Response message is 'Invalid credentials'\", function () {\r",
+							"    const jsonData = pm.response.text();\r",
+							"    pm.expect(jsonData).to.eql(\"Invalid credentials\");\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"username\": \"bigseller\",\r\n    \"password\": \"wrongpassword\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/authentication/login",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"authentication",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "invalidcredentials-usernotfound",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status is 401 (User not found)\", function () {\r",
+							"    pm.response.to.have.status(401);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Response message is 'user not found'\", function () {\r",
+							"    const jsonData = pm.response.text();\r",
+							"    pm.expect(jsonData).to.eql(\"User not found\");\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"username\": \"notarealuser\",\r\n    \"password\": \"password\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/authentication/login",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"authentication",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "successfullogin",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status is 200 (OK)\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Response contains JWT token\", function () {\r",
+							"    const jsonData = pm.response.text();\r",
+							"    pm.expect(jsonData).to.be.a(\"string\").and.not.empty;\r",
+							"});\r",
+							"\r",
+							"// save token for next requests\r",
+							"const jsonData = pm.response.text();\r",
+							"pm.collectionVariables.set(\"authToken\", jsonData);\r",
+							"\r",
+							"pm.test(\"Token saved to collection variables\", function () {\r",
+							"    pm.expect(pm.collectionVariables.get(\"authToken\")).to.eql(jsonData);\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"username\": \"bigseller\",\r\n    \"password\": \"password\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/authentication/login",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"authentication",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "forgotpassword-invalidaccount",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status is 400\", function () {",
+							"    pm.expect(pm.response.code).to.be.equal(400);",
+							"});",
+							"",
+							"pm.test(\"Response has all required fields\", function () {",
+							"    const jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.keys([\"message\", \"token\", \"expiry\"]);",
+							"});",
+							"",
+							"pm.test(\"Message contains username and email\", function () {",
+							"    const jsonData = pm.response.json();",
+							"    const requestBody = pm.request.body.raw ? JSON.parse(pm.request.body.raw) : {};",
+							"    pm.expect(jsonData.message).to.include(requestBody.username);",
+							"    pm.expect(jsonData.message).to.include(requestBody.email);",
+							"});",
+							"",
+							"pm.test(\"Message matches expected content\", function () {",
+							"    const jsonData = pm.response.json();",
+							"    const expectedMessage = \"There is no such user\";",
+							"    pm.expect(jsonData.message).to.contain(expectedMessage);",
+							"});",
+							"",
+							"pm.test(\"Token and expiry are null\", function () {",
+							"    const jsonData = pm.response.json();",
+							"    pm.expect(jsonData.token).to.be.null;",
+							"    pm.expect(jsonData.expiry).to.be.null;",
+							"});",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{ \r\n   \"email\": \"not@real.email\", \r\n   \"username\": \"notarealuser\" \r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/account/forgot-password",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"account",
+						"forgot-password"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "forgotpassword-succcess",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status is 200 (OK)\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Response has message, token, and expiry fields\", function () {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData).to.have.keys([\"message\", \"token\", \"expiry\"]);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Message contains expected text\", function () {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.message).to.include(\"An email with a recovery token has been sent\");\r",
+							"    pm.expect(jsonData.message).to.include(\"chelsea@gmail.com\");\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Token and expiry are present\", function () {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.token).to.be.a(\"string\").and.not.empty;\r",
+							"    pm.expect(jsonData.expiry).to.be.a(\"string\").and.not.empty;\r",
+							"});\r",
+							"\r",
+							"const jsonData = pm.response.json();\r",
+							"pm.collectionVariables.set(\"recoveryToken\", jsonData.token);\r",
+							"\r",
+							"pm.test(\"Recovery token saved to collection variables\", function () {\r",
+							"    pm.expect(pm.collectionVariables.get(\"recoveryToken\")).to.eql(jsonData.token);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{ \r\n   \"email\": \"chelsea@gmail.com\", \r\n   \"username\": \"bigseller\" \r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/account/forgot-password",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"account",
+						"forgot-password"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "resetpassword-success",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status is 200 (OK)\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Response has message and dateReset fields\", function () {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData).to.have.keys([\"message\", \"dateReset\"]);\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"Message indicates password reset success\", function () {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.message).to.include(\"Password reset successful\");\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"dateReset is present\", function () {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.dateReset).to.be.a(\"string\").and.not.empty;\r",
+							"});\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n \"newPassword\": \"newpassword\"\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/account/reset-password/{{recoveryToken}}",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"account",
+						"reset-password",
+						"{{recoveryToken}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "resetpassword-reusetoken",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status is 400 (Bad Request)\", function () {\r",
+							"    pm.response.to.have.status(400);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Response has message and dateReset fields\", function () {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData).to.have.keys([\"message\", \"dateReset\"]);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Message indicates token reuse error\", function () {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.message).to.include(\"This token has already been used\");\r",
+							"});\r",
+							"\r",
+							"pm.test(\"dateReset is null\", function () {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.dateReset).to.be.null;\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n \"newPassword\": \"newpassword2\"\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/account/reset-password/{{recoveryToken}}",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"account",
+						"reset-password",
+						"{{recoveryToken}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "login-newpass",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status is 200 (OK)\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Response contains JWT token\", function () {\r",
+							"    const jsonData = pm.response.text();\r",
+							"    pm.expect(jsonData).to.be.a(\"string\").and.not.empty;\r",
+							"});\r",
+							"\r",
+							"// save token for next requests\r",
+							"const token = pm.response.text().trim();\r",
+							"pm.collectionVariables.set(\"authToken\", token);\r",
+							"\r",
+							"pm.test(\"Token saved to collection variables\", function () {\r",
+							"    pm.expect(pm.collectionVariables.get(\"authToken\")).to.eql(token);\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{ \r\n   \"username\": \"bigseller\" ,\r\n   \"password\":\"newpassword\"\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/authentication/login",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"authentication",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "login-fail-witholdpass",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status is 401 (Unauthorized)\", function () {\r",
+							"    pm.response.to.have.status(401);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Response message is 'Invalid credentials'\", function () {\r",
+							"    const jsonData = pm.response.text();\r",
+							"    pm.expect(jsonData).to.eql(\"Invalid credentials\");\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"username\": \"bigseller\",\r\n    \"password\": \"password\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/authentication/login",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"authentication",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "new-auction-fail-badname",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status is 400 (Bad Request)\", function () {\r",
+							"    pm.response.to.have.status(400);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Message indicates itemName cannot be blank\", function () {\r",
+							"    const jsonData = pm.response.text();\r",
+							"    pm.expect(jsonData).to.include(\"Item Name cannot be blank\");\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{authToken}}",
+						"description": "\n",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"itemName\": \"\",\r\n    \"itemDescription\": \"A large and aggressive chimpanzee. Likes 2 eat bananas. Speaks sign language.\",\r\n    \"basePrice\": 150.00,\r\n    \"seconds\": 250\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/auction/new-auction",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"auction",
+						"new-auction"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "new-auction-fail-badprice",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status is 400 (Bad Request)\", function () {\r",
+							"    pm.response.to.have.status(400);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Message indicates price not correct\", function () {\r",
+							"    const jsonData = pm.response.text();\r",
+							"    pm.expect(jsonData).to.include(\"Item Price must be greater\");\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{authToken}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"itemName\": \"Chimpanzee\",\r\n    \"itemDescription\": \"A large and aggressive chimpanzee. Likes 2 eat bananas. Speaks sign language.\",\r\n    \"basePrice\": -10,\r\n    \"seconds\": 250\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/auction/new-auction",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"auction",
+						"new-auction"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "new-auction-fail-bad-duration",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status is 400 (Bad Request)\", function () {\r",
+							"    pm.response.to.have.status(400);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Message indicates duration not correct\", function () {\r",
+							"    const jsonData = pm.response.text();\r",
+							"    pm.expect(jsonData).to.include(\"Auction duration must be greater\");\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{authToken}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"itemName\": \"Chimpanzee\",\r\n    \"itemDescription\": \"A large and aggressive chimpanzee. Likes 2 eat bananas. Speaks sign language.\",\r\n    \"basePrice\": 150.00,\r\n    \"seconds\": -10\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/auction/new-auction",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"auction",
+						"new-auction"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "new-auction-success",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"\r",
+							"pm.test(\"Status is 200 (OK)\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"Response contains message, auctionId, and submitSuccess\", function () {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData).to.have.keys([\"message\", \"auctionId\", \"submitSuccess\"]);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"submitSuccess is true\", function () {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.submitSuccess).to.be.true;\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Message indicates successful submission\", function () {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.message).to.include(\"successfully been submitted\");\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"auctionId is present and non-empty\", function () {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.auctionId).to.be.a(\"string\").and.not.empty;\r",
+							"});\r",
+							"\r",
+							"\r",
+							"const jsonData = pm.response.json();\r",
+							"pm.collectionVariables.set(\"auctionId\", jsonData.auctionId);\r",
+							"\r",
+							"pm.test(\"auctionId saved to collection variables\", function () {\r",
+							"    pm.expect(pm.collectionVariables.get(\"auctionId\")).to.eql(jsonData.auctionId);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{authToken}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"itemName\": \"Chimpanzee\",\r\n    \"itemDescription\": \"A large and aggressive chimpanzee. Likes 2 eat bananas. Speaks sign language.\",\r\n    \"basePrice\": 150.00,\r\n    \"seconds\": 5\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/auction/new-auction",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"auction",
+						"new-auction"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "validate-new-auction",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"\r",
+							"pm.test(\"Status is 200 (OK)\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"Response is valid JSON\", function () {\r",
+							"    pm.response.to.be.json;\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"Response contains expected auction fields\", function () {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData).to.have.keys([\r",
+							"        \"id\",\r",
+							"        \"itemDescription\",\r",
+							"        \"itemName\",\r",
+							"        \"sellerID\",\r",
+							"        \"catalogueID\",\r",
+							"        \"basePrice\",\r",
+							"        \"auctionStartTime\",\r",
+							"        \"auctionEndTime\",\r",
+							"        \"auctionType\",\r",
+							"        \"status\",\r",
+							"        \"auctionStatus\",\r",
+							"        \"valid\"\r",
+							"    ]);\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"Item name and description are correct\", function () {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.itemName).to.eql(\"Chimpanzee\");\r",
+							"    pm.expect(jsonData.itemDescription).to.include(\"A large and aggressive chimpanzee\");\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"Base price is positive\", function () {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.basePrice).to.be.above(0);\r",
+							"});\r",
+							"\r",
+							"const jsonData = pm.response.json();\r",
+							"pm.collectionVariables.set(\"catalogueID\", jsonData.catalogueID);\r",
+							"\r",
+							"pm.test(\"Auction status fields are valid\", function () {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.auctionStatus).to.be.a(\"string\");\r",
+							"    pm.expect(jsonData.valid).to.be.true;\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{authToken}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/auction/auctions/{{auctionId}}",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"auction",
+						"auctions",
+						"{{auctionId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "seller-bid-on-own-item-fail",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"\r",
+							"pm.test(\"Status is 200 (OK)\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Response is valid JSON\", function () {\r",
+							"    pm.response.to.be.json;\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Response contains expected fields\", function () {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData).to.have.keys([\r",
+							"        \"catalogueItemId\",\r",
+							"        \"userId\",\r",
+							"        \"bidAmount\",\r",
+							"        \"auctionId\",\r",
+							"        \"bidId\",\r",
+							"        \"message\",\r",
+							"        \"isSuccess\"\r",
+							"    ]);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Bid was not successful\", function () {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.isSuccess).to.be.false;\r",
+							"});\r",
+							"\r",
+							"pm.test(\"bidId is null\", function () {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.bidId).to.be.null;\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Message indicates seller cannot bid on own item\", function () {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.message).to.include(\"seller may not bid on their own items\");\r",
+							"});\r",
+							"\r",
+							"pm.test(\"bidAmount is a number and auctionId is a string\", function () {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.bidAmount).to.be.a(\"number\");\r",
+							"    pm.expect(jsonData.auctionId).to.be.a(\"string\");\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{authToken}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"auctionID\": \"{{auctionId}}\",\r\n    \"bidRequest\": 500.0\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/bidding/bid",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"bidding",
+						"bid"
+					],
+					"query": [
+						{
+							"key": "",
+							"value": null,
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "new_bidder_created",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"username\": \"bigbidder\",\r\n  \"password\": \"password\",\r\n  \"email\": \"creedance@gmail.com\",\r\n  \"firstName\": \"Creedance\",\r\n  \"lastName\": \"Love\",\r\n  \"streetName\": \"Sugar Street\",\r\n  \"streetNum\": \"12\",\r\n  \"city\": \"Capetown\",\r\n  \"postalCode\": \"12345\",\r\n  \"country\": \"South Africa\"\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/account/signup",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"account",
+						"signup"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "newuser-login",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// save token for next requests\r",
+							"const token = pm.response.text().trim();\r",
+							"pm.collectionVariables.set(\"authToken_bidder2\", token);\r",
+							"\r",
+							"pm.test(\"Token saved to collection variables\", function () {\r",
+							"    pm.expect(pm.collectionVariables.get(\"authToken_bidder2\")).to.eql(token);\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"username\": \"bigbidder\",\r\n    \"password\": \"password\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/authentication/login",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"authentication",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "user-attempts-to-pay-before-auctionend",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"\r",
+							"pm.test(\"Status is 200 (OK)\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"Response is valid JSON\", function () {\r",
+							"    pm.response.to.be.json;\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"Response contains expected fields\", function () {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData).to.have.keys([\r",
+							"        \"message\",\r",
+							"        \"paymentAmount\",\r",
+							"        \"paymentSuccess\",\r",
+							"        \"paymentId\"\r",
+							"    ]);\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"Payment was successful\", function () {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.paymentSuccess).to.be.true;\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"Message indicates success\", function () {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.message).to.include(\"successfully submitted\");\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Payment amount is a positive number\", function () {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.paymentAmount).to.be.a(\"number\");\r",
+							"    pm.expect(jsonData.paymentAmount).to.be.above(0);\r",
+							"});\r",
+							"\r",
+							"\r",
+							"const jsonData = pm.response.json();\r",
+							"pm.collectionVariables.set(\"paymentId\", jsonData.paymentId);\r",
+							"\r",
+							"pm.test(\"Payment ID saved to collection variables\", function () {\r",
+							"    pm.expect(pm.collectionVariables.get(\"paymentId\")).to.eql(jsonData.paymentId);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{authToken_bidder2}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{ \r\n    \"cardNumber\": \"4137894711755904\", \r\n    \"expiryMonth\": \"11\", \r\n    \"expiryYear\": \"2028\",\r\n    \"securityCode\": \"590\", \r\n    \"itemPrice\": 10.0, \r\n    \"sellerID\": \"02\", \r\n    \"catalogueID\": \"{{catalogueID}}\", \r\n    \"isExpedited\": true, \r\n    \"shippingCost\": 10, \r\n    \"paymentTime\": \"2025-11-02T22:44:36\"\r\n\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/payment/payment",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"payment",
+						"payment"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "validate_invalid_receipt-auctionnotover",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"\r",
+							"pm.test(\"Status is 200 (OK)\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"Response is valid JSON\", function () {\r",
+							"    pm.response.to.be.json;\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"Response contains expected fields\", function () {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData).to.have.keys([\r",
+							"        \"id\",\r",
+							"        \"paymentId\",\r",
+							"        \"userId\",\r",
+							"        \"itemId\",\r",
+							"        \"itemCost\",\r",
+							"        \"isExpedited\",\r",
+							"        \"shippingCost\",\r",
+							"        \"buyerFirstName\",\r",
+							"        \"buyerLastName\",\r",
+							"        \"buyerStreetName\",\r",
+							"        \"buyerStreetNum\",\r",
+							"        \"buyerCity\",\r",
+							"        \"buyerPostalCode\",\r",
+							"        \"buyerCountry\",\r",
+							"        \"itemName\",\r",
+							"        \"sellerId\",\r",
+							"        \"status\",\r",
+							"        \"failureReason\",\r",
+							"        \"timestamp\"\r",
+							"    ]);\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"Payment status indicates failure\", function () {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.status).to.include(\"FAILED\");\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"Failure reason is correct\", function () {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.failureReason).to.include(\"not yet over\");\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"Item and shipping cost are numbers\", function () {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.itemCost).to.be.a(\"number\");\r",
+							"    pm.expect(jsonData.shippingCost).to.be.a(\"number\");\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"Buyer information is valid\", function () {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.buyerFirstName).to.be.a(\"string\").and.not.empty;\r",
+							"    pm.expect(jsonData.buyerLastName).to.be.a(\"string\").and.not.empty;\r",
+							"    pm.expect(jsonData.buyerCity).to.be.a(\"string\").and.not.empty;\r",
+							"    pm.expect(jsonData.buyerCountry).to.be.a(\"string\").and.not.empty;\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"Timestamp is a valid ISO date\", function () {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    const date = new Date(jsonData.timestamp);\r",
+							"    pm.expect(date.toString()).to.not.eql(\"Invalid Date\");\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{authToken_bidder2}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:8080/api/payment/receipt/{{paymentId}}",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"payment",
+						"receipt",
+						"{{paymentId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "auction-closes-aftertimer_15sec",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"let start = Date.now();\r",
+							"while (Date.now() - start < 15000) {\r",
+							"    // wait for 15 seconds for auction to be over\r",
+							"}"
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"\r",
+							"pm.test(\"Status is 200 (OK)\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Response is valid JSON\", function () {\r",
+							"    pm.response.to.be.json;\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"Response contains expected auction fields\", function () {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData).to.have.keys([\r",
+							"        \"id\",\r",
+							"        \"itemDescription\",\r",
+							"        \"itemName\",\r",
+							"        \"sellerID\",\r",
+							"        \"catalogueID\",\r",
+							"        \"basePrice\",\r",
+							"        \"auctionStartTime\",\r",
+							"        \"auctionEndTime\",\r",
+							"        \"auctionType\",\r",
+							"        \"status\",\r",
+							"        \"auctionStatus\",\r",
+							"        \"valid\"\r",
+							"    ]);\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"Auction status is closed\", function () {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.auctionStatus.toLowerCase()).to.eql(\"closed\");\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"Auction status flag is false\", function () {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.status).to.be.false;\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Auction valid flag is true\", function () {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.valid).to.be.true;\r",
+							"});\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{authToken}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/auction/auctions/{{auctionId}}",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"auction",
+						"auctions",
+						"{{auctionId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "bid-on-item-after-close",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"\r",
+							"pm.test(\"Status is 200 (OK)\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"Response is valid JSON\", function () {\r",
+							"    pm.response.to.be.json;\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Response contains expected fields\", function () {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData).to.have.keys([\r",
+							"        \"catalogueItemId\",\r",
+							"        \"userId\",\r",
+							"        \"bidAmount\",\r",
+							"        \"auctionId\",\r",
+							"        \"bidId\",\r",
+							"        \"message\",\r",
+							"        \"isSuccess\"\r",
+							"    ]);\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"Bid was not successful\", function () {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.isSuccess).to.be.false;\r",
+							"});\r",
+							"\r",
+							"pm.test(\"bidId is null\", function () {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.bidId).to.be.null;\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Message indicates auction is not active\", function () {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.message).to.include(\"not currently active\");\r",
+							"});\r",
+							"\r",
+							"pm.test(\"bidAmount is a number and auctionId is a string\", function () {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.bidAmount).to.be.a(\"number\");\r",
+							"    pm.expect(jsonData.auctionId).to.be.a(\"string\");\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{authToken_bidder2}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"auctionID\": \"{{auctionId}}\",\r\n    \"bidRequest\": 500.0\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/bidding/bid",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"bidding",
+						"bid"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "seller-creates-auction-for-bidding",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const jsonData = pm.response.json();\r",
+							"pm.collectionVariables.set(\"auctionId\", jsonData.auctionId);\r",
+							"\r",
+							"pm.test(\"auctionId saved to collection variables\", function () {\r",
+							"    pm.expect(pm.collectionVariables.get(\"auctionId\")).to.eql(jsonData.auctionId);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{authToken}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"itemName\": \"Gorilla\",\r\n    \"itemDescription\": \"A kind and thoughtful Gorilla. Likes 2 eat bananas. Speaks sign language.\",\r\n    \"basePrice\": 200.00,\r\n    \"seconds\": 8\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/auction/new-auction",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"auction",
+						"new-auction"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get_new_catid",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const jsonData = pm.response.json();\r",
+							"pm.collectionVariables.set(\"catalogueID\", jsonData.catalogueID);\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{authToken}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/auction/auctions/{{auctionId}}",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"auction",
+						"auctions",
+						"{{auctionId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "new_auction_get_prices",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const savedCatalogueID = pm.collectionVariables.get(\"catalogueID\");\r",
+							"\r",
+							"\r",
+							"const jsonData = pm.response.json();\r",
+							"pm.collectionVariables.set(\"shippingCost\", jsonData.shippingCost);\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{authToken_bidder2}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/catalogue/items/{{catalogueID}}",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"catalogue",
+						"items",
+						"{{catalogueID}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "user-bids-on-auction-fail-bidtoolow",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"\r",
+							"pm.test(\"Status is 200 (OK)\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Response is valid JSON\", function () {\r",
+							"    pm.response.to.be.json;\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Response contains expected fields\", function () {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData).to.have.keys([\r",
+							"        \"catalogueItemId\",\r",
+							"        \"userId\",\r",
+							"        \"bidAmount\",\r",
+							"        \"auctionId\",\r",
+							"        \"bidId\",\r",
+							"        \"message\",\r",
+							"        \"isSuccess\"\r",
+							"    ]);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Bid was not successful\", function () {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.isSuccess).to.be.false;\r",
+							"});\r",
+							"\r",
+							"pm.test(\"bidId is null\", function () {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.bidId).to.be.null;\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Message indicates bid value too low\", function () {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.message).to.include(\"too low\");\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Fields have correct types\", function () {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.catalogueItemId).to.be.a(\"string\");\r",
+							"    pm.expect(jsonData.auctionId).to.be.a(\"string\");\r",
+							"    pm.expect(jsonData.bidAmount).to.be.a(\"number\");\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{authToken_bidder2}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"auctionID\": \"{{auctionId}}\",\r\n    \"bidRequest\": 1.0\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/bidding/bid",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"bidding",
+						"bid"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "user-bids-on-auction-success",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"\r",
+							"pm.test(\"Status is 200 (OK)\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Response is valid JSON\", function () {\r",
+							"    pm.response.to.be.json;\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Response contains expected fields\", function () {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData).to.have.keys([\r",
+							"        \"catalogueItemId\",\r",
+							"        \"userId\",\r",
+							"        \"bidAmount\",\r",
+							"        \"auctionId\",\r",
+							"        \"bidId\",\r",
+							"        \"message\",\r",
+							"        \"isSuccess\"\r",
+							"    ]);\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"Bid request is successful\", function () {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.isSuccess).to.be.true;\r",
+							"});\r",
+							"\r",
+							"pm.test(\"bidId is not null\", function () {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.bidId).to.be.a(\"string\").and.not.empty;\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"Message indicates bid placed\", function () {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.message).to.include(\"Bid request placed\");\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"Fields have correct types\", function () {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.catalogueItemId).to.be.a(\"string\");\r",
+							"    pm.expect(jsonData.auctionId).to.be.a(\"string\");\r",
+							"    pm.expect(jsonData.bidAmount).to.be.a(\"number\");\r",
+							"    pm.expect(jsonData.userId).to.be.a(\"string\");\r",
+							"});\r",
+							"\r",
+							"const jsonData = pm.response.json();\r",
+							"pm.collectionVariables.set(\"bidId\", jsonData.bidId);\r",
+							"\r",
+							"pm.test(\"bidId saved to collection variables\", function () {\r",
+							"    pm.expect(pm.collectionVariables.get(\"bidId\")).to.eql(jsonData.bidId);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{authToken_bidder2}}",
+						"description": "\n",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"auctionID\": \"{{auctionId}}\",\r\n    \"bidRequest\": 500.0\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/bidding/bid",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"bidding",
+						"bid"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "bid-is-valid",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"\r",
+							"pm.test(\"Status is 200 (OK)\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Response is valid JSON\", function () {\r",
+							"    pm.response.to.be.json;\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Response contains expected fields\", function () {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData).to.have.keys([\r",
+							"        \"id\",\r",
+							"        \"auctionID\",\r",
+							"        \"bidderID\",\r",
+							"        \"catalogueID\",\r",
+							"        \"amount\",\r",
+							"        \"bidTime\",\r",
+							"        \"status\",\r",
+							"        \"valid\"\r",
+							"    ]);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Bid status message is correct\", function () {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.status).to.include(\"sucessful\");\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Bid is valid\", function () {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.valid).to.be.true;\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Bid amount is a positive number\", function () {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.amount).to.be.a(\"number\").and.above(0);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"IDs are strings\", function () {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.id).to.be.a(\"string\");\r",
+							"    pm.expect(jsonData.auctionID).to.be.a(\"string\");\r",
+							"    pm.expect(jsonData.bidderID).to.be.a(\"string\");\r",
+							"    pm.expect(jsonData.catalogueID).to.be.a(\"string\");\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Bid time is a valid ISO date\", function () {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    const date = new Date(jsonData.bidTime);\r",
+							"    pm.expect(date.toString()).to.not.eql(\"Invalid Date\");\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{authToken_bidder2}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:8080/api/bidding/bids/{{bidId}}",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"bidding",
+						"bids",
+						"{{bidId}}"
+					],
+					"query": [
+						{
+							"key": "",
+							"value": "",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "bidder-3-created",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"username\": \"biggestbidder\",\r\n  \"password\": \"password\",\r\n  \"email\": \"sangria@gmail.com\",\r\n  \"firstName\": \"Sangria\",\r\n  \"lastName\": \"Fabuloso\",\r\n  \"streetName\": \"Salad Street\",\r\n  \"streetNum\": \"12\",\r\n  \"city\": \"Astana\",\r\n  \"postalCode\": \"12345\",\r\n  \"country\": \"Kazakhstan\"\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/account/signup",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"account",
+						"signup"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "bidder-3-login",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// save token for next requests\r",
+							"const token = pm.response.text().trim();\r",
+							"pm.collectionVariables.set(\"authToken_bidder3\", token);\r",
+							"\r",
+							"pm.test(\"Token saved to collection variables\", function () {\r",
+							"    pm.expect(pm.collectionVariables.get(\"authToken_bidder3\")).to.eql(token);\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"username\": \"biggestbidder\",\r\n    \"password\": \"password\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/authentication/login",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"authentication",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "higher-bidder-bids-onitem-success",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{authToken_bidder3}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"auctionID\": \"{{auctionId}}\",\r\n    \"bidRequest\": 1500.0\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/bidding/bid",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"bidding",
+						"bid"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "user-pay-for-item-fail-not-highest-bidder_timer15sec",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"let start = Date.now();\r",
+							"while (Date.now() - start < 15000) {\r",
+							"    // wait for 15 seconds for auction to be over\r",
+							"}"
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// set payment id to chekc reciept\r",
+							"\r",
+							"const jsonData = pm.response.json();\r",
+							"pm.collectionVariables.set(\"paymentId\", jsonData.paymentId);\r",
+							"\r",
+							"pm.test(\"Payment ID saved to collection variables\", function () {\r",
+							"    pm.expect(pm.collectionVariables.get(\"paymentId\")).to.eql(jsonData.paymentId);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{authToken_bidder2}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{ \r\n    \"cardNumber\": \"4137894711755904\", \r\n    \"expiryMonth\": \"11\", \r\n    \"expiryYear\": \"2028\",\r\n    \"securityCode\": \"590\", \r\n    \"itemPrice\": 10.0, \r\n    \"sellerID\": \"02\", \r\n    \"catalogueID\": \"{{catalogueID}}\", \r\n    \"isExpedited\": true, \r\n    \"shippingCost\": 10, \r\n    \"paymentTime\": \"2025-11-02T22:44:36\"\r\n\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/payment/payment",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"payment",
+						"payment"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "validate_invalidpayment-nothighestbidder",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"\r",
+							"pm.test(\"Status is 200 (OK)\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"Response is valid JSON\", function () {\r",
+							"    pm.response.to.be.json;\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"Response contains expected fields\", function () {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData).to.have.keys([\r",
+							"        \"id\",\r",
+							"        \"paymentId\",\r",
+							"        \"userId\",\r",
+							"        \"itemId\",\r",
+							"        \"itemCost\",\r",
+							"        \"isExpedited\",\r",
+							"        \"shippingCost\",\r",
+							"        \"buyerFirstName\",\r",
+							"        \"buyerLastName\",\r",
+							"        \"buyerStreetName\",\r",
+							"        \"buyerStreetNum\",\r",
+							"        \"buyerCity\",\r",
+							"        \"buyerPostalCode\",\r",
+							"        \"buyerCountry\",\r",
+							"        \"itemName\",\r",
+							"        \"sellerId\",\r",
+							"        \"status\",\r",
+							"        \"failureReason\",\r",
+							"        \"timestamp\"\r",
+							"    ]);\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"Payment status indicates failure\", function () {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.status).to.include(\"FAILED\");\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"Failure reason is present\", function () {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.failureReason).to.be.a(\"string\").and.not.empty;\r",
+							"    pm.expect(jsonData.failureReason).to.contain(\"Nice try, punk\");\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Item cost and shipping cost are numbers\", function () {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.itemCost).to.be.a(\"number\");\r",
+							"    pm.expect(jsonData.shippingCost).to.be.a(\"number\");\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Buyer information is valid\", function () {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.buyerFirstName).to.be.a(\"string\").and.not.empty;\r",
+							"    pm.expect(jsonData.buyerLastName).to.be.a(\"string\").and.not.empty;\r",
+							"    pm.expect(jsonData.buyerCity).to.be.a(\"string\").and.not.empty;\r",
+							"    pm.expect(jsonData.buyerCountry).to.be.a(\"string\").and.not.empty;\r",
+							"});\r",
+							"\r",
+							"\r",
+							"const jsonData = pm.response.json();\r",
+							"pm.collectionVariables.set(\"paymentId\", jsonData.id);\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{authToken_bidder2}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:8080/api/payment/receipt/{{paymentId}}",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"payment",
+						"receipt",
+						"{{paymentId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "user-pays-incorrect-amount",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// set payment id to chekc reciept\r",
+							"\r",
+							"const jsonData = pm.response.json();\r",
+							"pm.collectionVariables.set(\"paymentId\", jsonData.paymentId);\r",
+							"\r",
+							"pm.test(\"Payment ID saved to collection variables\", function () {\r",
+							"    pm.expect(pm.collectionVariables.get(\"paymentId\")).to.eql(jsonData.paymentId);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{authToken_bidder3}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{ \r\n    \"cardNumber\": \"4137894711755904\", \r\n    \"expiryMonth\": \"11\", \r\n    \"expiryYear\": \"2028\",\r\n    \"securityCode\": \"590\", \r\n    \"itemPrice\": 10.0, \r\n    \"sellerID\": \"02\", \r\n    \"catalogueID\": \"{{catalogueID}}\", \r\n    \"isExpedited\": true, \r\n    \"shippingCost\": 10, \r\n    \"paymentTime\": \"2025-11-02T22:44:36\"\r\n\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/payment/payment",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"payment",
+						"payment"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "validate-invalid-receipt-wrong-price",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"\r",
+							"pm.test(\"Status is 200 (OK)\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"Response is valid JSON\", function () {\r",
+							"    pm.response.to.be.json;\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"Response contains expected fields\", function () {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData).to.have.keys([\r",
+							"        \"id\",\r",
+							"        \"paymentId\",\r",
+							"        \"userId\",\r",
+							"        \"itemId\",\r",
+							"        \"itemCost\",\r",
+							"        \"isExpedited\",\r",
+							"        \"shippingCost\",\r",
+							"        \"buyerFirstName\",\r",
+							"        \"buyerLastName\",\r",
+							"        \"buyerStreetName\",\r",
+							"        \"buyerStreetNum\",\r",
+							"        \"buyerCity\",\r",
+							"        \"buyerPostalCode\",\r",
+							"        \"buyerCountry\",\r",
+							"        \"itemName\",\r",
+							"        \"sellerId\",\r",
+							"        \"status\",\r",
+							"        \"failureReason\",\r",
+							"        \"timestamp\"\r",
+							"    ]);\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"Payment status indicates failure\", function () {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.status).to.include(\"FAILED\");\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"Failure reason is present\", function () {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.failureReason).to.be.a(\"string\").and.not.empty;\r",
+							"    pm.expect(jsonData.failureReason).to.contain(\"different than what the payment\");\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Item cost and shipping cost are numbers\", function () {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.itemCost).to.be.a(\"number\");\r",
+							"    pm.expect(jsonData.shippingCost).to.be.a(\"number\");\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Buyer information is valid\", function () {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.buyerFirstName).to.be.a(\"string\").and.not.empty;\r",
+							"    pm.expect(jsonData.buyerLastName).to.be.a(\"string\").and.not.empty;\r",
+							"    pm.expect(jsonData.buyerCity).to.be.a(\"string\").and.not.empty;\r",
+							"    pm.expect(jsonData.buyerCountry).to.be.a(\"string\").and.not.empty;\r",
+							"});\r",
+							"\r",
+							"\r",
+							"const jsonData = pm.response.json();\r",
+							"pm.collectionVariables.set(\"paymentId\", jsonData.id);\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{authToken_bidder3}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:8080/api/payment/receipt/{{paymentId}}",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"payment",
+						"receipt",
+						"{{paymentId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "user-pay-for-item-success",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// set payment id to chekc reciept\r",
+							"\r",
+							"const jsonData = pm.response.json();\r",
+							"pm.collectionVariables.set(\"paymentId\", jsonData.paymentId);\r",
+							"\r",
+							"pm.test(\"Payment ID saved to collection variables\", function () {\r",
+							"    pm.expect(pm.collectionVariables.get(\"paymentId\")).to.eql(jsonData.paymentId);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{authToken_bidder3}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{ \r\n    \"cardNumber\": \"4137894711755904\", \r\n    \"expiryMonth\": \"11\", \r\n    \"expiryYear\": \"2028\",\r\n    \"securityCode\": \"590\", \r\n    \"itemPrice\": 1500.0, \r\n    \"sellerID\": \"02\", \r\n    \"catalogueID\": \"{{catalogueID}}\", \r\n    \"isExpedited\": false, \r\n    \"shippingCost\": {{shippingCost}}, \r\n    \"paymentTime\": \"2025-11-02T22:44:36\"\r\n\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/payment/payment",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"payment",
+						"payment"
+					],
+					"query": [
+						{
+							"key": "auth",
+							"value": null,
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "validate_payment",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"\r",
+							"pm.test(\"Status is 200 (OK)\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"Response is valid JSON\", function () {\r",
+							"    pm.response.to.be.json;\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"Response contains expected fields\", function () {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData).to.have.keys([\r",
+							"        \"id\",\r",
+							"        \"paymentId\",\r",
+							"        \"userId\",\r",
+							"        \"itemId\",\r",
+							"        \"itemCost\",\r",
+							"        \"isExpedited\",\r",
+							"        \"shippingCost\",\r",
+							"        \"buyerFirstName\",\r",
+							"        \"buyerLastName\",\r",
+							"        \"buyerStreetName\",\r",
+							"        \"buyerStreetNum\",\r",
+							"        \"buyerCity\",\r",
+							"        \"buyerPostalCode\",\r",
+							"        \"buyerCountry\",\r",
+							"        \"itemName\",\r",
+							"        \"sellerId\",\r",
+							"        \"status\",\r",
+							"        \"failureReason\",\r",
+							"        \"timestamp\"\r",
+							"    ]);\r",
+							"});\r",
+							"\r",
+							"\r",
+							"\r",
+							"pm.test(\"Catalogue item was reserved\", function () {\r",
+							"    const jsonData = pm.response.json();\r",
+							"   pm.expect(jsonData.status).to.include(\"reserved\");\r",
+							"});\r",
+							"\r",
+							"\r",
+							"\r",
+							"pm.test(\"Item cost and shipping cost are numbers\", function () {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.itemCost).to.be.a(\"number\");\r",
+							"    pm.expect(jsonData.shippingCost).to.be.a(\"number\");\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Buyer information is valid\", function () {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.buyerFirstName).to.be.a(\"string\").and.not.empty;\r",
+							"    pm.expect(jsonData.buyerLastName).to.be.a(\"string\").and.not.empty;\r",
+							"    pm.expect(jsonData.buyerCity).to.be.a(\"string\").and.not.empty;\r",
+							"    pm.expect(jsonData.buyerCountry).to.be.a(\"string\").and.not.empty;\r",
+							"});\r",
+							"\r",
+							"\r",
+							"const jsonData = pm.response.json();\r",
+							"pm.collectionVariables.set(\"paymentId\", jsonData.id);\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{authToken_bidder3}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:8080/api/payment/receipt/{{paymentId}}",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"payment",
+						"receipt",
+						"{{paymentId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get-catalogue-items",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Response is a list\", function () {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    pm.expect(Array.isArray(jsonData)).to.be.true;\r",
+							"});\r",
+							"\r",
+							"pm.test(\"All items are active\", function () {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    const allActive = jsonData.every(item => item.isActive === true);\r",
+							"    pm.expect(allActive).to.be.true;\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{authToken_bidder3}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:8080/api/catalogue/items?page=0",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"catalogue",
+						"items"
+					],
+					"query": [
+						{
+							"key": "page",
+							"value": "0"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get-catalogue-items-by-keyword",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Response is a list\", function () {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    pm.expect(Array.isArray(jsonData)).to.be.true;\r",
+							"});\r",
+							"\r",
+							"pm.test(\"All items are active\", function () {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    const allActive = jsonData.every(item => item.isActive === true);\r",
+							"    pm.expect(allActive).to.be.true;\r",
+							"});\r",
+							"\r",
+							"pm.test(\"All items contain keyword: coin\", function () {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    const allContainKeyword = jsonData.every(item => \r",
+							"        (item.itemName && item.itemName.includes(coin))\r",
+							"    );\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{authToken_bidder3}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:8080/api/catalogue/items?page=0&keyword=\"coin\"",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"catalogue",
+						"items"
+					],
+					"query": [
+						{
+							"key": "page",
+							"value": "0"
+						},
+						{
+							"key": "keyword",
+							"value": "\"coin\""
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"variable": [
+		{
+			"key": "authToken",
+			"value": ""
+		},
+		{
+			"key": "recoveryToken",
+			"value": ""
+		},
+		{
+			"key": "auctionId",
+			"value": ""
+		},
+		{
+			"key": "authToken_bidder2",
+			"value": ""
+		},
+		{
+			"key": "authToken_bidder3",
+			"value": ""
+		},
+		{
+			"key": "paymentId",
+			"value": ""
+		},
+		{
+			"key": "catalogueID",
+			"value": ""
+		},
+		{
+			"key": "bidId",
+			"value": ""
+		},
+		{
+			"key": "shippingCost",
+			"value": ""
+		},
+		{
+			"key": "expeditedShippingCost",
+			"value": ""
+		}
+	]
+}

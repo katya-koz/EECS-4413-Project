@@ -1,16 +1,16 @@
 package com.bluebid.catalogue_app_service.controller;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.bluebid.catalogue_app_service.dto.PostNewItemRequest;
 import com.bluebid.catalogue_app_service.model.CatalogueItem;
 import com.bluebid.catalogue_app_service.service.CatalogueService;
 
@@ -18,9 +18,10 @@ import com.bluebid.catalogue_app_service.service.CatalogueService;
 @RequestMapping("/catalogue")
 public class CatalogueController {
 	private final CatalogueService _catalogueService;
-	
-	public CatalogueController(CatalogueService catalogueService) {
+	private final KafkaTemplate<String, Object> _kafkaTemplate;
+	public CatalogueController(CatalogueService catalogueService, KafkaTemplate<String, Object> _kafkaTemplate) {
 	    this._catalogueService = catalogueService;
+	    this._kafkaTemplate = _kafkaTemplate;
 	}
 	
 	@GetMapping("/items")
@@ -36,13 +37,15 @@ public class CatalogueController {
 	
 	    return ResponseEntity.ok(catalogue);
 	}
-	
-	@PostMapping("/item")
-	public ResponseEntity<Boolean> postCatalogueItem(@RequestBody PostNewItemRequest newItemRequest){
-		
-		
-		
-		return ResponseEntity.ok(true);
+	@GetMapping("/items/{itemId}")
+	public ResponseEntity<?> getAuction(@PathVariable String itemId) {
+	    Optional<CatalogueItem> item = _catalogueService.getItemById(itemId);
+	    if (item != null) {
+	        return ResponseEntity.ok(item);
+	    } else {
+	        return ResponseEntity.notFound().build();
+	    }
 	}
+
 
 }

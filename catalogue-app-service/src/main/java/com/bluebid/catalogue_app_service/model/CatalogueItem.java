@@ -9,18 +9,20 @@ import java.time.LocalDateTime;
 public class CatalogueItem {
 
     @Id
-    private String itemID; // mongo id
-    private String sellerID;
+    private String id; // mongo id
+    
+	private String sellerID;
     private String highestBidderID;
     private String itemName;
     private double currentBiddingPrice;
 //    private String auctionType;
-//    private LocalDateTime auctionStartDate;
-//    private LocalDateTime auctionEndDate;  
+    private LocalDateTime auctionStartDate;
+    private LocalDateTime auctionEndDate;  
     private double shippingCost;
     private double expeditedShippingCost;
     private String itemDescription;
     private int shippingDays;
+    private int expeditedShippingDays;
     private Boolean isActive;
 
     
@@ -29,6 +31,23 @@ public class CatalogueItem {
 //    	this.auctionEndDate = auctionEnd;
 //    	
 //    }
+    
+    public CatalogueItem() {};
+//    public CatalogueItem(String itemName, String itemDescription, String sellerID, double basePrice) {
+//		this.itemName = itemName;
+//		this.itemDescription = itemDescription;
+//		this.sellerID = sellerID;
+//		currentBiddingPrice = basePrice;
+//	}
+
+	public String getId() {
+		return id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
+	}
+
 
     public String getSellerID() {
         return sellerID;
@@ -70,13 +89,13 @@ public class CatalogueItem {
 //        this.auctionType = auctionType;
 //    }
 //
-//    public LocalDateTime getAuctionEndTime() {
-//        return auctionEndDate;
-//    }
-//
-//    public void setAuctionEndTime(LocalDateTime auctionEndDate){
-//        this.auctionEndDate = auctionEndDate;
-//    }
+    public LocalDateTime getAuctionEndTime() {
+        return auctionEndDate;
+    }
+
+    public void setAuctionEndTime(LocalDateTime auctionEndDate){
+        this.auctionEndDate = auctionEndDate;
+    }
 
     public double getShippingCost() {
         return shippingCost;
@@ -118,11 +137,19 @@ public class CatalogueItem {
 		this.isActive = isActive;
 	}
 
-//	public LocalDateTime getAuctionStartDate() {
-//		return auctionStartDate;
-//	}
-//
-//	public void setAuctionStartDate(LocalDateTime auctionStartDate) {
-//		this.auctionStartDate = auctionStartDate;
-//	}
+	public int getExpeditedShippingDays() {
+		return expeditedShippingDays;
+	}
+
+	public void setExpeditedShippingDays(int expeditedShippingDays) {
+		this.expeditedShippingDays = expeditedShippingDays;
+	}
+
+	public LocalDateTime getAuctionStartDate() {
+		return auctionStartDate;
+	}
+
+	public void setAuctionStartDate(LocalDateTime auctionStartDate) {
+		this.auctionStartDate = auctionStartDate;
+	}
 }
