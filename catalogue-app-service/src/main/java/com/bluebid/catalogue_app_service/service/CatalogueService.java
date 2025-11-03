@@ -144,8 +144,9 @@ public class CatalogueService {
 		
 	    ThreadLocalRandom random = ThreadLocalRandom.current();
 
-	    double shippingCost = random.nextDouble(5.0, 20.0);
-	    double expeditedShippingCost = shippingCost * random.nextDouble(1.2, 1.8);
+	    double shippingCost = (double) Math.round(random.nextDouble(5.0, 20.0));
+	    double expeditedShippingCost = (double) Math.round(shippingCost * random.nextDouble(1.2, 1.8));
+
 	    int shippingDays = random.nextInt(3, 11);
 	    int expeditedShippingDays = Math.max(1, shippingDays - random.nextInt(1, 4));
 
