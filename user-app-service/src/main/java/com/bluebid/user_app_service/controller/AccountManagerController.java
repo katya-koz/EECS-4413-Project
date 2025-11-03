@@ -35,7 +35,7 @@ public class AccountManagerController {
 //	    this._emailService = emailService; to be implemented!
 	}
 	
-	
+	// public endpoint
 	@PostMapping("/forgot-password")
 	public ResponseEntity<ForgotPasswordResponse> forgotPassword(@RequestBody ForgotPasswordRequest req){
 		// initial request where a user sends an email and username to request a code to change their password
@@ -56,7 +56,7 @@ public class AccountManagerController {
 		
 		
 	}
-	
+	// public endpoint
 	@PutMapping("/reset-password/{tokenId}")
 	public ResponseEntity<ResetPasswordResponse> resetUserPassword(@RequestBody ResetPasswordRequest resetPasswordRequest, @PathVariable String tokenId) {
 
@@ -70,7 +70,7 @@ public class AccountManagerController {
 	    }
 	}
 
-	
+	// public endpoint
 	@PostMapping("/signup")
 	public ResponseEntity<?> createUserProfile(@RequestBody CreateUserProfileRequest createProfileRequest){
 		// attempt to save new user to db
@@ -97,11 +97,4 @@ public class AccountManagerController {
 		    }
 		
 	}
-	
-
-	
-
-	
-
-
 }

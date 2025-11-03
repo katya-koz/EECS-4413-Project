@@ -16,3 +16,4 @@ https://www.youtube.com/watch?v=-pv5pMBlMxs -- video tutorial on kafka + docker 
 https://restfulapi.net/resource-naming/ -- api naming conventions guide
 https://medium.com/@dinesharney/implementing-the-saga-pattern-using-choreography-and-orchestration-53e66cbd520e --  Choreography-Based Saga pattern using kafka example
 https://medium.com/@darshak.kachchhi/setting-up-a-kafka-cluster-using-docker-compose-a-step-by-step-guide-a1ee5972b122 -- kafka Kraft mode guide for docker compose
+https://www.geeksforgeeks.org/advance-java/api-gateway-authentication-and-authorization-in-spring-boot/ -- jwt gateway authentication

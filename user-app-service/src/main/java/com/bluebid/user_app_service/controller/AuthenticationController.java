@@ -23,6 +23,7 @@ public class AuthenticationController {
 	    this._jwtManager = tokenManager;
 	}
 	
+	// public endpoint
 	@PostMapping("/login")
 	public ResponseEntity<String> validateUserCredentials(@RequestBody LoginRequest loginRequest){
 		// validate user
