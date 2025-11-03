@@ -75,7 +75,7 @@ public class CatalogueService {
             
             else {
             
-	            if (Math.abs(itemCost - event.getExpectedItemCost()) < 0.0001 && Math.abs(shippingCost - event.getExpectedShippingCost()) < 0.0001) { // tolerance for double math
+	            if (Math.abs(itemCost - event.getExpectedItemCost()) < 0.0001 && Math.abs(shippingCost - event.getExpectedShippingCost()) < 0.01) { // tolerance for double math
 	                _kafkaTemplate.send("catalogue.payment-item-validation-success-topic", new ItemValidationSuccessEvent(itemId, itemName, shipping, shippingCost, itemCost, event.getId()));
 	                item.setIsActive(false); // set item to be inactive
 	                _catalogueRepository.save(item);
