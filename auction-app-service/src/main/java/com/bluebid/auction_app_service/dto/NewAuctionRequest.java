@@ -3,12 +3,12 @@ package com.bluebid.auction_app_service.dto;
 import java.time.LocalDateTime;
 public class NewAuctionRequest {
 	
-	public String getSellerID() {
-		return sellerID;
-	}
-	public void setSellerID(String sellerID) {
-		this.sellerID = sellerID;
-	}
+//	public String getSellerID() {
+//		return sellerID;
+//	}
+//	public void setSellerID(String sellerID) {
+//		this.sellerID = sellerID;
+//	}
 	public String getCatalogueID() {
 		return catalogueID;
 	}
@@ -33,7 +33,7 @@ public class NewAuctionRequest {
 	public void setAuctionEndTime(LocalDateTime auctionEndTime) {
 		this.auctionEndTime = auctionEndTime;
 	}
-	String sellerID;
+	//String sellerID; not needed anymore as the userid sending the request is in the jwt header
 	String catalogueID;
 	String basePrice;
 	LocalDateTime auctionStartTime;

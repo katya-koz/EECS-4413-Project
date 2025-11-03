@@ -2,16 +2,16 @@ package com.bluebid.user_app_service.dto;
 
 public class ResetPasswordRequest {
 	
-	String email;
-	String userID;
+//	String email; // dont need
+//	String userID;
 	String newPassword;
-	
-	public String getUserID() {
-		return userID;
-	}
-	public void setUserID(String userID) {
-		this.userID = userID;
-	}
+//	
+//	public String getUserID() {
+//		return userID;
+//	}
+//	public void setUserID(String userID) {
+//		this.userID = userID;
+//	}
 	public String getNewPassword() {
 		return newPassword;
 	}

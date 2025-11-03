@@ -13,7 +13,7 @@ public class AttemptPaymentRequest {
 	
 	
 	// ids for cat item, user and seller
-	String userID; // user making purchase
+	///String userID; // user making purchase , no longer needed since the userid is in jwt header
 	String sellerID; // seller selling item
 	String catalogueID; // item id in catalogue
 	LocalDateTime paymentTime;
@@ -32,12 +32,12 @@ public class AttemptPaymentRequest {
 	public void setIsExpedited(Boolean isExpedited) {
 		this.isExpedited = isExpedited;
 	}
-	public String getUserID() {
-		return userID;
-	}
-	public void setUserID(String userID) {
-		this.userID = userID;
-	}
+//	public String getUserID() {
+//		return userID;
+//	}
+//	public void setUserID(String userID) {
+//		this.userID = userID;
+//	}
 	public String getSellerID() {
 		return sellerID;
 	}
