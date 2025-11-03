@@ -1,7 +1,6 @@
 
 package com.bluebid.auction_app_service.service;
 
-import org.apache.kafka.common.metrics.stats.Max;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -12,7 +11,7 @@ import com.bluebid.auction_app_service.dto.BidInitiatedEvent;
 import com.bluebid.auction_app_service.dto.BidResponse;
 import com.bluebid.auction_app_service.dto.ItemValidationFailureEvent;
 import com.bluebid.auction_app_service.dto.ItemValidationSuccessEvent;
-import com.bluebid.auction_app_service.dto.InitiateAuctionEvent;
+import com.bluebid.auction_app_service.dto.UploadCatalogueItemEvent;
 import com.bluebid.auction_app_service.dto.ItemAddedFailureEvent;
 import com.bluebid.auction_app_service.dto.ItemAddedSuccessEvent;
 import com.bluebid.auction_app_service.dto.UserInfoValidationFailureEvent;
@@ -48,7 +47,7 @@ public class AuctionService {
 
 
 	}
-
+	//####################################### PLACE A BID #######################################
 	public BidResponse initiatePlaceBid(String auctionId, String userId, Double bidValue) {
 		// check if new bid is higher than current highest bid (or base price)
 		// we need to fetch the current highest bid value
@@ -109,7 +108,7 @@ public class AuctionService {
 
 	@KafkaListener(topics = "catalogue.bid-item-validation-failed-topic", groupId = "bid-group", containerFactory = "itemValidationFailureListenerFactory")
 	public void handleCatalogueFailure( ItemValidationFailureEvent event) {
-		Optional<Bid> optionalBid = _bidRepository.findById(event.getProducerEventID());
+		Optional<Bid> optionalBid = _bidRepository.findById(event.getAuctionId());
 
 		Bid bid = optionalBid.get(); 
 
@@ -152,7 +151,12 @@ public class AuctionService {
 		// save
 		_bidRepository.save(bid);
 	}
+	
+	public Bid getBidById(String bidId) {
+		return _bidRepository.findById(bidId).orElse(null);
+	}
 
+	//####################################### POST NEW AUCTION #######################################
 	
 	@KafkaListener(topics = "catalogue.item-add-success-topic", groupId = "item-upload-group", containerFactory = "itemAddedSuccessListenerFactory")
 	public void handleItemAddSuccess(ItemAddedSuccessEvent event) 
@@ -164,6 +168,7 @@ public class AuctionService {
 		Auction auction = auctionOptional.get();
 		
 		//update the status
+		auction.setStatus(true);
 		auction.setAuctionStatus("item validated");
 		auction.setValid(true);
 		
@@ -172,7 +177,7 @@ public class AuctionService {
 	}
 	
 	@KafkaListener(topics = "catalogue.item-add-failure-topic", groupId = "item-upload-group", containerFactory = "itemAddedFailureListenerFactory")
-	public void handleItemAddSuccess(ItemAddedFailureEvent event) 
+	public void handleItemAddFailure(ItemAddedFailureEvent event) 
 	{
 		String auctionID = event.getAuctionID();
 		
@@ -190,7 +195,7 @@ public class AuctionService {
 	
 	
 	//logical validation methods
-	private boolean validateAuctionInput(String itemName, String itemDescription, String sellerID, boolean isValid, double basePrice, int days, int hours)
+	private boolean validateAuctionInput(String itemName, String itemDescription, double basePrice)
 	{
 	
 		if (itemName == null)
@@ -213,13 +218,13 @@ public class AuctionService {
 	
 	}
 	
-	public String isValidAuctionItem(String itemName, String itemDescription, String sellerID, boolean isValid, double basePrice, int days, int hours)
+	public String isValidAuctionItem(String itemName, String itemDescription, String sellerID, boolean isValid, double basePrice, int secondsDuration)
 	{
-		boolean areItemsValid = validateAuctionInput(itemName, itemDescription, sellerID, isValid, basePrice, days, hours);
+		boolean areItemsValid = validateAuctionInput(itemName, itemDescription, basePrice);
 		
 		if (areItemsValid == true)
 		{
-			return initiateAuction(itemName, itemDescription, sellerID, isValid, basePrice, days, hours);
+			return initiateAuction(itemName, itemDescription, sellerID, basePrice, secondsDuration);
 		}
 		else
 		{
@@ -228,10 +233,11 @@ public class AuctionService {
 		
 	}
 	
-	public String initiateAuction(String itemName, String itemDescription, String sellerID, boolean isValid, double basePrice, int days, int hours)
+	public String initiateAuction(String itemName, String itemDescription, String sellerID, double basePrice, int secondsDuration)
 	{
-		//create initiateAuctionEvent
-		InitiateAuctionEvent event = new InitiateAuctionEvent(itemName, itemDescription, sellerID, isValid, basePrice, days, hours);
+		
+		LocalDateTime start = LocalDateTime.now();
+		LocalDateTime end = start.plusSeconds(secondsDuration);
 		
 		//create Auction item
 		Auction auction = new Auction(
@@ -240,27 +246,49 @@ public class AuctionService {
 				sellerID,
 				false,
 				basePrice,
-				days,
-				hours
+				start,
+				end
 				);
 		
-		auction.setAuctionStartTime(LocalDateTime.now());
-		//calculate auction duration and set the auction end time
-		auction.setAuctionEndTime(auction.calcuateDuration());
+		
 		
 		auction.setAuctionStatus("pending validation");
 		
 		//save the auction into the db (with inital state of isValid = false)
 		_auctionRepository.save(auction);
 		
+		// event
+		UploadCatalogueItemEvent event = new UploadCatalogueItemEvent(sellerID, itemName, start, end, itemDescription, basePrice, auction.getId());
+		
 		
 		//publish event for user
 		_kafkaTemplate.send("auction.validation-topic", event);
 		
-		return auction.getAuctionID();
+		return auction.getId();
 		
 		
 	}
+//	
+//	public LocalDateTime calcuateDuration(LocalDateTime now, int days, int hours) //this is assuming we have valid input, we should have front end logic preventing invalid input
+//	{
+//		
+//		int duration = 0;
+//		
+//		if (days == 0)
+//		{
+//			duration = hours;
+//		}
+//		else
+//		{
+//			duration = (days * 24) + hours;
+//		}
+//		
+//		return now.plusHours(duration);
+//		
+//	}
+//	
+	
+	//############################ END AUCTION USE CASE ##################################
 
 	public void endAuction(String auctionId) {
 		// assume we have a timer or some external event tracker to track when this ends, then the endpoint is called
@@ -296,15 +324,13 @@ public class AuctionService {
 
 		_messagingTemplate.convertAndSend("/topic/auction/" + auctionId, notification);
 	}
-
-
-	public void createNewAuction(Auction auction) {
-		_auctionRepository.save(auction);
+	public Auction getAuctionById(String auctionid) {
+		return _auctionRepository.findById(auctionid).orElse(null);
 	}
 
-	public Bid getBidById(String bidId) {
-		return _bidRepository.findById(bidId).orElse(null);
-	}
+
+	
+
 
 //	private Auction convertToAuctionObject(InitiateAuctionEvent request)
 //	{

@@ -5,21 +5,21 @@ public class ItemAddedSuccessEvent {
 	private String catalogueID;
 	private String itemName;
 	private String itemDescription;
-	private String sellerID;
-	private String auctionID;
+	private String sellerId;
+	private String auctionId;
 	
 	public ItemAddedSuccessEvent()
 	{
 		
 	}
 	
-	public ItemAddedSuccessEvent(String catalogueID, String itemName, String itemDescription, String sellerID, String auctionID)
+	public ItemAddedSuccessEvent(String catalogueID, String itemName, String itemDescription, String sellerId, String auctionId)
 	{
 		this.catalogueID = catalogueID;
 		this.itemName = itemName;
 		this.itemDescription = itemDescription;
-		this.sellerID = sellerID;
-		this.auctionID = auctionID;
+		this.sellerId = sellerId;
+		this.auctionId = auctionId;
 	}
 
 	public String getCatalogueID() {
@@ -46,20 +46,20 @@ public class ItemAddedSuccessEvent {
 		this.itemDescription = itemDescription;
 	}
 
-	public String getSellerID() {
-		return sellerID;
+	public String getSellerId() {
+		return sellerId;
 	}
 
-	public void setSellerID(String sellerID) {
-		this.sellerID = sellerID;
+	public void setSellerID(String sellerId) {
+		this.sellerId = sellerId;
 	}
 
 	public String getAuctionID() {
-		return auctionID;
+		return auctionId;
 	}
 
-	public void setAuctionID(String auctionID) {
-		this.auctionID = auctionID;
+	public void setAuctionID(String auctionId) {
+		this.auctionId = auctionId;
 	}
 }
 	

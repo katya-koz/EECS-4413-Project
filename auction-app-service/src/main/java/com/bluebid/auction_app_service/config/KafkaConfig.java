@@ -22,7 +22,6 @@ import com.bluebid.auction_app_service.dto.ItemValidationFailureEvent;
 import com.bluebid.auction_app_service.dto.ItemValidationSuccessEvent;
 import com.bluebid.auction_app_service.dto.UserInfoValidationFailureEvent;
 import com.bluebid.auction_app_service.dto.UserInfoValidationSuccessEvent;
-import com.bluebid.auction_app_service.dto.InitiateAuctionEvent;
 import com.bluebid.auction_app_service.dto.ItemAddedFailureEvent;
 import com.bluebid.auction_app_service.dto.ItemAddedSuccessEvent;
 
@@ -142,22 +141,7 @@ public class KafkaConfig {
                 new JsonDeserializer<>(ItemAddedFailureEvent.class, false)
         );
     }
-//    //auction initiated event
-//    @Bean
-//    public ConsumerFactory<String, InitiateAuctionEvent> auctionConsumerFactory() {
-//        Map<String, Object> config = new HashMap<>();
-//        config.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "kafka:9092");
-//        config.put(ConsumerConfig.GROUP_ID_CONFIG, "catalogue-group");
-//        config.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
-//        config.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class);
-//
-//        return new DefaultKafkaConsumerFactory<>(
-//            config,
-//            new StringDeserializer(),
-//            new JsonDeserializer<>(InitiateAuctionEvent.class, false) 
-//        );
-//    }
-    
+
     @Bean
     public ConcurrentKafkaListenerContainerFactory<String, UserInfoValidationFailureEvent> userValidationFailureListenerFactory() {
         ConcurrentKafkaListenerContainerFactory<String, UserInfoValidationFailureEvent> factory = new ConcurrentKafkaListenerContainerFactory<>();
@@ -199,14 +183,6 @@ public class KafkaConfig {
         factory.setConsumerFactory(ItemAddedFailureConsumerFactory());
         return factory;
     }
-    
- // 
-    
-//    @Bean
-//    public ConcurrentKafkaListenerContainerFactory<String, InitiateAuctionEvent> auctionInitiatedListenerContainerFactory() {
-//        ConcurrentKafkaListenerContainerFactory<String, InitiateAuctionEvent> factory = new ConcurrentKafkaListenerContainerFactory<>();
-//        factory.setConsumerFactory(auctionConsumerFactory());
-//        return factory;
-//    }
+
 
 }

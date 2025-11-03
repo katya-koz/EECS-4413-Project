@@ -1,12 +1,12 @@
 package com.bluebid.auction_app_service.controller;
-import java.time.LocalDateTime;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import com.bluebid.auction_app_service.dto.InitiateAuctionEvent;
+import com.bluebid.auction_app_service.dto.NewAuctionRequest;
+import com.bluebid.auction_app_service.dto.NewAuctionResponse;
 import com.bluebid.auction_app_service.model.Auction;
 import com.bluebid.auction_app_service.service.AuctionService;
 
@@ -30,14 +30,20 @@ public class AuctionController {
 	}
 
 	@PostMapping("/new-auction")
-	public ResponseEntity<String> startNewAuction(@RequestBody InitiateAuctionEvent newAuctionRequest){
+	public ResponseEntity<?> startNewAuction(@RequestBody NewAuctionRequest newAuctionRequest){
 
 		String itemName = newAuctionRequest.getItemName();
 		String itemDescription = newAuctionRequest.getItemDescription();
 		String sellerID = newAuctionRequest.getSellerID();
 		double basePrice = newAuctionRequest.getBasePrice();
-		int days = newAuctionRequest.getDays();
-		int hours = newAuctionRequest.getHours();
+		int secondsDuration = newAuctionRequest.getSeconds();
+		
+		// these fields will be randomized by the catalogue service upon creation
+//		double shippingCost = newAuctionRequest.getShippingCost();
+//		double expeditedShippingCost = newAuctionRequest.getExpeditedShippingCost();
+//		int shippingDays= newAuctionRequest.getShippingDays();
+//		int expeditedShippingDays = newAuctionRequest.getExpeditedShippingDays();
+		
 		String auctionID = null;
 
 		//initial validations
@@ -69,25 +75,28 @@ public class AuctionController {
 					.body("Item Price must be greater or equal to $1"); 
 		}
 
-		if (days < 0)
+		if (secondsDuration < 1)
 		{
 			return ResponseEntity
 					.badRequest()
-					.body("Auction duration must be greater or equal to 1 hour"); 
+					.body("Auction duration must be greater or equal to 1 second"); // of course, normally this would be too low. but for testing purposes this timer should be allowed to be set lower
 		}
-
-		if (hours < 0)
+		
+		if(secondsDuration > 60 * 60 * 24 * 10) // 10 day limit
+		
 		{
 			return ResponseEntity
 					.badRequest()
-					.body("Auction duration must be greater or equal to 1 hour"); 
+					.body("Auction duration cannot be longer than 10 days."); // same limit as ebay
+			
 		}
+		
 
 
 		//attempt to initiate auction
 		try
 		{
-			auctionID = _auctionService.initiateAuction(itemName, itemDescription, sellerID, false, basePrice, days, hours);
+			auctionID = _auctionService.initiateAuction(itemName, itemDescription, sellerID,basePrice, secondsDuration);
 		}
 		
 		catch(IllegalArgumentException e)
@@ -98,47 +107,18 @@ public class AuctionController {
 
 		}
 
-		//if all validations pass, return an auction submited succesfully message
-		//add a new response object (similar to what you loked at before - to implment)
-		return new ResponseEntity<>(
-				String.format("Auction %s submitted successfully", auctionID), 
-				HttpStatus.CREATED
-				);
+		 return ResponseEntity.ok(new NewAuctionResponse("New auction request has successfully been submitted.", auctionID, true));
+	}
+	
+	
+	@GetMapping("/auctions/{auctionid}")
+	public ResponseEntity<?> getAuction(@PathVariable String auctionid) {
+	    Auction receipt = _auctionService.getAuctionById(auctionid);
+	    if (receipt != null) {
+	        return ResponseEntity.ok(receipt);
+	    } else {
+	        return ResponseEntity.notFound().build();
+	    }
 	}
 
-	//  @PostMapping
-	//  public ResponseEntity<Auction> create(@Valid @RequestBody CreateAuctionRequest auction) {
-	//    Auction a = new Auction(auction.getSellerId(), auction.getCatalogueId(), auction.getItemName(), auction.getBasePrice(), auction.getAuctionType(), auction.getShippingCost(), auction.getExpeditedShippingCost(), auction.getShippingDays(), auction.getEndTime());
-	//    a = Repo.save(a);
-	//    return ResponseEntity.created(URI.create("/api/auctions/" + a.getId())).body(a);
-	//  }
-	//
-	//  @GetMapping
-	//  public List<Auction> list() { return Repo.findAll(); }
-	//
-	//  @GetMapping("/{id}")
-	//  public ResponseEntity<Auction> get(@PathVariable String id) {
-	//    return Repo.findById(id).map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
-	//  }
-	//
-	//  @PostMapping("/{id}/bids")
-	//  public ResponseEntity<?> bid(@PathVariable String id, @Valid @RequestBody BidRequest bid) {
-	//    Optional<Auction> updated = auctionService.placeBid(id, bid.getUserId(), bid.getBidValue());
-	//    if (updated.isPresent()) {
-	//      return ResponseEntity.ok(updated.get());
-	//    } else {
-	//      return ResponseEntity.badRequest().body("Bid rejected: lower than current highest or auction not active");
-	//    }
-	//  }
-	//
-	//  @PostMapping("/{id}/end")
-	//  public ResponseEntity<?> end(@PathVariable String id) {
-	//    Optional<Auction> ended = auctionService.endAuction(id);
-	//    if (ended.isPresent()) {
-	//      notificationService.sendAuctionEndNotification(id, ended.get().getHighestBidderId());
-	//      return ResponseEntity.ok(ended.get());
-	//    } else {
-	//      return ResponseEntity.notFound().build();
-	//    }
-	//  }
 }

@@ -17,7 +17,7 @@ public class CatalogueItem {
     private double currentBiddingPrice;
 //    private String auctionType;
     private LocalDateTime auctionStartDate;
-//    private LocalDateTime auctionEndDate;  
+    private LocalDateTime auctionEndDate;  
     private double shippingCost;
     private double expeditedShippingCost;
     private String itemDescription;
@@ -32,12 +32,13 @@ public class CatalogueItem {
 //    	
 //    }
     
-    public CatalogueItem(String itemName, String itemDescription, String sellerID, double basePrice) {
-		this.itemName = itemName;
-		this.itemDescription = itemDescription;
-		this.sellerID = sellerID;
-		currentBiddingPrice = basePrice;
-	}
+    public CatalogueItem() {};
+//    public CatalogueItem(String itemName, String itemDescription, String sellerID, double basePrice) {
+//		this.itemName = itemName;
+//		this.itemDescription = itemDescription;
+//		this.sellerID = sellerID;
+//		currentBiddingPrice = basePrice;
+//	}
 
 	public String getId() {
 		return id;
@@ -88,13 +89,13 @@ public class CatalogueItem {
 //        this.auctionType = auctionType;
 //    }
 //
-//    public LocalDateTime getAuctionEndTime() {
-//        return auctionEndDate;
-//    }
-//
-//    public void setAuctionEndTime(LocalDateTime auctionEndDate){
-//        this.auctionEndDate = auctionEndDate;
-//    }
+    public LocalDateTime getAuctionEndTime() {
+        return auctionEndDate;
+    }
+
+    public void setAuctionEndTime(LocalDateTime auctionEndDate){
+        this.auctionEndDate = auctionEndDate;
+    }
 
     public double getShippingCost() {
         return shippingCost;

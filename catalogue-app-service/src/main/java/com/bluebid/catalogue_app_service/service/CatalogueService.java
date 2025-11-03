@@ -3,6 +3,7 @@ package com.bluebid.catalogue_app_service.service;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.ThreadLocalRandom;
 
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -12,13 +13,12 @@ import org.springframework.stereotype.Service;
 //import com.bluebid.auction_app_service.model.Auction;
 //import com.bluebid.catalogue_app_service.dto.AuctionUploadEvent;
 import com.bluebid.catalogue_app_service.dto.BidInitiatedEvent;
-import com.bluebid.catalogue_app_service.dto.InitiateAuctionEvent;
 import com.bluebid.catalogue_app_service.dto.ItemAddedFailureEvent;
 import com.bluebid.catalogue_app_service.dto.ItemAddedSuccessEvent;
 import com.bluebid.catalogue_app_service.dto.ItemValidationFailureEvent;
 import com.bluebid.catalogue_app_service.dto.ItemValidationSuccessEvent;
 import com.bluebid.catalogue_app_service.dto.PaymentInitiatedEvent;
-import com.bluebid.catalogue_app_service.dto.PostNewItemRequest;
+import com.bluebid.catalogue_app_service.dto.UploadCatalogueItemEvent;
 import com.bluebid.catalogue_app_service.model.CatalogueItem;
 import com.bluebid.catalogue_app_service.repository.CatalogueRepository;
 //import com.bluebid.payment_app_service.model.Receipt;
@@ -46,6 +46,7 @@ public class CatalogueService {
         
     }
     
+    //############################## PAY FOR ITEM USE CASE ###########################
     @KafkaListener(topics= "payment.item-validation-topic", groupId = "catalogue-group", containerFactory = "paymentInitiatedListenerContainerFactory")
     public void reserveItemForPurchase(PaymentInitiatedEvent event) {
     	// once a payment event has been received for an item, and the user is validated, it must be set to inactive in the db, and information for the receipt must be fetched and published	
@@ -59,13 +60,18 @@ public class CatalogueService {
             Double shippingCost = event.getIsExpedited() ? item.getExpeditedShippingCost() : item.getShippingCost();
             Double itemCost = item.getCurrentBiddingPrice();
             String highestBidderUserId = item.getHighestBidderID();
+            LocalDateTime auctionEnd = item.getAuctionEndTime();
             
-            if(!event.getUserID().equals(highestBidderUserId)) {
-            	// return a fail if the user who is attempting to purchase the item is not the one who won the bid
-            	_kafkaTemplate.send("catalogue.payment-item-validation-failed-topic", new ItemValidationFailureEvent(event.getCatalogueID(),event.getId(), "Nice try, punk... that requested user ID is not the same as the auction winner." ));
+            
+            if(event.getPaymentTime().isBefore(auctionEnd)) {
+            	_kafkaTemplate.send("catalogue.payment-item-validation-failed-topic", new ItemValidationFailureEvent(event.getCatalogueID(),event.getId(),"This auction is not yet over." ));
+
             }else if(event.getUserID().equals(event.getSellerID())) {
             	_kafkaTemplate.send("catalogue.payment-item-validation-failed-topic", new ItemValidationFailureEvent(event.getCatalogueID(),event.getId(), "A seller cannot purchase their own listing!." ));
 
+            }else if(!event.getUserID().equals(highestBidderUserId)) {
+            	// return a fail if the user who is attempting to purchase the item is not the one who won the bid
+            	_kafkaTemplate.send("catalogue.payment-item-validation-failed-topic", new ItemValidationFailureEvent(event.getCatalogueID(),event.getId(), "Nice try, punk... that requested user ID is not the same as the auction winner." ));
             }
             
             else {
@@ -85,7 +91,7 @@ public class CatalogueService {
     }
     
     
-    
+  //############################## BID ON ITEM USE CASE ###########################
     @KafkaListener(topics= "bid.item-validation-topic", groupId = "catalogue-group", containerFactory = "bidInitiatedListenerContainerFactory")
     public void validateItemBidAmount(BidInitiatedEvent event) {
     	// once a payment event has been received for an item, and the user is validated, it must be set to inactive in the db, and information for the receipt must be fetched and published	
@@ -113,22 +119,45 @@ public class CatalogueService {
         }
     	
     }
-    
+  //############################## NEW AUCTION USE CASE ###########################
     @KafkaListener(topics = "auction.validation-topic", groupId = "catalogue-group", containerFactory = "auctionInitiatedListenerContainerFactory")
-    public String addToCatalogue(String itemName, String itemDescription, String sellerID, boolean isValid, double basePrice, int days, int hours)
+    public String addToCatalogue(UploadCatalogueItemEvent event)
   	{
-  		InitiateAuctionEvent event = new InitiateAuctionEvent(itemName, itemDescription, sellerID, isValid, basePrice, days, hours);
+		String itemName= event.getItemName();
+		String itemDescription= event.getItemDescription();
+		String sellerID= event.getSellerID();
+		double basePrice= event.getBasePrice();
+    	
+  		//InitiateAuctionEvent event = new InitiateAuctionEvent(itemName, itemDescription, sellerID, isValid, basePrice, days, hours);
   		boolean areItemsValid = validateCatalogueInput(itemName, itemDescription, sellerID, basePrice);
   		
   		
   		//create Catalogue Item
-  		CatalogueItem item = new CatalogueItem(
-  				itemName,
-  				itemDescription,
-  				sellerID,
-  				basePrice
-  				);
-  		  		
+  		CatalogueItem item = new CatalogueItem();
+  		item.setSellerID(event.getSellerID());
+		item.setItemName(event.getItemName());
+		item.setAuctionStartDate(event.getAuctionStartDate());
+		item.setAuctionEndTime(event.getAuctionEndDate());
+		item.setItemDescription(event.getItemDescription());  	
+		
+		//generate random shipping costs and times
+		
+	    ThreadLocalRandom random = ThreadLocalRandom.current();
+
+	    double shippingCost = random.nextDouble(5.0, 20.0);
+	    double expeditedShippingCost = shippingCost * random.nextDouble(1.2, 1.8);
+	    int shippingDays = random.nextInt(3, 11);
+	    int expeditedShippingDays = Math.max(1, shippingDays - random.nextInt(1, 4));
+
+	    item.setShippingCost(shippingCost);
+	    item.setExpeditedShippingCost(expeditedShippingCost);
+	    item.setShippingDays(shippingDays);
+	    item.setExpeditedShippingDays(expeditedShippingDays);
+	    
+	    
+	    item.setHighestBidderID(null);
+	    item.setIsActive(true);
+	    item.setCurrentBiddingPrice(basePrice); 
   				
   		//if validationation passes here, publish a success event here
   		if (areItemsValid)
@@ -136,14 +165,14 @@ public class CatalogueService {
   			
   			//save the catalogue item into the db
   	  		_catalogueRepository.save(item);
-  	  		_kafkaTemplate.send("catalogue.item-add-success-topic", new ItemAddedSuccessEvent(item.getId(),item.getItemName(),item.getItemDescription(),item.getSellerID(),item.getId()));
+  	  		_kafkaTemplate.send("catalogue.item-add-success-topic", new ItemAddedSuccessEvent(item.getId(),item.getItemName(),item.getItemDescription(),item.getSellerID(),event.getAuctionId()));
   	  	
 
   		}
   		//if validation fails, publish a failure event here
   		else
   		{
-  			_kafkaTemplate.send("catalogue.item-add-failure-topic", new ItemAddedFailureEvent(item.getId(),item.getItemName(),item.getItemDescription(),item.getSellerID(), "Validation Failed. Item not added to the database.",item.getId()));
+  			_kafkaTemplate.send("catalogue.item-add-failure-topic", new ItemAddedFailureEvent(item.getId(),item.getItemName(),item.getItemDescription(),item.getSellerID(), "Validation Failed. Item not added to the database.",event.getAuctionId()));
   		}
   		  		
   		
@@ -176,73 +205,7 @@ public class CatalogueService {
   	
   	}
   	
-//  	public String isValidCatalogueItem(String itemName, String itemDescription, String sellerID, boolean isValid, double basePrice, int days, int hours)
-//  	{
-//  		boolean areItemsValid = validateCatalogueInput(itemName, itemDescription, sellerID, basePrice);
-//  		
-//  		if (areItemsValid == true)
-//  		{
-//  			return addToCatalogue(itemName, itemDescription, sellerID, basePrice, days, hours);
-//  		}
-//  		else
-//  		{
-//  			return "Please check your inputs and try again.";
-//  		}
-//  		
-//  	}
-  	
-  	
-  	
-    
-//    //helper function to convert the request to a catalogueItem
-//    private CatalogueItem convertToCatalogueItem(PostNewItemRequest request)
-//    {
-//    	CatalogueItem item = new CatalogueItem();
-//    	
-//    	item.setSellerID(request.getSellerID());
-//  	item.setAuctionStartDate(LocalDateTime.now());
-//    	String basePriceAsString = request.getBasePrice(); //do we have verifcations to ensure this is an integer? 
-//    	item.setCurrentBiddingPrice(Integer.parseInt(basePriceAsString));
-//    	item.setItemName(request.getItemName());
-//    	item.setItemDescription(request.getItemDescription());
-//    	
-//    	return item;
-//    	
-//    	
-//    }
-//    public String uploadItem(PostNewItemRequest request)
-//    {
-//    	System.out.println("attempting save");
-//    	//save to the mongoDB
-//    	CatalogueItem newItem = convertToCatalogueItem(request);
-//    	CatalogueItem savedItem = this._catalogueRepository.save(newItem);
-//    	System.out.println("success message save complete");
-//    	//get generated string
-//    	String catalogueId = savedItem.getId();
-//    	
-//    	
-//    	uploadItemToAuction(catalogueId, request);
-//    	
-//    	//return the catalogueId
-//    	return catalogueId;
-//    }
-//    
-//    private void uploadItemToAuction(String catalogueId, PostNewItemRequest request)
-//    {
-//    	//create new event object 
-//    	AuctionUploadEvent event = new AuctionUploadEvent();
-//    	
-//    	event.setSellerId(request.getSellerID());
-//    	event.setCatalogueId(catalogueId);
-//    	event.setBasePrice(request.getBasePrice());
-//    	event.setItemDescription(request.getItemDescription());
-//    	event.setItemName(request.getItemName());
-//    	
-//    	//send kafka message
-//    	this._kafkaTemplate.send("new-auction-item-topic",catalogueId, event);
-//    	
-//    	System.out.println("success message AHH");
-//    }
+
     
   
 }

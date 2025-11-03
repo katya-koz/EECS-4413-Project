@@ -19,8 +19,8 @@ import org.springframework.kafka.support.serializer.JsonDeserializer;
 import org.springframework.kafka.support.serializer.JsonSerializer;
 
 import com.bluebid.catalogue_app_service.dto.BidInitiatedEvent;
-import com.bluebid.catalogue_app_service.dto.InitiateAuctionEvent;
 import com.bluebid.catalogue_app_service.dto.PaymentInitiatedEvent;
+import com.bluebid.catalogue_app_service.dto.UploadCatalogueItemEvent;
 @Configuration
 public class KafkaConfig {
 	
@@ -97,7 +97,7 @@ public class KafkaConfig {
     
     // auction initiated event
     @Bean
-    public ConsumerFactory<String, InitiateAuctionEvent> auctionConsumerFactory() {
+    public ConsumerFactory<String, UploadCatalogueItemEvent> auctionConsumerFactory() {
         Map<String, Object> config = new HashMap<>();
         config.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "kafka:9092");
         config.put(ConsumerConfig.GROUP_ID_CONFIG, "catalogue-group");
@@ -107,13 +107,13 @@ public class KafkaConfig {
         return new DefaultKafkaConsumerFactory<>(
             config,
             new StringDeserializer(),
-            new JsonDeserializer<>(InitiateAuctionEvent.class, false) 
+            new JsonDeserializer<>(UploadCatalogueItemEvent.class, false) 
         );
     }
     
     @Bean
-    public ConcurrentKafkaListenerContainerFactory<String, InitiateAuctionEvent> auctionInitiatedListenerContainerFactory() {
-        ConcurrentKafkaListenerContainerFactory<String, InitiateAuctionEvent> factory = new ConcurrentKafkaListenerContainerFactory<>();
+    public ConcurrentKafkaListenerContainerFactory<String, UploadCatalogueItemEvent> auctionInitiatedListenerContainerFactory() {
+        ConcurrentKafkaListenerContainerFactory<String, UploadCatalogueItemEvent> factory = new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(auctionConsumerFactory());
         return factory;
     }
