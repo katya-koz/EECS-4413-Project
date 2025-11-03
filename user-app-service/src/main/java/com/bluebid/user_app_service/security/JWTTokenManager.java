@@ -16,13 +16,14 @@ import org.springframework.stereotype.Component;
 public class JWTTokenManager {
 	
     private final SecretKey key = Keys.hmacShaKeyFor("6ce0128b814365a2592f3dd44042f83649908c3672db59ef192b56e711e4c649".getBytes()); /// key for testing purposes
-	private final long expirationMs = 1000 * 60 * 30 ; // token expires in 30 min
+	private final long expirationMs = 1000 * 60 * 60 ; // token expires in 60 min - for testing
 	
 	
 	// generate a token with the user's username
-	public String generateToken(String username) {
+	//changed to generate with userid instead
+	public String generateToken(String userId) {
 		return Jwts.builder()
-        .subject(username)
+        .subject(userId)
         .issuedAt(new Date())
         .expiration(new Date(System.currentTimeMillis() + expirationMs))
         .signWith(key)  

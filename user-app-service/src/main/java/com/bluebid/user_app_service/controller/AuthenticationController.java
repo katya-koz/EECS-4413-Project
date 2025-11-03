@@ -33,7 +33,7 @@ public class AuthenticationController {
 		try{
 			User user = _userService.validateCredentials(loginRequest.getUsername(), loginRequest.getPassword());
 
-			String token = _jwtManager.generateToken(user.getUsername());
+			String token = _jwtManager.generateToken(user.getId());
 			return ResponseEntity.ok(token);}
 		
 		catch(RuntimeException e) {

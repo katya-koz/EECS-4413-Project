@@ -289,41 +289,41 @@ public class AuctionService {
 //	
 	
 	//############################ END AUCTION USE CASE ##################################
-
-	public void endAuction(String auctionId) {
-		// assume we have a timer or some external event tracker to track when this ends, then the endpoint is called
-		// this should notify all bidders
-
-		// first validate that the auction has really ended
-		Auction auction = _auctionRepository.findById(auctionId).orElseThrow(() -> new RuntimeException("Auction not found with ID: " + auctionId));	  
-
-		if(!auction.getAuctionEndTime().isBefore(LocalDateTime.now())) {
-			// then the auction isnt really over
-			return;
-		}
-		auction.setStatus(false);
-		_auctionRepository.save(auction);
-
-		// get all bidders by id
-		List<Bid> bids = _bidRepository.findByAuctionIDOrderByAmountDesc(auctionId);
-
-		if (bids.isEmpty()) {
-			return;
-		}
-
-		// winner is the highest bid 
-		Bid winner = bids.get(0);
-
-		// send notifications to all the bidders
-		AuctionNotification notification = new AuctionNotification(
-				"Auction ended! Winner is user " + winner.getBidderID(),
-				auctionId,
-				winner.getAmount(),
-				winner.getBidderID()
-				);
-
-		_messagingTemplate.convertAndSend("/topic/auction/" + auctionId, notification);
-	}
+	// offloaded to scheduler
+//	public void endAuction(String auctionId) {
+//		// assume we have a timer or some external event tracker to track when this ends, then the endpoint is called
+//		// this should notify all bidders
+//
+//		// first validate that the auction has really ended
+//		Auction auction = _auctionRepository.findById(auctionId).orElseThrow(() -> new RuntimeException("Auction not found with ID: " + auctionId));	  
+//
+//		if(!auction.getAuctionEndTime().isBefore(LocalDateTime.now())) {
+//			// then the auction isnt really over
+//			return;
+//		}
+//		auction.setStatus(false);
+//		_auctionRepository.save(auction);
+//
+//		// get all bidders by id
+//		List<Bid> bids = _bidRepository.findByAuctionIDOrderByAmountDesc(auctionId);
+//
+//		if (bids.isEmpty()) {
+//			return;
+//		}
+//
+//		// winner is the highest bid 
+//		Bid winner = bids.get(0);
+//
+//		// send notifications to all the bidders
+//		AuctionNotification notification = new AuctionNotification(
+//				"Auction ended! Winner is user " + winner.getBidderID(),
+//				auctionId,
+//				winner.getAmount(),
+//				winner.getBidderID()
+//				);
+//
+//		_messagingTemplate.convertAndSend("/topic/auction/" + auctionId, notification);
+//	}
 	public Auction getAuctionById(String auctionid) {
 		return _auctionRepository.findById(auctionid).orElse(null);
 	}
