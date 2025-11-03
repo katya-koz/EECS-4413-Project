@@ -41,16 +41,6 @@ public class CatalogueController {
 	    return ResponseEntity.ok(catalogue);
 	}
 	
-//	@PostMapping("/item")
-//	public ResponseEntity<Map<String,String>> postCatalogueItem(@RequestBody PostNewItemRequest newItemRequest){
-//		String newCatalogueId = _catalogueService.uploadItem(newItemRequest);
-//		System.out.println("finished upload " + newCatalogueId);
-//		Map<String, String> responseBody = Map.of(
-//		        "message", "Item created successfully!",
-//		        "catalogueId", newCatalogueId);	
-//		
-//		
-//		return ResponseEntity.status(HttpStatus.CREATED).body(responseBody);
-//	}
+
 
 }

@@ -2,7 +2,6 @@ package com.bluebid.auction_app_service.dto;
 
 import java.time.LocalDateTime;
 
-import org.apache.kafka.common.Uuid;
 
 public class BidInitiatedEvent {
 	// publish this event when a bid request has been made

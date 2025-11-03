@@ -67,7 +67,10 @@ public class NewAuctionRequest {
 	public void setSeconds(int seconds) {
 		this.seconds = seconds;
 	}
-
-	
+	//String sellerID; not needed anymore as the userid sending the request is in the jwt header
+	String catalogueID;
+	String basePrice;
+	LocalDateTime auctionStartTime;
+	LocalDateTime auctionEndTime;
 
 }

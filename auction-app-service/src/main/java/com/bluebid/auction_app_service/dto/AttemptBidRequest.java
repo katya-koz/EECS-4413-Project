@@ -4,7 +4,7 @@ import java.time.LocalDateTime;
 
 public class AttemptBidRequest {
 	
-	String userID;
+	//String userID;
 	String auctionID;
 	double bidRequest;
 	LocalDateTime bidSentTime;
@@ -17,12 +17,12 @@ public class AttemptBidRequest {
 	}
 	
 	
-	public String getUserID() {
-		return userID;
-	}
-	public void setUserID(String userID) {
-		this.userID = userID;
-	}
+//	public String getUserID() {
+//		return userID;
+//	}
+//	public void setUserID(String userID) {
+//		this.userID = userID;
+//	}
 	
 	public double getBidRequest() {
 		return bidRequest;

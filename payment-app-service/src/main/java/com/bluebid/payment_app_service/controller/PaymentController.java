@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -26,7 +27,15 @@ public class PaymentController {
 	}
 	
 	@PostMapping("/payment")
-	public ResponseEntity<?> attemptPayment(@RequestBody AttemptPaymentRequest attemptPaymentRequest){
+	public ResponseEntity<?> attemptPayment(
+				@RequestBody AttemptPaymentRequest attemptPaymentRequest,
+				@RequestHeader(value = "X-User-Id", required = false) String userId
+			){
+		
+		 if (userId == null || userId.isBlank()) {
+			 return ResponseEntity .badRequest().body("Missing user id header.");
+
+		 }
 	
 		String cardNumber = attemptPaymentRequest.getCardNumber();
 		String expiryMonth = attemptPaymentRequest.getExpiryMonth();
@@ -34,7 +43,6 @@ public class PaymentController {
 		String cvv = attemptPaymentRequest.getSecurityCode();
 		Double amount = attemptPaymentRequest.getItemPrice();
 		
-		String userID = attemptPaymentRequest.getUserID();
 		String sellerID = attemptPaymentRequest.getSellerID();
 		String catID = attemptPaymentRequest.getCatalogueID();
 		Boolean isExpedited = attemptPaymentRequest.getIsExpedited();
@@ -56,7 +64,7 @@ public class PaymentController {
 		            .body("Payment and/or shipping amount is not valid.");
         }
 	   
-        String paymentId = _paymentService.isValidPaymentInfo(cardNumber, expiryMonth, expiryYear, cvv, userID, sellerID, catID, time, isExpedited, amount, shippingCost);
+        String paymentId = _paymentService.isValidPaymentInfo(cardNumber, expiryMonth, expiryYear, cvv, userId, sellerID, catID, time, isExpedited, amount, shippingCost);
         
         if (paymentId != null) {
             return ResponseEntity.ok(new PaymentResponse(
