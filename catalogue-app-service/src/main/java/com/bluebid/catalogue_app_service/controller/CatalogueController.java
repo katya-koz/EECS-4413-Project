@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.bluebid.auction_app_service.model.Auction;
 import com.bluebid.catalogue_app_service.dto.PostNewItemRequest;
 import com.bluebid.catalogue_app_service.model.CatalogueItem;
 import com.bluebid.catalogue_app_service.service.CatalogueService;
