@@ -8,20 +8,28 @@ import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
-import com.bluebid.catalogue_app_service.dto.AuctionUploadEvent;
+//import com.bluebid.auction_app_service.dto.InitiateAuctionEvent;
+//import com.bluebid.auction_app_service.model.Auction;
+//import com.bluebid.catalogue_app_service.dto.AuctionUploadEvent;
 import com.bluebid.catalogue_app_service.dto.BidInitiatedEvent;
+import com.bluebid.catalogue_app_service.dto.InitiateAuctionEvent;
+import com.bluebid.catalogue_app_service.dto.ItemAddedFailureEvent;
+import com.bluebid.catalogue_app_service.dto.ItemAddedSuccessEvent;
 import com.bluebid.catalogue_app_service.dto.ItemValidationFailureEvent;
 import com.bluebid.catalogue_app_service.dto.ItemValidationSuccessEvent;
 import com.bluebid.catalogue_app_service.dto.PaymentInitiatedEvent;
 import com.bluebid.catalogue_app_service.dto.PostNewItemRequest;
 import com.bluebid.catalogue_app_service.model.CatalogueItem;
 import com.bluebid.catalogue_app_service.repository.CatalogueRepository;
+//import com.bluebid.payment_app_service.model.Receipt;
 
 @Service
 public class CatalogueService {
 	
 	private final CatalogueRepository _catalogueRepository;
 	private final KafkaTemplate<String, Object> _kafkaTemplate;
+	private static final int MAX_CHAR_LIMIT = 100;
+
 	public CatalogueService(CatalogueRepository catalogueRepository, KafkaTemplate<String, Object> kafkaTemplate) {
 		this._kafkaTemplate = kafkaTemplate;
         this._catalogueRepository = catalogueRepository;
@@ -101,53 +109,135 @@ public class CatalogueService {
     	
     }
     
-    //helper function to convert the request to a catalogueItem
-    private CatalogueItem convertToCatalogueItem(PostNewItemRequest request)
-    {
-    	CatalogueItem item = new CatalogueItem();
-    	
-    	item.setSellerID(request.getSellerID());
-//    	item.setAuctionStartDate(LocalDateTime.now());
-    	String basePriceAsString = request.getBasePrice(); //do we have verifcations to ensure this is an integer? 
-    	item.setCurrentBiddingPrice(Integer.parseInt(basePriceAsString));
-    	item.setItemName(request.getItemName());
-    	item.setItemDescription(request.getItemDescription());
-    	
-    	return item;
-    	
-    	
-    }
-    public String uploadItem(PostNewItemRequest request)
-    {
-    	System.out.println("attempting save");
-    	//save to the mongoDB
-    	CatalogueItem newItem = convertToCatalogueItem(request);
-    	CatalogueItem savedItem = this._catalogueRepository.save(newItem);
-    	System.out.println("success message save complete");
-    	//get generated string
-    	String catalogueId = savedItem.getId();
-    	
-    	
-    	uploadItemToAuction(catalogueId, request);
-    	
-    	//return the catalogueId
-    	return catalogueId;
-    }
+    @KafkaListener(topics = "auction.validation-topic", groupId = "catalogue-group", containerFactory = "auctionInitiatedListenerContainerFactory")
+    public String addToCatalogue(String itemName, String itemDescription, String sellerID, boolean isValid, double basePrice, int days, int hours)
+  	{
+  		InitiateAuctionEvent event = new InitiateAuctionEvent(itemName, itemDescription, sellerID, isValid, basePrice, days, hours);
+  		boolean areItemsValid = validateCatalogueInput(itemName, itemDescription, sellerID, basePrice);
+  		
+  		
+  		//create Catalogue Item
+  		CatalogueItem item = new CatalogueItem(
+  				itemName,
+  				itemDescription,
+  				sellerID,
+  				basePrice
+  				);
+  		  		
+  				
+  		//if validationation passes here, publish a success event here
+  		if (areItemsValid)
+  		{
+  			
+  			//save the catalogue item into the db
+  	  		_catalogueRepository.save(item);
+  	  		_kafkaTemplate.send("catalogue.item-add-success-topic", new ItemAddedSuccessEvent(item.getId(),item.getItemName(),item.getItemDescription(),item.getSellerID(),item.getId()));
+  	  	
+
+  		}
+  		//if validation fails, publish a failure event here
+  		else
+  		{
+  			_kafkaTemplate.send("catalogue.item-add-failure-topic", new ItemAddedFailureEvent(item.getId(),item.getItemName(),item.getItemDescription(),item.getSellerID(), "Validation Failed. Item not added to the database.",item.getId()));
+  		}
+  		  		
+  		
+  		return item.getId();
+ 
+  	}
     
-    private void uploadItemToAuction(String catalogueId, PostNewItemRequest request)
-    {
-    	//create new event object 
-    	AuctionUploadEvent event = new AuctionUploadEvent();
-    	
-    	event.setSellerId(request.getSellerID());
-    	event.setCatalogueId(catalogueId);
-    	event.setBasePrice(request.getBasePrice());
-    	event.setItemDescription(request.getItemDescription());
-    	event.setItemName(request.getItemName());
-    	
-    	//send kafka message
-    	this._kafkaTemplate.send("new-auction-item-topic",catalogueId, event);
-    	
-    	System.out.println("success message AHH");
-    }
+    
+  //logical validation methods
+  	private boolean validateCatalogueInput(String itemName, String itemDescription, String sellerID, double basePrice)
+  	{
+  	
+  		if (itemName == null)
+  		{
+  			return false;
+  		}
+  		if (itemName.length() > MAX_CHAR_LIMIT)
+  		{
+  			return false;
+  		}
+  		if (itemDescription.length() > MAX_CHAR_LIMIT)
+  		{
+  			return false;
+  		}
+  		if (basePrice < 1)
+  		{
+  			return false;
+  		}
+  		return true;	
+  	
+  	}
+  	
+//  	public String isValidCatalogueItem(String itemName, String itemDescription, String sellerID, boolean isValid, double basePrice, int days, int hours)
+//  	{
+//  		boolean areItemsValid = validateCatalogueInput(itemName, itemDescription, sellerID, basePrice);
+//  		
+//  		if (areItemsValid == true)
+//  		{
+//  			return addToCatalogue(itemName, itemDescription, sellerID, basePrice, days, hours);
+//  		}
+//  		else
+//  		{
+//  			return "Please check your inputs and try again.";
+//  		}
+//  		
+//  	}
+  	
+  	
+  	
+    
+//    //helper function to convert the request to a catalogueItem
+//    private CatalogueItem convertToCatalogueItem(PostNewItemRequest request)
+//    {
+//    	CatalogueItem item = new CatalogueItem();
+//    	
+//    	item.setSellerID(request.getSellerID());
+//  	item.setAuctionStartDate(LocalDateTime.now());
+//    	String basePriceAsString = request.getBasePrice(); //do we have verifcations to ensure this is an integer? 
+//    	item.setCurrentBiddingPrice(Integer.parseInt(basePriceAsString));
+//    	item.setItemName(request.getItemName());
+//    	item.setItemDescription(request.getItemDescription());
+//    	
+//    	return item;
+//    	
+//    	
+//    }
+//    public String uploadItem(PostNewItemRequest request)
+//    {
+//    	System.out.println("attempting save");
+//    	//save to the mongoDB
+//    	CatalogueItem newItem = convertToCatalogueItem(request);
+//    	CatalogueItem savedItem = this._catalogueRepository.save(newItem);
+//    	System.out.println("success message save complete");
+//    	//get generated string
+//    	String catalogueId = savedItem.getId();
+//    	
+//    	
+//    	uploadItemToAuction(catalogueId, request);
+//    	
+//    	//return the catalogueId
+//    	return catalogueId;
+//    }
+//    
+//    private void uploadItemToAuction(String catalogueId, PostNewItemRequest request)
+//    {
+//    	//create new event object 
+//    	AuctionUploadEvent event = new AuctionUploadEvent();
+//    	
+//    	event.setSellerId(request.getSellerID());
+//    	event.setCatalogueId(catalogueId);
+//    	event.setBasePrice(request.getBasePrice());
+//    	event.setItemDescription(request.getItemDescription());
+//    	event.setItemName(request.getItemName());
+//    	
+//    	//send kafka message
+//    	this._kafkaTemplate.send("new-auction-item-topic",catalogueId, event);
+//    	
+//    	System.out.println("success message AHH");
+//    }
+    
+  
 }

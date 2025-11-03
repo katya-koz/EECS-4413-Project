@@ -32,7 +32,14 @@ public class CatalogueItem {
 //    	
 //    }
     
-    public String getId() {
+    public CatalogueItem(String itemName, String itemDescription, String sellerID, double basePrice) {
+		this.itemName = itemName;
+		this.itemDescription = itemDescription;
+		this.sellerID = sellerID;
+		currentBiddingPrice = basePrice;
+	}
+
+	public String getId() {
 		return id;
 	}
 
