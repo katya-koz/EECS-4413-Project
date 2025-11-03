@@ -22,6 +22,8 @@ import com.bluebid.auction_app_service.dto.ItemValidationFailureEvent;
 import com.bluebid.auction_app_service.dto.ItemValidationSuccessEvent;
 import com.bluebid.auction_app_service.dto.UserInfoValidationFailureEvent;
 import com.bluebid.auction_app_service.dto.UserInfoValidationSuccessEvent;
+import com.bluebid.auction_app_service.dto.ItemAddedFailureEvent;
+import com.bluebid.auction_app_service.dto.ItemAddedSuccessEvent;
 
 @Configuration
 public class KafkaConfig {
@@ -111,6 +113,36 @@ public class KafkaConfig {
     }
     
     @Bean
+    public ConsumerFactory<String, ItemAddedSuccessEvent> ItemAddedSuccessConsumerFactory() {
+        Map<String, Object> config = new HashMap<>();
+        config.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "kafka:9092");
+        config.put(ConsumerConfig.GROUP_ID_CONFIG, "catalogue-group");
+        config.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
+        config.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class);
+
+        return new DefaultKafkaConsumerFactory<>(
+                config,
+                new StringDeserializer(),
+                new JsonDeserializer<>(ItemAddedSuccessEvent.class, false)
+        );
+    }
+    
+    @Bean
+    public ConsumerFactory<String, ItemAddedFailureEvent> ItemAddedFailureConsumerFactory() {
+        Map<String, Object> config = new HashMap<>();
+        config.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "kafka:9092");
+        config.put(ConsumerConfig.GROUP_ID_CONFIG, "catalogue-group");
+        config.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
+        config.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class);
+
+        return new DefaultKafkaConsumerFactory<>(
+                config,
+                new StringDeserializer(),
+                new JsonDeserializer<>(ItemAddedFailureEvent.class, false)
+        );
+    }
+
+    @Bean
     public ConcurrentKafkaListenerContainerFactory<String, UserInfoValidationFailureEvent> userValidationFailureListenerFactory() {
         ConcurrentKafkaListenerContainerFactory<String, UserInfoValidationFailureEvent> factory = new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(UserInfoValidationFailureConsumerFactory());
@@ -137,5 +169,20 @@ public class KafkaConfig {
         factory.setConsumerFactory(ItemValidationFailureConsumerFactory());
         return factory;
     }
+    
+    @Bean
+    public ConcurrentKafkaListenerContainerFactory<String, ItemAddedSuccessEvent> itemAddedSuccessListenerFactory() {
+        ConcurrentKafkaListenerContainerFactory<String, ItemAddedSuccessEvent> factory = new ConcurrentKafkaListenerContainerFactory<>();
+        factory.setConsumerFactory(ItemAddedSuccessConsumerFactory());
+        return factory;
+    }
+    
+    @Bean
+    public ConcurrentKafkaListenerContainerFactory<String, ItemAddedFailureEvent> itemAddedFailureListenerFactory() {
+        ConcurrentKafkaListenerContainerFactory<String, ItemAddedFailureEvent> factory = new ConcurrentKafkaListenerContainerFactory<>();
+        factory.setConsumerFactory(ItemAddedFailureConsumerFactory());
+        return factory;
+    }
+
 
 }

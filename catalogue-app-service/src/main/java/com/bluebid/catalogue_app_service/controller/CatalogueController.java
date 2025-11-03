@@ -1,8 +1,11 @@
 package com.bluebid.catalogue_app_service.controller;
 
 import java.util.List;
+import java.util.Map;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -18,9 +21,10 @@ import com.bluebid.catalogue_app_service.service.CatalogueService;
 @RequestMapping("/catalogue")
 public class CatalogueController {
 	private final CatalogueService _catalogueService;
-	
-	public CatalogueController(CatalogueService catalogueService) {
+	private final KafkaTemplate<String, Object> _kafkaTemplate;
+	public CatalogueController(CatalogueService catalogueService, KafkaTemplate<String, Object> _kafkaTemplate) {
 	    this._catalogueService = catalogueService;
+	    this._kafkaTemplate = _kafkaTemplate;
 	}
 	
 	@GetMapping("/items")

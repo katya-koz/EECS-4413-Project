@@ -9,6 +9,10 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class Auction {
 	@Id
 	private String id; // auction id in mongo (primary key)
+	
+	private String itemDescription;
+	
+	private String itemName;
 	private String sellerID;
 	private String catalogueID;
 	private double basePrice;
@@ -16,6 +20,53 @@ public class Auction {
 	private LocalDateTime auctionEndTime;
 	private String auctionType = "FORWARD"; // def
 	private boolean status;
+	private String auctionStatus;
+	private boolean isValid;
+	
+	
+	
+	public Auction(String itemName, String itemDescription, String sellerID, boolean isValid, double basePrice,
+			LocalDateTime start, LocalDateTime end) {
+		
+		this.itemName = itemName;
+		this.itemDescription = itemDescription;
+		this.sellerID = sellerID;
+		this.isValid = isValid;
+		this.basePrice = basePrice;
+		this.auctionEndTime = end;
+		this.auctionStartTime = start;
+	}
+	
+	public Auction () {
+		
+	}
+	
+
+	public String getAuctionStatus() {
+		return auctionStatus;
+	}
+
+	public void setAuctionStatus(String auctionStatus) {
+		this.auctionStatus = auctionStatus;
+	}
+
+	public boolean isValid() {
+		return isValid;
+	}
+
+	public void setValid(boolean isValid) {
+		this.isValid = isValid;
+	}
+
+
+
+	public String getId() {
+		return id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
+	}
 
 	public String getSellerID() {
 		return sellerID;
@@ -59,7 +110,26 @@ public class Auction {
 	public void setAuctionType(String auctionType) {
 		this.auctionType = auctionType;
 	}
+	public String getItemDescription() {
+		return itemDescription;
+	}
 
- 
+
+	public void setItemDescription(String itemDescription) {
+		this.itemDescription = itemDescription;
+	}
+
+
+	public String getItemName() {
+		return itemName;
+	}
+
+
+	public void setItemName(String itemName) {
+		this.itemName = itemName;
+	}
+
+	
+	 
 }
 

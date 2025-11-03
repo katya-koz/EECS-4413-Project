@@ -1,37 +1,71 @@
 package com.bluebid.auction_app_service.dto;
 
-import java.time.LocalDateTime;
 public class NewAuctionRequest {
 	
-//	public String getSellerID() {
-//		return sellerID;
-//	}
-//	public void setSellerID(String sellerID) {
-//		this.sellerID = sellerID;
-//	}
-	public String getCatalogueID() {
-		return catalogueID;
+	private String itemName;
+	private String itemDescription;
+	private String sellerID;
+	private double basePrice;
+	private int seconds;
+
+	
+	public NewAuctionRequest() {}
+	
+	
+
+
+	public NewAuctionRequest(String itemName, String itemDescription, String sellerID, 
+		double basePrice, int seconds) {
+		this.itemName = itemName;
+		this.itemDescription = itemDescription;
+		this.sellerID = sellerID;
+		this.basePrice = basePrice;
+		this.seconds = seconds;
 	}
-	public void setCatalogueID(String catalogueID) {
-		this.catalogueID = catalogueID;
+
+
+
+
+	public String getItemName() {
+		return itemName;
 	}
-	public String getBasePrice() {
+
+	public void setItemName(String itemName) {
+		this.itemName = itemName;
+	}
+
+	public String getItemDescription() {
+		return itemDescription;
+	}
+
+	public void setItemDescription(String itemDescription) {
+		this.itemDescription = itemDescription;
+	}
+
+	public String getSellerID() {
+		return sellerID;
+	}
+
+	public void setSellerID(String sellerID) {
+		this.sellerID = sellerID;
+	}
+
+	public double getBasePrice() {
 		return basePrice;
 	}
-	public void setBasePrice(String basePrice) {
+
+	public void setBasePrice(double basePrice) {
 		this.basePrice = basePrice;
 	}
-	public LocalDateTime getAuctionStartTime() {
-		return auctionStartTime;
+
+
+
+	public int getSeconds() {
+		return seconds;
 	}
-	public void setAuctionStartTime(LocalDateTime auctionStartTime) {
-		this.auctionStartTime = auctionStartTime;
-	}
-	public LocalDateTime getAuctionEndTime() {
-		return auctionEndTime;
-	}
-	public void setAuctionEndTime(LocalDateTime auctionEndTime) {
-		this.auctionEndTime = auctionEndTime;
+
+	public void setSeconds(int seconds) {
+		this.seconds = seconds;
 	}
 	//String sellerID; not needed anymore as the userid sending the request is in the jwt header
 	String catalogueID;

@@ -4,7 +4,6 @@ import java.time.LocalDateTime;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -15,7 +14,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.bluebid.user_app_service.dto.CreateUserProfileRequest;
 import com.bluebid.user_app_service.dto.ForgotPasswordRequest;
 import com.bluebid.user_app_service.dto.ForgotPasswordResponse;
-import com.bluebid.user_app_service.dto.PasswordResetRequest;
 import com.bluebid.user_app_service.dto.ResetPasswordRequest;
 import com.bluebid.user_app_service.dto.ResetPasswordResponse;
 import com.bluebid.user_app_service.model.RecoveryToken;

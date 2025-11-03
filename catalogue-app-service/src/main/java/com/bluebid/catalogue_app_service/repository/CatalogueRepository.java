@@ -6,9 +6,10 @@ import java.util.Optional;
 
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
-
+import org.springframework.stereotype.Repository;
 import com.bluebid.catalogue_app_service.model.CatalogueItem;
 
+@Repository
 public interface CatalogueRepository extends MongoRepository<CatalogueItem, String> {
 	
 	//List<CatalogueItem> findByItemNameContaining(String keyword);
