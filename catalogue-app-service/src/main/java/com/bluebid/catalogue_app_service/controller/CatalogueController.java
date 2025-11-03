@@ -2,6 +2,7 @@ package com.bluebid.catalogue_app_service.controller;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -44,7 +45,7 @@ public class CatalogueController {
 	}
 	@GetMapping("/items/{itemId}")
 	public ResponseEntity<?> getAuction(@PathVariable String itemId) {
-	    CatalogueItem item = _catalogueService.getItemById(itemId);
+	    Optional<CatalogueItem> item = _catalogueService.getItemById(itemId);
 	    if (item != null) {
 	        return ResponseEntity.ok(item);
 	    } else {
