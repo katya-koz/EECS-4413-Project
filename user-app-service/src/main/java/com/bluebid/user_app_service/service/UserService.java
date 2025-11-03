@@ -65,7 +65,7 @@ public class UserService {
 	
 
 	
-    @KafkaListener(topics= "payment.user-validation-topic", groupId = "user-group", containerFactory = "paymentInitiatedListenerContainerFactory")
+    @KafkaListener(topics= "payment.user-validation-topic", groupId = "user-payment-validation-group", containerFactory = "paymentInitiatedListenerContainerFactory")
 	    public void handleCatalogueSuccess(PaymentInitiatedEvent event) {
 	        Optional<User> optionalUser = _userRepository.findById(event.getUserID());
 
@@ -98,7 +98,7 @@ public class UserService {
 	    }
     
     
-    @KafkaListener(topics= "bid.user-validation-topic", groupId = "user-group", containerFactory = "bidInitiatedListenerContainerFactory")
+    @KafkaListener(topics= "bid.user-validation-topic", groupId = "user-bid-validation-group", containerFactory = "bidInitiatedListenerContainerFactory")
     public void handleCatalogueSuccess(BidInitiatedEvent event) {
         Optional<User> optionalUser = _userRepository.findById(event.getUserID());
 

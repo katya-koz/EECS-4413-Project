@@ -90,7 +90,7 @@ public class AuctionService {
 	}
 
 
-	@KafkaListener(topics = "catalogue.bid-item-validation-success-topic", groupId = "bid-group", containerFactory = "itemValidationSuccessListenerFactory")
+	@KafkaListener(topics = "catalogue.bid-item-validation-success-topic", groupId = "bid-item-success-group", containerFactory = "itemValidationSuccessListenerFactory")
 	public void handleCatalogueSuccess( ItemValidationSuccessEvent event) {
 		Optional<Bid> optionalReceipt = _bidRepository.findById(event.getProducerEventID());
 
@@ -106,7 +106,7 @@ public class AuctionService {
 
 	}
 
-	@KafkaListener(topics = "catalogue.bid-item-validation-failed-topic", groupId = "bid-group", containerFactory = "itemValidationFailureListenerFactory")
+	@KafkaListener(topics = "catalogue.bid-item-validation-failed-topic", groupId = "bid-item-fail-group", containerFactory = "itemValidationFailureListenerFactory")
 	public void handleCatalogueFailure( ItemValidationFailureEvent event) {
 		Optional<Bid> optionalBid = _bidRepository.findById(event.getAuctionId());
 
@@ -119,7 +119,7 @@ public class AuctionService {
 		_bidRepository.save(bid);
 	}
 	//
-	@KafkaListener(topics = "user.bid-user-validation-success-topic", groupId = "bid-group", containerFactory = "userValidationSuccessListenerFactory")
+	@KafkaListener(topics = "user.bid-user-validation-success-topic", groupId = "bid-user-success-group", containerFactory = "userValidationSuccessListenerFactory")
 	public void handleUserSuccess(UserInfoValidationSuccessEvent event) {
 		Optional<Bid> optionalBid = _bidRepository.findById(event.getProducerID());
 
@@ -138,7 +138,7 @@ public class AuctionService {
 
 	}
 
-	@KafkaListener(topics = "user.bid-validation-failed-topic", groupId = "bid-group" , containerFactory = "userValidationFailureListenerFactory")
+	@KafkaListener(topics = "user.bid-validation-failed-topic", groupId = "bid-user-fail-group" , containerFactory = "userValidationFailureListenerFactory")
 	public void handleUserFailure(UserInfoValidationFailureEvent event) {
 		Optional<Bid> optionalBid = _bidRepository.findById(event.getProducerEventID());
 		Bid bid = optionalBid.get();
@@ -158,7 +158,7 @@ public class AuctionService {
 
 	//####################################### POST NEW AUCTION #######################################
 	
-	@KafkaListener(topics = "catalogue.item-add-success-topic", groupId = "item-upload-group", containerFactory = "itemAddedSuccessListenerFactory")
+	@KafkaListener(topics = "catalogue.item-add-success-topic", groupId = "item-upload-success-group", containerFactory = "itemAddedSuccessListenerFactory")
 	public void handleItemAddSuccess(ItemAddedSuccessEvent event) 
 	{
 		String auctionID = event.getAuctionID();
@@ -176,7 +176,7 @@ public class AuctionService {
 		_auctionRepository.save(auction);
 	}
 	
-	@KafkaListener(topics = "catalogue.item-add-failure-topic", groupId = "item-upload-group", containerFactory = "itemAddedFailureListenerFactory")
+	@KafkaListener(topics = "catalogue.item-add-failure-topic", groupId = "item-upload-failure-group", containerFactory = "itemAddedFailureListenerFactory")
 	public void handleItemAddFailure(ItemAddedFailureEvent event) 
 	{
 		String auctionID = event.getAuctionID();

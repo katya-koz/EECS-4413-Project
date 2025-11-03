@@ -32,7 +32,7 @@ public class PaymentService {
 	
 	// kafka listeners
 	
-	@KafkaListener(topics = "catalogue.payment-item-validation-success-topic", groupId = "payment-group", containerFactory = "itemValidationSuccessListenerFactory")
+	@KafkaListener(topics = "catalogue.payment-item-validation-success-topic", groupId = "catalogue-payment-success-group", containerFactory = "itemValidationSuccessListenerFactory")
     public void handleCatalogueSuccess( ItemValidationSuccessEvent event) {
         Optional<Receipt> optionalReceipt = _paymentRepository.findByPaymentId(event.getProducerEventID());
 
@@ -49,9 +49,9 @@ public class PaymentService {
         _paymentRepository.save(receipt);
     }
 
-    @KafkaListener(topics = "catalogue.payment-item-validation-failed-topic", groupId = "payment-group", containerFactory = "itemValidationFailureListenerFactory")
+    @KafkaListener(topics = "catalogue.payment-item-validation-failed-topic", groupId = "catalogue-payment-failure-group", containerFactory = "itemValidationFailureListenerFactory")
     public void handleCatalogueFailure( ItemValidationFailureEvent event) {
-    	 Optional<Receipt> optionalReceipt = _paymentRepository.findByPaymentId(event.getProducerEventID());
+    	 Optional<Receipt> optionalReceipt = _paymentRepository.findByPaymentId(event.getProducerId());
 
          Receipt receipt = optionalReceipt.get(); // it exists since initializepayment is not called unless a reciept is successfully saved
 
@@ -63,7 +63,7 @@ public class PaymentService {
          _paymentRepository.save(receipt);
     }
 
-    @KafkaListener(topics = "user.payment-user-validation-success-topic", groupId = "payment-group", containerFactory = "userValidationSuccessListenerFactory")
+    @KafkaListener(topics = "user.payment-user-validation-success-topic", groupId = "user-payment-success-group", containerFactory = "userValidationSuccessListenerFactory")
     public void handleUserSuccess(UserInfoValidationSuccessEvent event) {
     	Optional<Receipt> optionalReceipt = _paymentRepository.findByPaymentId(event.getProducerID());
 
@@ -87,7 +87,7 @@ public class PaymentService {
         
     }
 
-    @KafkaListener(topics = "user.payment-validation-failed-topic", groupId = "payment-group" , containerFactory = "userValidationFailureListenerFactory")
+    @KafkaListener(topics = "user.payment-validation-failed-topic", groupId = "user-payment-failure-group" , containerFactory = "userValidationFailureListenerFactory")
     public void handleUserFailure(UserInfoValidationFailureEvent event) {
    	 Optional<Receipt> optionalReceipt = _paymentRepository.findByPaymentId(event.getProducerEventID());
 

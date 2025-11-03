@@ -62,7 +62,6 @@ public class CatalogueService {
             String highestBidderUserId = item.getHighestBidderID();
             LocalDateTime auctionEnd = item.getAuctionEndTime();
             
-            System.out.println("received validation req");
             if(event.getPaymentTime().isBefore(auctionEnd)) {
             	_kafkaTemplate.send("catalogue.payment-item-validation-failed-topic", new ItemValidationFailureEvent(event.getCatalogueID(),event.getId(),"This auction is not yet over." ));
 
