@@ -18,6 +18,7 @@ public interface CatalogueRepository extends MongoRepository<CatalogueItem, Stri
 
 	@Query("{ 'itemName': { $regex: ?0, $options: 'i' }, 'isActive': true }") // case insensitive
 	List<CatalogueItem> findByKeywordQuery(String keyword);
+	
 
 	Optional<CatalogueItem> findByIdAndIsActive(String catalogueID, boolean b);
 	

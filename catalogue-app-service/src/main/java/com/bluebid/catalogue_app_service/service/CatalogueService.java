@@ -205,6 +205,11 @@ public class CatalogueService {
   		return true;	
   	
   	}
+
+	public Optional<CatalogueItem> getItemById(String itemId) {
+		return _catalogueRepository.findById(itemId);
+		return null;
+	}
   	
 
     
