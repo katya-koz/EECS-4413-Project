@@ -27,13 +27,21 @@ public class AuctionController {
 		
 	}
 	
+	
 	@PostMapping("/new-auction")
-	public ResponseEntity<Boolean> startNewAuction(@RequestBody NewAuctionRequest newAuctionRequest){
+	public ResponseEntity<?> startNewAuction(@RequestBody NewAuctionRequest newAuctionRequest,
+												@RequestHeader(value = "X-User-Id", required = false) String sellerId){
+		
+		if (sellerId == null || sellerId.isBlank()) {
+			 return ResponseEntity.badRequest().body("Missing user id header.");
+		 }
+		
+		
 		LocalDateTime startTime = LocalDateTime.now();
 		LocalDateTime endTime = newAuctionRequest.getAuctionEndTime();
 			 
 		Auction auction = new Auction();
-		auction.setSellerID(newAuctionRequest.getSellerID());
+		auction.setSellerID(sellerId);
 		auction.setCatalogueID(newAuctionRequest.getCatalogueID());
 		auction.setAuctionStartTime(startTime);
 		auction.setAuctionEndTime(endTime);

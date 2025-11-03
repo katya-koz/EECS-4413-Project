@@ -37,12 +37,6 @@ public class CatalogueController {
 	    return ResponseEntity.ok(catalogue);
 	}
 	
-	@PostMapping("/item")
-	public ResponseEntity<Boolean> postCatalogueItem(@RequestBody PostNewItemRequest newItemRequest){
-		
-		
-		
-		return ResponseEntity.ok(true);
-	}
+
 
 }
