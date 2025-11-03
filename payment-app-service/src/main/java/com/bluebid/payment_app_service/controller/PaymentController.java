@@ -33,9 +33,7 @@ public class PaymentController {
 			){
 		
 		 if (userId == null || userId.isBlank()) {
-			 return ResponseEntity
-			            .badRequest()
-			            .body("Missing user id header.");
+			 return ResponseEntity .badRequest().body("Missing user id header.");
 
 		 }
 	
