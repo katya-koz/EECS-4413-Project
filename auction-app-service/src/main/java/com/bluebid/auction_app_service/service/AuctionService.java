@@ -54,6 +54,11 @@ public class AuctionService {
 		List<Bid> bidsOnAuction = _bidRepository.findByAuctionIDAndIsValidTrueOrderByAmountDesc(auctionId);
 		Double currentHighestBidValue = 0.0;
 		Auction auction = _auctionRepository.findById(auctionId).orElseThrow(() -> new RuntimeException ("Auction not found with ID: " + auctionId));
+		
+		if(auction.getAuctionEndTime().isBefore(LocalDateTime.now())) {
+			return new BidResponse(auction.getCatalogueID(), userId, bidValue, auctionId, null,"This auction is not currently active. Bid not placed.", false); 
+		}
+		
 		if(bidsOnAuction.isEmpty()) {
 			// if there are no bids on the auction, then we are comparing the user's attempted bid against the base price
 
