@@ -12,6 +12,7 @@ import SignUp from "./SignUpPage/SignUp";
 import Home from "./HomePage/Home";
 import PayNow from "./PayNowPage/PayNow";
 import Receipt from "./PayNowPage/Reciept";
+import ResetPasswordPage from "./ResetPasswordPage/ResetPasswordPage";
 import { UserProvider } from "./Context/UserContext";
 
 function AppRoutes() {
@@ -23,6 +24,7 @@ function AppRoutes() {
       <Routes location={state?.backgroundLocation || location}>
         <Route path="/signin" element={<SignIn />} />
         <Route path="/signup" element={<SignUp />} />
+	<Route path="/reset-password" element={<ResetPasswordPage />} />
         <Route
           path="/"
           element={
