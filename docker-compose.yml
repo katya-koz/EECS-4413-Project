@@ -23,7 +23,7 @@ services:
         - kafka-net
   ## GATEWAY
   gateway:
-    build: ./gateway-app-service
+    build: ./backend/gateway-app-service
     depends_on:
       - user-service
       - catalogue-service
@@ -36,7 +36,7 @@ services:
   # USER SERVICE
   user-service:
      build:
-       context: ./user-app-service
+       context: ./backend/user-app-service
        dockerfile: Dockerfile
      depends_on:
        - user-db
@@ -55,14 +55,14 @@ services:
       MONGO_INITDB_DATABASE: userdb
     volumes:
       - user-db:/data/db
-      - ./init-scripts/init-userdb.js:/docker-entrypoint-initdb.d/init-userdb.js:ro ## initialize user db
+      - ./backend/init-scripts/init-userdb.js:/docker-entrypoint-initdb.d/init-userdb.js:ro ## initialize user db
     networks:
-      - kafka-net
+      - backend-net
 
   # PAYMENT SERVICE
   payment-service:
     build:
-      context: ./payment-app-service
+      context: ./backend/payment-app-service
       dockerfile: Dockerfile
     depends_on:
       - payment-db
@@ -81,14 +81,14 @@ services:
       MONGO_INITDB_DATABASE: paymentdb
     volumes:
       - payment-db:/data/db
-      - ./init-scripts/init-payment.js:/docker-entrypoint-initdb.d/init-paymentdb.js:ro ## initialize user db
+      - ./backend/init-scripts/init-payment.js:/docker-entrypoint-initdb.d/init-paymentdb.js:ro ## initialize user db
     networks:
         - backend-net
 
   # AUCTION SERVICE #
   auction-service:
     build:
-      context: ./auction-app-service
+      context: ./backend/auction-app-service
       dockerfile: Dockerfile
     depends_on:
       - auction-db
@@ -107,14 +107,14 @@ services:
       MONGO_INITDB_DATABASE: auctiondb
     volumes:
       - auction-db:/data/db
-      - ./init-scripts/init-auctiondb.js:/docker-entrypoint-initdb.d/init-auctiondb.js:ro
+      - ./backend/init-scripts/init-auctiondb.js:/docker-entrypoint-initdb.d/init-auctiondb.js:ro
     networks:
         - backend-net
 
   # CATALOGUE SERVICE
   catalogue-service:
     build:
-      context: ./catalogue-app-service
+      context: ./backend/catalogue-app-service
       dockerfile: Dockerfile
     depends_on:
       - catalogue-db
@@ -133,7 +133,7 @@ services:
       MONGO_INITDB_DATABASE: cataloguedb
     volumes:
       - catalogue-db:/data/db
-      - ./init-scripts/init-cataloguedb.js:/docker-entrypoint-initdb.d/init-cataloguedb.js:ro
+      - ./backend/init-scripts/init-cataloguedb.js:/docker-entrypoint-initdb.d/init-cataloguedb.js:ro
     networks:
       - backend-net
 
