@@ -24,7 +24,7 @@ export default function ResetPasswordPage() {
   const token = qs.get("token");
 
   return (
-    <div className="rp-container">
+    <div className="rp-container resetpw">
       <div className="rp-card">
         {!token ? <RequestResetForm /> : <ConfirmResetForm token={token} />}
         <div className="rp-footer">
