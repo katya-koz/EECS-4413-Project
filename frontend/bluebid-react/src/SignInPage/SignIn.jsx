@@ -90,6 +90,23 @@ function SignIn() {
             }}
           />
           <button
+            type="button"
+            onClick={() => navigate("/reset-password")}
+            style={{
+              justifySelf: "end",
+              background: "transparent",
+              border: "none",
+              color: "#007bff",
+              textDecoration: "underline",
+              cursor: "pointer",
+              padding: 0,
+              marginTop: "-6px",
+            }}
+            aria-label="Forgot password? Click here to reset it."
+          >
+            Forgot password?
+          </button>
+	   <button
             type="submit"
             style={{
               padding: "12px",
