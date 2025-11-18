@@ -2,6 +2,8 @@ import { useEffect, useMemo, useState } from "react";
 import { useLocation, Link } from "react-router-dom";
 import "./ResetPasswordPage.css";
 
+const API_BASE = "http://localhost:8080";
+
 async function postJSON(path, body) {
   const res = await fetch(API_BASE + path, {
     method: "POST",
