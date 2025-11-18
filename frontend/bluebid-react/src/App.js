@@ -13,6 +13,7 @@ import Home from "./HomePage/Home";
 import PayNow from "./PayNowPage/PayNow";
 import Receipt from "./PayNowPage/Reciept";
 import ResetPasswordPage from "./ResetPasswordPage/ResetPasswordPage";
+import AuctionNotification from "./Components/Notification/AuctionNotification";
 import { UserProvider } from "./Context/UserContext";
 
 function AppRoutes() {
@@ -74,6 +75,7 @@ function App() {
     <Router>
       <UserProvider>
         <AppRoutes />
+	<AuctionNotification />
       </UserProvider>
     </Router>
   );
