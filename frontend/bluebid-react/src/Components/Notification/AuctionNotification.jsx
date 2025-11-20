@@ -1,7 +1,7 @@
 // this will be the notification on auction end (like a toast)
 import { useEffect, useState } from "react";
 
-export default AuctionNotification() {
+export default function AuctionNotification() {
   const [msg, setMsg] = useState(null);
   const [visible, setVisible] = useState(false);
 
