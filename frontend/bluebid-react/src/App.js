@@ -12,7 +12,8 @@ import SignUp from "./SignUpPage/SignUp";
 import Home from "./HomePage/Home";
 import PayNow from "./PayNowPage/PayNow";
 import Receipt from "./PayNowPage/Reciept";
-import ResetPasswordPage from "./ResetPasswordPage/ResetPasswordPage";
+import ResetPasswordRequestPage from "./ResetPasswordPage/ResetPasswordRequestPage";
+import ResetPasswordConfirmPage from "./ResetPasswordPage/ResetPasswordConfirmPage";
 import AuctionNotification from "./Components/Notification/AuctionNotification";
 import { UserProvider } from "./Context/UserContext";
 
@@ -25,7 +26,8 @@ function AppRoutes() {
       <Routes location={state?.backgroundLocation || location}>
         <Route path="/signin" element={<SignIn />} />
         <Route path="/signup" element={<SignUp />} />
-	<Route path="/reset-password" element={<ResetPasswordPage />} />
+	<Route path="/reset-password/request" element={<ResetPasswordRequestPage />} />
+	<Route path="/reset-password/confirm" element={<ResetPasswordConfirmPage />} />
         <Route
           path="/"
           element={
