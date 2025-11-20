@@ -36,7 +36,7 @@ export default function ResetPasswordConfirmPage() {
     setMessage("");
     try {
       await postJSON("/api/auth/reset-password", { token, newPassword: password });
-      setMessage("Password updated. You can now sign in.");
+      setMessage("Password is Updated! You can now sign in.");
     } catch (e) {
       setError(e.message);
     } finally {
@@ -47,7 +47,7 @@ export default function ResetPasswordConfirmPage() {
   return (
     <div style={{ minHeight:"100vh", display:"flex", justifyContent:"center", alignItems:"center", padding:"20px" }}>
       <div style={{ width:"100%", maxWidth:"400px", padding:"30px", border:"1px solid #ccc", borderRadius:"12px", boxShadow:"0 4px 10px rgba(0,0,0,0.1)", background:"#fff" }}>
-        <h2 style={{ fontSize:"24px", fontWeight:"bold", marginBottom:"12px" }}>Set a new password</h2>
+        <h2 style={{ fontSize:"24px", fontWeight:"bold", marginBottom:"12px" }}>Set a New Password</h2>
         <form onSubmit={handleSubmit} style={{ display:"grid", gap:"12px" }}>
           <label style={{ fontWeight:600 }}>
             Token
@@ -55,7 +55,7 @@ export default function ResetPasswordConfirmPage() {
               type="text"
               value={token}
               onChange={(e)=>setToken(e.target.value)}
-              placeholder="Paste reset token"
+              placeholder="Paste Reset Token Here"
               style={{ padding:"10px", borderRadius:"6px", border:"1px solid #ccc" }}
               required
             />
@@ -72,7 +72,7 @@ export default function ResetPasswordConfirmPage() {
             />
           </label>
           <label style={{ fontWeight:600 }}>
-            Confirm password
+            Confirm Password
             <input
               type="password"
               value={confirm}
@@ -91,7 +91,7 @@ export default function ResetPasswordConfirmPage() {
           </ul>
 
           <button type="submit" disabled={!valid || busy} style={{ padding:"12px", borderRadius:"8px", background:"#007bff", color:"#fff", fontWeight:"bold", border:"none", cursor:"pointer" }}>
-            {busy ? "Saving…" : "Update password"}
+            {busy ? "Saving…" : "Update Password"}
           </button>
         </form>
 
@@ -107,7 +107,7 @@ export default function ResetPasswordConfirmPage() {
         )}
 
         <button type="button" onClick={()=>navigate("/signin")} style={{ marginTop:"12px", background:"transparent", border:"none", color:"#007bff", textDecoration:"underline", cursor:"pointer" }}>
-          Back to sign in
+          Back to Sign In
         </button>
       </div>
     </div>

@@ -43,8 +43,8 @@ export default function ResetPasswordRequestPage() {
 
   return (
     <div style={{ minHeight:"100vh", display:"flex", justifyContent:"center", alignItems:"center", padding:"20px" }}>
-      <div style={{ width:"100%", maxWidth:"400px", padding:"30px", border:"1px solid #ccc", borderRadius:"12px", boxShadow:"0 4px 10px rgba(0,0,0,0.1)", background:"#fff" }}>
-        <h2 style={{ fontSize:"24px", fontWeight:"bold", marginBottom:"12px" }}>Reset your password</h2>
+      <div style={{ width:"100%", maxWidth:"400px", padding:"30px", border:"1px solid #ccc", borderRadius:"12px", boxShadow:"0 4px 10px 	rgba(0,0,0,0.1)", background:"#fff" }}>
+        <h2 style={{ fontSize:"24px", fontWeight:"bold", marginBottom:"12px" }}>Reset Your Password</h2>
         <p style={{ marginTop:"-6px", marginBottom:"16px", color:"#555" }}>
           Enter your account email. We’ll return a reset token.
         </p>
@@ -54,7 +54,7 @@ export default function ResetPasswordRequestPage() {
             Email
             <input
               type="email"
-              placeholder="you@example.com"
+              placeholder="name@example.com"
               value={email}
               onChange={(e)=>setEmail(e.target.value)}
               required
@@ -62,7 +62,7 @@ export default function ResetPasswordRequestPage() {
             />
           </label>
           <button type="submit" disabled={busy} style={{ padding:"12px", borderRadius:"8px", background:"#007bff", color:"#fff", fontWeight:"bold", border:"none", cursor:"pointer" }}>
-            {busy ? "Requesting…" : "Request reset token"}
+            {busy ? "Requesting…" : "Request Reset Token"}
           </button>
         </form>
 
@@ -97,8 +97,8 @@ export default function ResetPasswordRequestPage() {
           </div>
         )}
 
-        <button type="button" onClick={()=>navigate("/signin")} style={{ marginTop:"12px", background:"transparent", border:"none", color:"#007bff", textDecoration:"underline", cursor:"pointer" }}>
-          Back to sign in
+        <button type="button" onClick={()=>navigate("/signin")} style={{ marginTop:"12px", background:"transparent", border:"none", color:"#007bff", 	textDecoration:"underline", cursor:"pointer" }}>
+          Back to Sign In
         </button>
       </div>
     </div>
