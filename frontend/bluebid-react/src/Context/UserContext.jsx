@@ -1,10 +1,11 @@
 import { createContext, useContext, useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 const UserContext = createContext();
 
 export function UserProvider({ children }) {
   const [token, setToken] = useState(() => localStorage.getItem("token")); // get token from local storage
-  const [loaded, setLoaded] = useState(false); // load user flag
+  const navigate = useNavigate();
 
   // load userr from local storage
   const [user, setUser] = useState(() => {
@@ -16,6 +17,9 @@ export function UserProvider({ children }) {
     const saved = localStorage.getItem("expiresAt");
     return saved ? Number(saved) : null;
   });
+
+  // subscribe to user's bids
+  function subscribeBids() {}
 
   useEffect(() => {
     if (token) localStorage.setItem("token", token);
@@ -31,10 +35,6 @@ export function UserProvider({ children }) {
     if (expiresAt) localStorage.setItem("expiresAt", expiresAt.toString());
     else localStorage.removeItem("expiresAt");
   }, [expiresAt]);
-
-  useEffect(() => {
-    setLoaded(true);
-  }, []);
 
   useEffect(() => {
     if (!expiresAt) {
@@ -72,6 +72,8 @@ export function UserProvider({ children }) {
     setToken(null);
     setUser(null);
     setExpiresAt(null);
+
+    navigate("/signin");
   };
 
   // automatically applies jwt to header (Authorization Bearer), and correct content type
@@ -91,7 +93,6 @@ export function UserProvider({ children }) {
     });
 
     if (res.status === 401) {
-      console.log("logging out 4");
       logout();
     }
 

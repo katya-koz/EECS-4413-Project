@@ -1,5 +1,6 @@
 package com.bluebid.auction_app_service.controller;
 
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -30,6 +31,17 @@ public class AuctionController {
 	}
 	
 
+	@GetMapping("/auctions/")
+	public ResponseEntity<?> getUserAuctions( @RequestHeader(value = "X-User-Id", required = false) String userId){
+		// get auctions that a userr is currently bidding on
+		if (userId == null || userId.isBlank()) {
+			 return ResponseEntity.badRequest().body("Missing user id header.");
+
+		 }
+		
+		return ResponseEntity.ok(_auctionService.getUserAuction(userId));
+
+	}
 
 	@PostMapping("/new-auction")
 	public ResponseEntity<?> startNewAuction(@RequestBody NewAuctionRequest newAuctionRequest,

@@ -31,7 +31,11 @@ function SignIn() {
 
     const data = await res.json();
 
-    login(data.token, { username: data.username }, data.expiresAt);
+    login(
+      data.token,
+      { username: data.username, userid: data.userId },
+      data.expiresAt
+    );
     // navigate to home page
     navigate("/");
   }
@@ -106,7 +110,7 @@ function SignIn() {
           >
             Forgot password?
           </button>
-	   <button
+          <button
             type="submit"
             style={{
               padding: "12px",

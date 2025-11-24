@@ -1,12 +1,11 @@
 
 package com.bluebid.auction_app_service.service;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.core.KafkaTemplate;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
-import com.bluebid.auction_app_service.dto.AuctionNotification;
 import com.bluebid.auction_app_service.dto.BidInitiatedEvent;
 import com.bluebid.auction_app_service.dto.BidResponse;
 import com.bluebid.auction_app_service.dto.ItemValidationFailureEvent;
@@ -14,14 +13,13 @@ import com.bluebid.auction_app_service.dto.ItemValidationSuccessEvent;
 import com.bluebid.auction_app_service.dto.UploadCatalogueItemEvent;
 import com.bluebid.auction_app_service.dto.ItemAddedFailureEvent;
 import com.bluebid.auction_app_service.dto.ItemAddedSuccessEvent;
-import com.bluebid.auction_app_service.dto.UserInfoValidationFailureEvent;
-import com.bluebid.auction_app_service.dto.UserInfoValidationSuccessEvent;
 import com.bluebid.auction_app_service.model.Auction;
 import com.bluebid.auction_app_service.model.Bid;
 import com.bluebid.auction_app_service.repository.AuctionRepository;
 import com.bluebid.auction_app_service.repository.BidRepository;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -34,13 +32,10 @@ public class AuctionService {
 
 	private final AuctionRepository _auctionRepository;
 	private final BidRepository _bidRepository;
-	private final SimpMessagingTemplate  _messagingTemplate;
-	//private final SimpMessagingTemplate _messagingTemplate;
 	//, SimpMessagingTemplate template
 	private final KafkaTemplate<String, Object> _kafkaTemplate;
 
-	public AuctionService(AuctionRepository auctionRepository, BidRepository bidRepository, SimpMessagingTemplate  messagingTemplate,KafkaTemplate<String, Object> kafkaTemplate) {
-		this._messagingTemplate = messagingTemplate;
+	public AuctionService(AuctionRepository auctionRepository, BidRepository bidRepository,KafkaTemplate<String, Object> kafkaTemplate) {
 		this._auctionRepository = auctionRepository;
 		this._bidRepository = bidRepository;
 		this._kafkaTemplate = kafkaTemplate;
@@ -131,40 +126,7 @@ public class AuctionService {
 		// save
 		_bidRepository.save(bid);
 	}
-	//we dont need to validate the userid for this since we are using jwt tokens.
-//	@KafkaListener(topics = "user.bid-user-validation-success-topic", groupId = "bid-user-success-group", containerFactory = "userValidationSuccessListenerFactory")
-//	public void handleUserSuccess(UserInfoValidationSuccessEvent event) {
-//		Optional<Bid> optionalBid = _bidRepository.findById(event.getProducerID());
-//
-//		Bid bid = optionalBid.get();
-//
-//		// update or overwrite bid info
-//		bid.setStatus("USER_VALIDATED");
-//		
-//
-//		// save
-//		_bidRepository.save(bid);
-//
-//		// once user is validated, then we can send a catalogue validation request.
-//		_kafkaTemplate.send("bid.item-validation-topic", new BidInitiatedEvent(bid.getId(), bid.getBidderID(), bid.getCatalogueID(), bid.getBidTime(), bid.getAmount() )); // can turn this into a copy construtor
-//
-//
-//	}
-//
-//	@KafkaListener(topics = "user.bid-validation-failed-topic", groupId = "bid-user-fail-group" , containerFactory = "userValidationFailureListenerFactory")
-//	public void handleUserFailure(UserInfoValidationFailureEvent event) {
-//		Optional<Bid> optionalBid = _bidRepository.findById(event.getProducerEventID());
-//		Bid bid = optionalBid.get();
-//
-//		// update or overwrite bid info
-//		bid.setStatus(event.getMessage());
-//		bid.setValid(false);
-//
-//
-//		// save
-//		_bidRepository.save(bid);
-//	}
-	
+
 	public Bid getBidById(String bidId) {
 		return _bidRepository.findById(bidId).orElse(null);
 	}
@@ -282,81 +244,33 @@ public class AuctionService {
 		
 		
 	}
-//	
-//	public LocalDateTime calcuateDuration(LocalDateTime now, int days, int hours) //this is assuming we have valid input, we should have front end logic preventing invalid input
-//	{
-//		
-//		int duration = 0;
-//		
-//		if (days == 0)
-//		{
-//			duration = hours;
-//		}
-//		else
-//		{
-//			duration = (days * 24) + hours;
-//		}
-//		
-//		return now.plusHours(duration);
-//		
-//	}
-//	
-	
-	//############################ END AUCTION USE CASE ##################################
-	// offloaded to scheduler
-//	public void endAuction(String auctionId) {
-//		// assume we have a timer or some external event tracker to track when this ends, then the endpoint is called
-//		// this should notify all bidders
-//
-//		// first validate that the auction has really ended
-//		Auction auction = _auctionRepository.findById(auctionId).orElseThrow(() -> new RuntimeException("Auction not found with ID: " + auctionId));	  
-//
-//		if(!auction.getAuctionEndTime().isBefore(LocalDateTime.now())) {
-//			// then the auction isnt really over
-//			return;
-//		}
-//		auction.setStatus(false);
-//		_auctionRepository.save(auction);
-//
-//		// get all bidders by id
-//		List<Bid> bids = _bidRepository.findByAuctionIDOrderByAmountDesc(auctionId);
-//
-//		if (bids.isEmpty()) {
-//			return;
-//		}
-//
-//		// winner is the highest bid 
-//		Bid winner = bids.get(0);
-//
-//		// send notifications to all the bidders
-//		AuctionNotification notification = new AuctionNotification(
-//				"Auction ended! Winner is user " + winner.getBidderID(),
-//				auctionId,
-//				winner.getAmount(),
-//				winner.getBidderID()
-//				);
-//
-//		_messagingTemplate.convertAndSend("/topic/auction/" + auctionId, notification);
-//	}
+
+
 	public Auction getAuctionById(String auctionid) {
 		return _auctionRepository.findById(auctionid).orElse(null);
 	}
-
-
-	
-
-
-//	private Auction convertToAuctionObject(InitiateAuctionEvent request)
-//	{
-//		Auction auction = new Auction();
-//		auction.setSellerID(request.getSellerID());
-//		auction.setCatalogueID(request.getCatalogueID());
-//		auction.setAuctionType("FORWARD");
-//
-//		String priceAsString = request.getBasePrice();
-//		auction.setBasePrice(Integer.parseInt(priceAsString));
-//
-//		return auction;
-//	}
+	public List<Auction> getUserAuction(String userId) {
+		List<Bid> userBids =  _bidRepository.findByBidderIDAndIsValid(userId, true);
+		
+		List<Auction> userAuctions = new ArrayList<Auction>();
+		
+		for(Bid b : userBids) {
+			// check if we've already added the auction
+			
+			if (userAuctions.stream().anyMatch(a -> a.getId().equals(b.getAuctionID()))) {
+				continue; // skip if auction is already added
+			}
+			
+			
+			Optional<Auction> auctionOpt = _auctionRepository.findById(b.getAuctionID());
+			if(auctionOpt.isPresent()) {
+				userAuctions.add(auctionOpt.get());
+			}
+			
+			
+		}
+		
+		return userAuctions;
+	}
 
 }

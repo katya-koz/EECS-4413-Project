@@ -1,14 +1,17 @@
 package com.bluebid.auction_app_service.dto;
+
+import com.bluebid.auction_app_service.model.Auction;
+
 // what is sent as a message to subscribers
 public class AuctionNotification {
     private String message;
-    private String auctionId;
+    private Auction auction;
     private double finalPrice;
     private String winnerId;
 
-    public AuctionNotification(String message, String auctionId, double finalPrice, String winnerId) {
+    public AuctionNotification(String message, Auction auction, double finalPrice, String winnerId) {
         this.message = message;
-        this.auctionId = auctionId;
+        this.auction = auction;
         this.finalPrice = finalPrice;
         this.winnerId = winnerId;
     }
@@ -21,12 +24,12 @@ public class AuctionNotification {
 		this.message = message;
 	}
 
-	public String getAuctionId() {
-		return auctionId;
+	public Auction getAuction() {
+		return auction;
 	}
 
-	public void setAuctionId(String auctionId) {
-		this.auctionId = auctionId;
+	public void setAuction(Auction auction) {
+		this.auction = auction;
 	}
 
 	public double getFinalPrice() {

@@ -3,6 +3,9 @@ package com.bluebid.auction_app_service.repository;
 import java.util.List;
 
 import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.data.mongodb.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.http.ResponseEntity;
 
 import com.bluebid.auction_app_service.model.Bid;
 
@@ -13,6 +16,9 @@ public interface BidRepository extends MongoRepository<Bid, String>{
 	List<Bid> findByAuctionIDOrderByAmountDesc(String auctionId);
 
 	List<Bid> findByAuctionIDAndIsValidTrueOrderByAmountDesc(String auctionId);
+	
+	List<Bid> findByBidderIDAndIsValid(String userId, boolean isValid);
+	
 
 }
 

@@ -25,7 +25,8 @@ public class JwtAuthenticationFilter  implements GatewayFilter {
     	    "/api/authentication/login",
     	    "/api/account/signup",
     	    "/api/account/forgot-password",
-    	    "/api/account/reset-password"
+    	    "/api/account/reset-password",
+    	    "/ws"
     	);
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {

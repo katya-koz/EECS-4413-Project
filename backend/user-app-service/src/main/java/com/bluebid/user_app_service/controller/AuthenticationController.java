@@ -41,7 +41,8 @@ public class AuthenticationController {
 	        	tokenResponse.getToken(),
 	            user.getUsername(),
 	            tokenResponse.getExpiresAt(),
-	            "Login successful."
+	            "Login successful.",
+	            user.getId()
 	        );
 
 	        return ResponseEntity.ok(response);
@@ -52,7 +53,8 @@ public class AuthenticationController {
 		            null,
 		            loginRequest.getUsername(),
 		            null,
-		            e.getMessage()
+		            e.getMessage(),
+		            null
 		        );
 		
 			return ResponseEntity.status(401).body(response);

@@ -8,9 +8,11 @@ public class AuthenticationResponse {
     private String username;
     private String message;
     private Date expiresAt;
+    private String userId;
 
-    public AuthenticationResponse(String token, String username, Date expiresAt, String message) {
+    public AuthenticationResponse(String token, String username, Date expiresAt, String message, String userId) {
         this.setToken(token);
+        this.setUserId(userId);
         this.setUsername(username);
         this.setMessage(message);
         this.setExpiresAt(expiresAt);
@@ -46,6 +48,14 @@ public class AuthenticationResponse {
 
 	public void setExpiresAt(Date expiresAt) {
 		this.expiresAt = expiresAt;
+	}
+
+	public String getUserId() {
+		return userId;
+	}
+
+	public void setUserId(String userId) {
+		this.userId = userId;
 	}
 
 }
