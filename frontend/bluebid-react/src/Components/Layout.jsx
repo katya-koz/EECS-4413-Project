@@ -1,17 +1,17 @@
 import NavBar from "./NavBar";
 import { useUser } from "../Context/UserContext";
 import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 
 function Layout({ children }) {
-  const { user } = useUser();
-  const navigate = useNavigate();
+  const { user, token, expiresAt, logout, loaded } = useUser();
 
   useEffect(() => {
-    if (user === null) {
-      navigate("/signin");
+    if (!loaded) return; // wait for user to load before possible redirect
+
+    if (!user || !token || !expiresAt) {
+      logout();
     }
-  }, [user]);
+  }, [loaded, user, token, expiresAt]);
 
   return (
     <div

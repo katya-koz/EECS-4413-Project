@@ -3,16 +3,18 @@ import { createContext, useContext, useState, useEffect } from "react";
 const UserContext = createContext();
 
 export function UserProvider({ children }) {
-  const [token, setToken] = useState(() => localStorage.getItem("token"));
+  const [token, setToken] = useState(() => localStorage.getItem("token")); // get token from local storage
+  const [loaded, setLoaded] = useState(false); // load user flag
 
+  // load userr from local storage
   const [user, setUser] = useState(() => {
     const savedUser = localStorage.getItem("user");
     return savedUser ? JSON.parse(savedUser) : null;
   });
-
+  // load expiresAt from local storage
   const [expiresAt, setExpiresAt] = useState(() => {
     const saved = localStorage.getItem("expiresAt");
-    return saved ? new Date(saved).getTime() : null;
+    return saved ? Number(saved) : null;
   });
 
   useEffect(() => {
@@ -31,16 +33,26 @@ export function UserProvider({ children }) {
   }, [expiresAt]);
 
   useEffect(() => {
-    if (!expiresAt) return;
+    setLoaded(true);
+  }, []);
+
+  useEffect(() => {
+    if (!expiresAt) {
+      // log out if there's no 'expires at'
+      logout();
+      return;
+    }
 
     const now = Date.now();
 
     if (now >= expiresAt) {
+      // log out if token has expired
       logout();
       return;
     }
 
     const timeout = setTimeout(() => {
+      // automatically log out on token expiry
       logout();
     }, expiresAt - now);
 
@@ -48,6 +60,7 @@ export function UserProvider({ children }) {
   }, [expiresAt]);
 
   const login = (jwt, userData, expiry) => {
+    // on login, set storage
     setToken(jwt);
     setUser(userData || null);
 
@@ -55,11 +68,13 @@ export function UserProvider({ children }) {
   };
 
   const logout = () => {
+    // clear local storage
     setToken(null);
     setUser(null);
     setExpiresAt(null);
   };
 
+  // automatically applies jwt to header (Authorization Bearer), and correct content type
   const authFetch = async (url, options = {}) => {
     const headers = {
       ...(options.headers || {}),
@@ -75,7 +90,10 @@ export function UserProvider({ children }) {
       headers,
     });
 
-    if (res.status === 401) logout();
+    if (res.status === 401) {
+      console.log("logging out 4");
+      logout();
+    }
 
     return res;
   };

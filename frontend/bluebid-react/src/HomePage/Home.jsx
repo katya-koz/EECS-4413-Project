@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { useUser } from "../Context/UserContext";
 import { Link } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
 
 function Home() {
   const [wonItems, setWonItems] = useState([]);
