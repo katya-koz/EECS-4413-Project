@@ -31,9 +31,14 @@ public class JwtAuthenticationFilter  implements GatewayFilter {
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
     	String path = exchange.getRequest().getPath().toString();
+    	
+    	System.out.println("path recieved: " + path);
 
         if (PUBLIC_ENDPOINTS.stream().anyMatch(path::startsWith)) {
+        	System.out.println("Skipping this endpoint.");
+        	
             return chain.filter(exchange); // skip jwt check for public endpoints
+            
         }
     	
         String authHeader = exchange.getRequest().getHeaders().getFirst("Authorization");

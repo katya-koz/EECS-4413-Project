@@ -61,7 +61,7 @@ public class GatewayAppServiceRoute {
                         .uri("http://payment-service:8080"))
                 .route("auction_ws_route", r -> r
                 	    .path("/ws/**")
-                	    .uri("ws://auction-service:8080") // added route for websocket
+                	    .uri("http://auction-service:8080") // added route for websocket
                 	)
                 .build();
     }
