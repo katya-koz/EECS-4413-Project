@@ -2,77 +2,54 @@ import NavBar from "./NavBar";
 import { useUser } from "../Context/UserContext";
 import { useEffect, useState } from "react";
 import { Client } from "@stomp/stompjs";
-import AuctionEndNotification from "./Notification/AuctionNotification"; // your toast component
-
-import SockJS from "sockjs-client";
+import AuctionEndNotification from "./Notification/AuctionNotification";
 
 function Layout({ children }) {
-  const { user, token, expiresAt, logout } = useUser();
+  const { user, token, expiresAt, logout, authFetch } = useUser();
   const [notifications, setNotifications] = useState([]);
 
   useEffect(() => {
     if (!user) return;
-    console.log("hi");
-    async function subscribeAuctions() {
-      //const res = await fetch(`/api/auction/user-auctions/${user.id}`);
 
-      console.log("trying to connect...");
-
-      const socket = new SockJS("http://localhost:8080/ws");
+    const connectAuctions = async () => {
+      const auctions = await getAuctions();
 
       const client = new Client({
-        webSocketFactory: () => socket,
+        brokerURL: "ws://localhost:8080/ws",
         reconnectDelay: 5000,
       });
 
       client.onConnect = () => {
-        console.log("connected!");
+        auctions.forEach((a) => {
+          console.log(`subbed to /topic/auction/${a.id}`);
 
-        client.subscribe("/topic/auction/test", (message) => {
-          console.log("Received:", message.body);
+          client.subscribe(`/topic/auction/${a.id}`, (message) => {
+            const data = JSON.parse(message.body);
+            setNotifications((prev) => [...prev, data]);
+          });
         });
       };
 
-      client.onStompError = () => {
-        console.log("error!");
+      client.onStompError = (frame) => {
+        console.error("STOMP error", frame);
       };
 
       client.activate();
 
-      //const auctions = await res.json();
+      return () => client.deactivate();
+    };
 
-      // console.log("trying to connect...");
-      // const client = new Client({
-      //   brokerURL: "ws://localhost:8080/ws",
-      //   reconnectDelay: 5000,
-      // });
-
-      // // client.onConnect = () => {
-      // //   auctions.forEach((a) => {
-      // //     client.subscribe(`/topic/auction/${a.id}`, (msg) => {
-      // //       const notification = JSON.parse(msg.body);
-      // //       setNotifications((prev) => [...prev, notification]);
-      // //     });
-      // //   });
-      // // };
-
-      // client.onConnect = () => {
-      //   console.log("connected!");
-      //   // subscribe to test
-      //   client.subscribe(`/topic/auction/test`, (message) => {
-      //     console.log(message.body);
-      //   });
-      // };
-
-      // client.onStompError = () => {
-      //   console.log("error!");
-      // };
-
-      // client.activate();
-    }
-
-    subscribeAuctions();
+    connectAuctions();
   }, [user]);
+
+  async function getAuctions() {
+    const res = await authFetch("http://localhost:8080/api/auction/auctions/");
+
+    const response = await res.json();
+
+    console.log(response);
+    return response;
+  }
 
   useEffect(() => {
     if (user === null || token === null || expiresAt === null) {
@@ -91,7 +68,10 @@ function Layout({ children }) {
         <AuctionEndNotification
           key={i}
           message={n.message}
-          auctionId={n.auctionId}
+          auctionId={n.auction?.id}
+          onClose={() =>
+            setNotifications((prev) => prev.filter((_, idx) => idx !== i))
+          }
         />
       ))}
     </div>

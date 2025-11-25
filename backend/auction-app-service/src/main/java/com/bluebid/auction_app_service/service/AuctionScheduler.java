@@ -27,7 +27,7 @@ public class AuctionScheduler {
     public void closeExpiredAuctions() {
         LocalDateTime now = LocalDateTime.now();
         List<Auction> expiredAuctions = _auctionRepository.findByStatusTrueAndAuctionEndTimeBefore(now);
-        _auctionNotifier.notifyTest();
+        //_auctionNotifier.notifyTest();
         for (Auction auction : expiredAuctions) {
             auction.setStatus(false);
             auction.setAuctionStatus("closed");

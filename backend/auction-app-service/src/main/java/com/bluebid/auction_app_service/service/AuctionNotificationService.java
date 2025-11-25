@@ -53,9 +53,9 @@ public class AuctionNotificationService {
 		// i also thought it would be more efficient for the server to publish one topic per auction rather than a topic per every user per auction.
 		_msgTemplate.convertAndSend("/topic/auction/" + auction.getId(), notification);
 	}
-	public void notifyTest() {
-		_msgTemplate.convertAndSend("/topic/auction/test", "hello");
-	}
+//	public void notifyTest() {
+//		_msgTemplate.convertAndSend("/topic/auction/test", "hello");
+//	}
 
 }
 

@@ -1,7 +1,7 @@
 // this will be the notification on auction end (like a toast)
 import { useEffect, useState } from "react";
 
-function AuctionNotification(auctionId, message) {
+function AuctionNotification(auctionId, message, onClose) {
   const [msg, setMsg] = useState(null);
   const [visible, setVisible] = useState(false);
 
@@ -41,6 +41,20 @@ function AuctionNotification(auctionId, message) {
   return (
     <div style={box} onClick={() => setVisible(false)} aria-live="polite">
       {msg}
+
+      <button
+        onClick={onClose}
+        style={{
+          background: "transparent",
+          border: "none",
+          color: "#fff",
+          fontWeight: "bold",
+          fontSize: "16px",
+          cursor: "pointer",
+        }}
+      >
+        ×
+      </button>
     </div>
   );
 }
