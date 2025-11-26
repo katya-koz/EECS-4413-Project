@@ -18,9 +18,7 @@ function Home() {
     const data = await res.json();
     setActiveAuctions(data);
   }
-  useEffect(() => {
-    getUserCurrentAuctions();
-  }, []);
+
   return (
     <div>
       <h1>Welcome Back, {user?.username}</h1>

@@ -43,6 +43,7 @@ public class AuctionController {
 
 	}
 
+
 	@PostMapping("/new-auction")
 	public ResponseEntity<?> startNewAuction(@RequestBody NewAuctionRequest newAuctionRequest,
 		@RequestHeader(value = "X-User-Id", required = false) String sellerId){

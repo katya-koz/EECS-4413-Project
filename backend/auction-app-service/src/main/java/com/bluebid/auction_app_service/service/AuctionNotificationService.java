@@ -51,6 +51,8 @@ public class AuctionNotificationService {
 		// this is okay to do since the requirements want us to display the winner id for everyone, and also because our backend will verify that the corrrect user is attempting to pay/claim 
 		// an item with the json token.
 		// i also thought it would be more efficient for the server to publish one topic per auction rather than a topic per every user per auction.
+		
+		//System.out.println("publishing to: " + "/topic/auction/" + auction.getId());
 		_msgTemplate.convertAndSend("/topic/auction/" + auction.getId(), notification);
 	}
 //	public void notifyTest() {

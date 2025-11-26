@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useUser } from "../Context/UserContext";
 import { Link, useNavigate, useLocation } from "react-router-dom";
+import { useToast } from "../Context/ToastContext";
 
 function NewAuction() {
   const [newAuctionForm, setNewAuctionForm] = useState({
@@ -9,11 +10,10 @@ function NewAuction() {
     basePrice: "",
     seconds: "",
   });
-  const { user, authFetch } = useUser();
-
-  const location = useLocation();
+  const { authFetch } = useUser();
+  const { showToast } = useToast();
   const [errorMessage, setErrorMessage] = useState("");
-  const navigate = useNavigate();
+
   async function postNewAuction() {
     const res = await authFetch(
       "http://localhost:8080/api/auction/new-auction",
@@ -45,12 +45,7 @@ function NewAuction() {
         const auction = await res.json();
 
         if (auction.catalogueID) {
-          console.log("item id found: " + auction.catalogueID);
-
-          navigate(`/auction/items/${auction.catalogueID}`, {
-            state: { backgroundLocation: location },
-          });
-
+          showToast(`Auction created successfully for ${auction.itemName}!`);
           return; // success
         }
 
@@ -75,6 +70,7 @@ function NewAuction() {
         justifyContent: "center",
         alignItems: "center",
         padding: "20px",
+        flexDirection: "column",
       }}
     >
       <div

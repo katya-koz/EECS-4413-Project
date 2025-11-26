@@ -1,13 +1,12 @@
-import { createContext, useContext, useState, useEffect } from "react";
+import { createContext, useContext, useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { Client } from "@stomp/stompjs";
 
 const UserContext = createContext();
 
 export function UserProvider({ children }) {
+  const [notifications, setNotifications] = useState([]);
   const [token, setToken] = useState(() => localStorage.getItem("token")); // get token from local storage
-  const navigate = useNavigate();
-  // TO DO: we need to store the auctions we are already subscribed to, so that we dont subscribe to the same topic multiple times
-
   // load userr from local storage
   const [user, setUser] = useState(() => {
     const savedUser = localStorage.getItem("user");
@@ -19,8 +18,55 @@ export function UserProvider({ children }) {
     return saved ? Number(saved) : null;
   });
 
-  // subscribe to user's bids
-  function subscribeBids() {}
+  const navigate = useNavigate();
+  const clientRef = useRef(null);
+  const subscribedAuctions = useRef(new Set());
+
+  const subscribeToAuction = (auctionId) => {
+    if (!clientRef.current || subscribedAuctions.current.has(auctionId)) return;
+
+    clientRef.current.subscribe(`/topic/auction/${auctionId}`, (message) => {
+      const data = JSON.parse(message.body);
+      setNotifications((prev) => [...prev, data]);
+    });
+    subscribedAuctions.current.add(auctionId);
+  };
+
+  // TO DO: we need to store the auctions we are already subscribed to, so that we dont subscribe to the same topic multiple times
+  useEffect(() => {
+    if (!user) return;
+
+    // Create the client only once
+    clientRef.current = new Client({
+      brokerURL: "ws://localhost:8080/ws",
+      reconnectDelay: 5000,
+    });
+
+    clientRef.current.onConnect = async () => {
+      const auctions = await getAuctions();
+      auctions.forEach((a) => subscribeToAuction(a.id));
+    };
+
+    clientRef.current.onStompError = (frame) => {
+      console.error("STOMP Error:", frame);
+    };
+
+    clientRef.current.activate();
+
+    return () => {
+      clientRef.current.deactivate();
+      subscribedAuctions.current.clear();
+    };
+  }, [user]);
+
+  // get the user's bids
+  async function getAuctions() {
+    if (!user) return;
+    const res = await authFetch("http://localhost:8080/api/auction/auctions/");
+
+    const response = await res.json();
+    return response;
+  }
 
   useEffect(() => {
     if (token) localStorage.setItem("token", token);
@@ -102,7 +148,16 @@ export function UserProvider({ children }) {
 
   return (
     <UserContext.Provider
-      value={{ token, user, expiresAt, login, logout, authFetch }}
+      value={{
+        notifications,
+        token,
+        user,
+        expiresAt,
+        login,
+        logout,
+        authFetch,
+        subscribeToAuction,
+      }}
     >
       {children}
     </UserContext.Provider>
@@ -112,3 +167,50 @@ export function UserProvider({ children }) {
 export function useUser() {
   return useContext(UserContext);
 }
+
+/*
+  useEffect(() => {
+    if (!user) return;
+
+    const connectAuctions = async () => {
+      const auctions = await getAuctions();
+
+      const client = new Client({
+        brokerURL: "ws://localhost:8080/ws",
+        reconnectDelay: 5000,
+      });
+
+      client.onConnect = () => {
+        auctions.forEach((a) => {
+          console.log(`subbed to /topic/auction/${a.id}`);
+
+          client.subscribe(`/topic/auction/${a.id}`, (message) => {
+            const data = JSON.parse(message.body);
+            setNotifications((prev) => [...prev, data]);
+          });
+        });
+      };
+
+      client.onStompError = (frame) => {
+        console.error("STOMP error", frame);
+      };
+
+      client.activate();
+
+      return () => client.deactivate();
+    };
+
+    connectAuctions();
+  }, [user]);
+
+  async function getAuctions() {
+    if (!user) return;
+    const res = await authFetch("http://localhost:8080/api/auction/auctions/");
+
+    const response = await res.json();
+
+    console.log(response);
+    return response;
+  }
+ 
+ */

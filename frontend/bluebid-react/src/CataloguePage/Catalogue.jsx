@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useUser } from "../Context/UserContext";
 import CatalogueItemCard from "./CatalogueItemCard";
-import CatalogueItemModal from "./CatalogueItemModal";
+import CatalogueItemPage from "./CatalogueItemPage";
 
 function Catalogue() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -106,16 +106,18 @@ function Catalogue() {
       )}
 
       <div style={{ marginTop: "20px", textAlign: "center" }}>
-        <button
-          onClick={handlePrevPage}
+        <i
           disabled={page === 0 || loading}
           style={{ marginRight: "10px" }}
-        >
-          Previous
-        </button>
-        <button onClick={handleNextPage} disabled={!hasMore || loading}>
-          Next
-        </button>
+          onClick={handlePrevPage}
+          className="bi bi-arrow-left"
+        ></i>
+        <i
+          disabled={page === 0 || loading}
+          style={{ marginRight: "10px" }}
+          onClick={handleNextPage}
+          className="bi bi-arrow-right"
+        ></i>
       </div>
 
       {modalItemId && (
@@ -135,7 +137,7 @@ function Catalogue() {
           onClick={() => setModalItemId(null)}
         >
           <div onClick={(e) => e.stopPropagation()}>
-            <CatalogueItemModal
+            <CatalogueItemPage
               id={modalItemId}
               onUpdate={(updatedItem) => {
                 setItems((prevItems) =>

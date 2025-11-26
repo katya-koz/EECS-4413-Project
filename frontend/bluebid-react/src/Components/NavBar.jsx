@@ -1,7 +1,8 @@
 // components/Navbar.jsx
 import { Link } from "react-router-dom";
-
+import { useUser } from "../Context/UserContext";
 function NavBar() {
+  const { logout } = useUser();
   return (
     <nav
       style={{
@@ -29,6 +30,14 @@ function NavBar() {
           style={{ color: "white", textDecoration: "none" }}
         >
           Post an Auction
+        </Link>
+
+        <Link
+          to="/signin"
+          onClick={logout}
+          style={{ color: "white", textDecoration: "none" }}
+        >
+          Log out
         </Link>
       </div>
     </nav>

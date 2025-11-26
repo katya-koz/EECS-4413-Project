@@ -262,7 +262,7 @@ public class AuctionService {
 			}
 			
 			
-			Optional<Auction> auctionOpt = _auctionRepository.findById(b.getAuctionID());
+			Optional<Auction> auctionOpt = _auctionRepository.findByIdAndStatus(b.getAuctionID(), true);
 			if(auctionOpt.isPresent()) {
 				userAuctions.add(auctionOpt.get());
 			}
@@ -272,5 +272,6 @@ public class AuctionService {
 		
 		return userAuctions;
 	}
+	
 
 }

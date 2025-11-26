@@ -6,7 +6,7 @@ function CatalogueItemCard({ item }) {
   const location = useLocation();
   const [timeLeft, setTimeLeft] = useState("");
 
-  const endTime = new Date(item.auctionEndTime);
+  const endTime = new Date(item.auctionEndTime + "Z");
 
   // calc the time left in days/hours/min/sec format
   function calculateTimeLeftDHMS() {
@@ -42,11 +42,7 @@ function CatalogueItemCard({ item }) {
 
   return (
     <div
-      onClick={() =>
-        navigate(`/catalogue/items/${item.id}`, {
-          state: { backgroundLocation: location },
-        })
-      }
+      onClick={() => navigate(`/catalogue/items/${item.id}`)}
       className="cursor-pointer p-4 border rounded-xl shadow-md hover:shadow-lg transition bg-white"
     >
       <h2 className="text-lg font-semibold">{item.itemName}</h2>
