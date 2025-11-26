@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useUser } from "../Context/UserContext";
 
 function CatalogueItemModal({ id, onUpdate }) {
-  const { authFetch } = useUser();
+  const { authFetch, user } = useUser();
   const [item, setItem] = useState(null);
   const [loading, setLoading] = useState(true);
   const [timeLeft, setTimeLeft] = useState("");
@@ -195,26 +195,28 @@ function CatalogueItemModal({ id, onUpdate }) {
         <strong>Time Left:</strong> {timeLeft}
       </p>
 
-      <div style={{ display: "flex", marginTop: "20px", gap: "10px" }}>
-        <input
-          type="number"
-          placeholder="Your bid"
-          value={bidAmount}
-          onChange={(e) => setBidAmount(e.target.value)}
-          style={{
-            flex: 1,
-            padding: "8px",
-            borderRadius: "4px",
-            border: "1px solid #ccc",
-          }}
-        />
-        <button
-          onClick={handlePlaceBid}
-          style={{ padding: "8px 16px", borderRadius: "4px" }}
-        >
-          Place Bid
-        </button>
-      </div>
+      {item.sellerId != user.userId && (
+        <div style={{ display: "flex", marginTop: "20px", gap: "10px" }}>
+          <input
+            type="number"
+            placeholder="Your bid"
+            value={bidAmount}
+            onChange={(e) => setBidAmount(e.target.value)}
+            style={{
+              flex: 1,
+              padding: "8px",
+              borderRadius: "4px",
+              border: "1px solid #ccc",
+            }}
+          />
+          <button
+            onClick={handlePlaceBid}
+            style={{ padding: "8px 16px", borderRadius: "4px" }}
+          >
+            Place Bid
+          </button>
+        </div>
+      )}
       {bidMessage && <p style={{ marginTop: "10px" }}>{bidMessage}</p>}
     </div>
   );

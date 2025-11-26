@@ -24,6 +24,12 @@ function NavBar() {
         >
           Catalogue
         </Link>
+        <Link
+          to="/auction/new-auction"
+          style={{ color: "white", textDecoration: "none" }}
+        >
+          Post an Auction
+        </Link>
       </div>
     </nav>
   );

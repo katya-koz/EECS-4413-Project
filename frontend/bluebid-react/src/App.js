@@ -16,6 +16,7 @@ import ResetPasswordRequestPage from "./ResetPasswordPage/ResetPasswordRequestPa
 import ResetPasswordConfirmPage from "./ResetPasswordPage/ResetPasswordConfirmPage";
 import AuctionNotification from "./Components/Notification/AuctionNotification";
 import { UserProvider } from "./Context/UserContext";
+import NewAuction from "./NewAuctionPage/NewAuction";
 
 function AppRoutes() {
   const location = useLocation();
@@ -26,8 +27,14 @@ function AppRoutes() {
       <Routes location={state?.backgroundLocation || location}>
         <Route path="/signin" element={<SignIn />} />
         <Route path="/signup" element={<SignUp />} />
-	<Route path="/reset-password/request" element={<ResetPasswordRequestPage />} />
-	<Route path="/reset-password/confirm" element={<ResetPasswordConfirmPage />} />
+        <Route
+          path="/reset-password/request"
+          element={<ResetPasswordRequestPage />}
+        />
+        <Route
+          path="/reset-password/confirm"
+          element={<ResetPasswordConfirmPage />}
+        />
         <Route
           path="/"
           element={
@@ -53,6 +60,8 @@ function AppRoutes() {
             </Layout>
           }
         />
+        <Route path="/auction/items/:id" element={<CatalogueView />} />
+
         <Route
           path="/receipt/:id"
           element={
@@ -61,11 +70,21 @@ function AppRoutes() {
             </Layout>
           }
         />
+
+        <Route
+          path="/auction/new-auction"
+          element={
+            <Layout>
+              <NewAuction />
+            </Layout>
+          }
+        />
       </Routes>
 
       {state?.backgroundLocation && (
         <Routes>
           <Route path="/catalogue/items/:id" element={<CatalogueView />} />
+          <Route path="/auction/items/:id" element={<CatalogueView />} />
         </Routes>
       )}
     </>
@@ -77,7 +96,7 @@ function App() {
     <Router>
       <UserProvider>
         <AppRoutes />
-	<AuctionNotification />
+        <AuctionNotification />
       </UserProvider>
     </Router>
   );

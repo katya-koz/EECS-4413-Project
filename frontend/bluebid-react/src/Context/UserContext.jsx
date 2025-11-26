@@ -6,6 +6,7 @@ const UserContext = createContext();
 export function UserProvider({ children }) {
   const [token, setToken] = useState(() => localStorage.getItem("token")); // get token from local storage
   const navigate = useNavigate();
+  // TO DO: we need to store the auctions we are already subscribed to, so that we dont subscribe to the same topic multiple times
 
   // load userr from local storage
   const [user, setUser] = useState(() => {
