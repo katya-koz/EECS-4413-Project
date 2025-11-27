@@ -6,6 +6,7 @@ function PayNow() {
   const { id } = useParams();
   const [itemPrice, setItemPrice] = useState(0);
   const [shippingCost, setShippingCost] = useState(0);
+  const [loading, setLoading] = useState(true);
 
   const [cardNumber, setCardNumber] = useState("");
   const [cvv, setCvv] = useState("");
@@ -13,15 +14,38 @@ function PayNow() {
 
   useEffect(() => {
     // fetch values here, set to temp for now
-    setItemPrice(200);
-    setShippingCost(25);
+    async function getAuctionDetails() {
+		try{
+			const response = await fetch("http://localhost:8080/api/auction/auctions/${id}");
+			
+			if (response.ok) {
+				const data = await response.json();
+				
+				//set values here
+				//setItemPrice
+				//setShippingCost
+			}
+		} catch (error) {
+			console.log("failed to fetch acution item");
+		} finally{
+			setLoading(false);
+		}
+	}
+	
+	if (id){
+		getAuctionDetails();
+	}
+	
   }, [id]);
 
   const total = itemPrice + shippingCost;
   const navigate = useNavigate();
 
   const submitPayment = async () => {
+	
+	
     // submit payment info
+	// put post call here
     // go to reciept page...
   };
 
