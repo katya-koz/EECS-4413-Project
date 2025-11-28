@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useUser } from "../Context/UserContext";
 import { useNavigate } from "react-router-dom";
+import styles from "./SignUp.module.scss";
 
 function SignUp() {
   const [form, setForm] = useState({
@@ -28,18 +29,20 @@ function SignUp() {
   };
 
   async function handleSignUp() {
-    const username = form.username;
-    const password = form.password;
-    const firstName = form.firstName;
-    const lastName = form.lastName;
-    const streetName = form.streetName;
-    const streetNum = form.streetNum;
-    const city = form.city;
-    const postalCode = form.postalCode;
-    const country = form.country;
-    const email = form.email;
+    const {
+      username,
+      password,
+      firstName,
+      lastName,
+      streetName,
+      streetNum,
+      city,
+      postalCode,
+      country,
+      email,
+    } = form;
 
-    const res = await fetch("http://localhost:8080/api/account/signup", {
+    const res = await fetch("/api/account/signup", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -57,212 +60,136 @@ function SignUp() {
     });
 
     if (!res.ok) {
-      const message = await res.text();
-      console.error("Create account failed: " + message);
+      const message = await res.text().catch(() => "");
+      console.error("Create account failed: " + (message || res.status));
       return;
     }
 
     // if account was created successfully, log user in.
     handleLogin();
   }
+
   async function handleLogin() {
-    const username = form.username;
-    const password = form.password;
-    const res = await fetch("http://localhost:8080/api/authentication/login", {
+    const { username, password } = form;
+
+    const res = await fetch("/api/authentication/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ username, password }),
     });
 
     if (!res.ok) {
-      const data = await res.json();
-      console.error("Login failed: " + data.message);
+      const data = await res.json().catch(() => ({}));
+      console.error("Login failed: " + (data.message || res.status));
       return;
     }
 
     const data = await res.json();
-
     login(data.token, { username: data.username }, data.expiresAt);
-    // navigate to home page
     navigate("/");
   }
 
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        padding: "20px",
-      }}
-    >
-      <div
-        style={{
-          width: "100%",
-          maxWidth: "500px",
-          padding: "30px",
-          border: "1px solid #ccc",
-          borderRadius: "12px",
-          boxShadow: "0 4px 10px rgba(0,0,0,0.1)",
-        }}
-      >
-        <h2
-          style={{ fontSize: "24px", fontWeight: "bold", marginBottom: "20px" }}
-        >
-          Create Account
-        </h2>
-        <form onSubmit={handleSubmit} style={{ display: "grid", gap: "15px" }}>
+    <div className={styles.container}>
+      <div className={styles.card}>
+        <h2 className={styles.title}>Create Account</h2>
+
+        <form onSubmit={handleSubmit} className={styles.form}>
           <input
+            className={styles.input}
             type="email"
             name="email"
             placeholder="Email"
             value={form.email}
             onChange={handleChange}
-            style={{
-              padding: "10px",
-              borderRadius: "6px",
-              border: "1px solid #ccc",
-            }}
           />
 
           <input
-            type="username"
+            className={styles.input}
+            type="text"
             name="username"
             placeholder="Username / Display name"
             value={form.username}
             onChange={handleChange}
-            style={{
-              padding: "10px",
-              borderRadius: "6px",
-              border: "1px solid #ccc",
-            }}
           />
 
-          <div style={{ display: "flex", gap: "10px" }}>
+          <div className={styles.row}>
             <input
+              className={styles.input}
               type="text"
               name="firstName"
               placeholder="First Name"
               value={form.firstName}
               onChange={handleChange}
-              style={{
-                flex: 1,
-                padding: "10px",
-                borderRadius: "6px",
-                border: "1px solid #ccc",
-              }}
             />
             <input
+              className={styles.input}
               type="text"
               name="lastName"
               placeholder="Last Name"
               value={form.lastName}
               onChange={handleChange}
-              style={{
-                flex: 1,
-                padding: "10px",
-                borderRadius: "6px",
-                border: "1px solid #ccc",
-              }}
             />
           </div>
 
           <input
+            className={styles.input}
             type="password"
             name="password"
             placeholder="Password"
             value={form.password}
             onChange={handleChange}
-            style={{
-              padding: "10px",
-              borderRadius: "6px",
-              border: "1px solid #ccc",
-            }}
           />
 
-          <h3 style={{ marginTop: "10px" }}>Shipping Information</h3>
+          <h3 className={styles.sectionHeading}>Shipping Information</h3>
 
           <input
+            className={styles.input}
             type="text"
             name="country"
             placeholder="Country"
             value={form.country}
             onChange={handleChange}
-            style={{
-              padding: "10px",
-              borderRadius: "6px",
-              border: "1px solid #ccc",
-            }}
           />
 
-          <div style={{ display: "flex", gap: "10px" }}>
+          <div className={styles.row}>
             <input
+              className={styles.input}
               type="text"
               name="city"
               placeholder="City"
               value={form.city}
               onChange={handleChange}
-              style={{
-                flex: 1,
-                padding: "10px",
-                borderRadius: "6px",
-                border: "1px solid #ccc",
-              }}
             />
             <input
+              className={styles.input}
               type="text"
               name="postalCode"
               placeholder="Postal Code"
               value={form.postalCode}
               onChange={handleChange}
-              style={{
-                flex: 1,
-                padding: "10px",
-                borderRadius: "6px",
-                border: "1px solid #ccc",
-              }}
             />
           </div>
 
           <input
+            className={styles.input}
             type="text"
             name="streetName"
             placeholder="Street Name"
             value={form.streetName}
             onChange={handleChange}
-            style={{
-              padding: "10px",
-              borderRadius: "6px",
-              border: "1px solid #ccc",
-            }}
           />
 
           <input
+            className={styles.input}
             type="text"
             name="streetNum"
             placeholder="Street #"
             value={form.streetNum}
             onChange={handleChange}
-            style={{
-              padding: "10px",
-              borderRadius: "6px",
-              border: "1px solid #ccc",
-            }}
           />
 
-          <button
-            type="submit"
-            style={{
-              padding: "12px",
-              borderRadius: "8px",
-              backgroundColor: "#007bff",
-              color: "white",
-              fontWeight: "bold",
-              border: "none",
-              cursor: "pointer",
-            }}
-          >
+          <button type="submit" className={styles.primaryBtn}>
             Sign Up
           </button>
         </form>
@@ -270,4 +197,5 @@ function SignUp() {
     </div>
   );
 }
+
 export default SignUp;
