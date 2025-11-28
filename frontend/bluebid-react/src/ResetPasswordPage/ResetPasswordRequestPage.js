@@ -1,17 +1,35 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import styles from "./ResetPassword.module.scss";
 
-const API_BASE = "http://localhost:8080";
+/** Try several endpoints until one returns !404 */
+async function postFirstWorking(candidates) {
+  let lastErr;
+  for (const { path, body } of candidates) {
+    try {
+      const res = await fetch(path, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+      const data = await res.json().catch(() => ({}));
 
-async function postJSON(path, body) {
-  const res = await fetch(API_BASE + path, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(body),
-  });
-  const data = await res.json().catch(() => ({}));
-  if (!res.ok) throw new Error(data?.message || `Request failed (${res.status})`);
-  return data;
+      if (res.status === 404) {
+        // try next candidate
+        lastErr = new Error(`Not found: ${path}`);
+        continue;
+      }
+      if (!res.ok) {
+        throw new Error(data?.message || `Request failed (${res.status})`);
+      }
+      return data;
+    } catch (e) {
+      lastErr = e;
+      // continue if 404; otherwise surface the error
+      if (!(String(e?.message || "").includes("Not found"))) throw e;
+    }
+  }
+  throw lastErr || new Error("No matching endpoint found");
 }
 
 export default function ResetPasswordRequestPage() {
@@ -26,9 +44,18 @@ export default function ResetPasswordRequestPage() {
     setBusy(true);
     setError("");
     setToken("");
+
     try {
-      const data = await postJSON("/api/auth/request-password-reset", { email });
-      setToken(data.token || "");
+      // all paths are relative so they go through CRA proxy -> gateway:8080
+      const data = await postFirstWorking([
+        { path: "/api/authentication/request-password-reset", body: { email } },
+        { path: "/api/authentication/forgot-password",        body: { email } },
+        { path: "/api/auth/request-password-reset",           body: { email } }
+      ]);
+
+      const t = data.token || data.resetToken || data.value || "";
+      if (!t) throw new Error("Server did not return a token");
+      setToken(t);
     } catch (e) {
       setError(e.message);
     } finally {
@@ -42,54 +69,51 @@ export default function ResetPasswordRequestPage() {
   }
 
   return (
-    <div style={{ minHeight:"100vh", display:"flex", justifyContent:"center", alignItems:"center", padding:"20px" }}>
-      <div style={{ width:"100%", maxWidth:"400px", padding:"30px", border:"1px solid #ccc", borderRadius:"12px", boxShadow:"0 4px 10px 	rgba(0,0,0,0.1)", background:"#fff" }}>
-        <h2 style={{ fontSize:"24px", fontWeight:"bold", marginBottom:"12px" }}>Reset Your Password</h2>
-        <p style={{ marginTop:"-6px", marginBottom:"16px", color:"#555" }}>
+    <div className={styles.center}>
+      <div className={styles.card}>
+        <h2 className={styles.title}>Reset Your Password</h2>
+        <p className={styles.subtitle}>
           Enter your account email. We’ll return a reset token.
         </p>
 
-        <form onSubmit={handleSubmit} style={{ display:"grid", gap:"12px" }}>
-          <label style={{ fontWeight:600 }}>
+        <form onSubmit={handleSubmit} className={styles.form}>
+          <label className={styles.label}>
             Email
             <input
+              className={styles.input}
               type="email"
               placeholder="name@example.com"
               value={email}
               onChange={(e)=>setEmail(e.target.value)}
               required
-              style={{ padding:"10px", borderRadius:"6px", border:"1px solid #ccc" }}
             />
           </label>
-          <button type="submit" disabled={busy} style={{ padding:"12px", borderRadius:"8px", background:"#007bff", color:"#fff", fontWeight:"bold", border:"none", cursor:"pointer" }}>
+
+          <button type="submit" disabled={busy} className={styles.primaryBtn}>
             {busy ? "Requesting…" : "Request Reset Token"}
           </button>
         </form>
 
-        {error && (
-          <div style={{ marginTop:"12px", color:"#842029", background:"#f8d7da", border:"1px solid #f5c2c7", padding:"10px 12px", borderRadius:"8px" }}>
-            {error}
-          </div>
-        )}
+        {error && <div className={styles.error}>{error}</div>}
 
         {token && (
-          <div style={{ marginTop:"12px" }}>
-            <div style={{ fontSize:14, color:"#0f5132", background:"#d1e7dd", border:"1px solid #badbcc", padding:"10px 12px", borderRadius:"8px" }}>
+          <div className={styles.tokenBox}>
+            <div className={styles.success}>
               Token received:
-              <code style={{ display:"block", marginTop:6, wordBreak:"break-all" }}>{token}</code>
+              <code className={styles.tokenCode}>{token}</code>
             </div>
-            <div style={{ display:"flex", gap:8, marginTop:10 }}>
+            <div className={styles.actionsRow}>
               <button
                 type="button"
                 onClick={() => navigator.clipboard?.writeText(token)}
-                style={{ padding:"10px 12px", borderRadius:"8px", border:"1px solid #ccc", background:"#fff", cursor:"pointer" }}
+                className={styles.ghostBtn}
               >
                 Copy token
               </button>
               <button
                 type="button"
                 onClick={goToConfirm}
-                style={{ padding:"10px 12px", borderRadius:"8px", background:"#111827", color:"#fff", border:"none", cursor:"pointer" }}
+                className={`${styles.ghostBtn} ${styles.darkBtn}`}
               >
                 Go to confirm page
               </button>
@@ -97,7 +121,11 @@ export default function ResetPasswordRequestPage() {
           </div>
         )}
 
-        <button type="button" onClick={()=>navigate("/signin")} style={{ marginTop:"12px", background:"transparent", border:"none", color:"#007bff", 	textDecoration:"underline", cursor:"pointer" }}>
+        <button
+          type="button"
+          onClick={()=>navigate("/signin")}
+          className={styles.backLink}
+        >
           Back to Sign In
         </button>
       </div>
