@@ -1,0 +1,40 @@
+.card {
+  cursor: pointer;
+  padding: 16px;
+  border: 1px solid #e5e7eb; 
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(0,0,0,.08);
+  transition: box-shadow .2s ease, transform .2s ease;
+
+  &:hover {
+    box-shadow: 0 6px 16px rgba(0,0,0,.12);
+    transform: translateY(-1px);
+  }
+}
+
+.title {
+  font-size: 1.125rem; 
+  font-weight: 600;
+  margin: 0;
+}
+
+.row {
+  margin-top: 8px;
+  color: #374151; 
+}
+
+.muted {
+  color: #374151;
+  .label {
+    font-weight: 600;
+  }
+}
+
+.time {
+  margin-top: 4px;
+  color: #1f2937; 
+  .label {
+    font-weight: 600;
+  }
+}
