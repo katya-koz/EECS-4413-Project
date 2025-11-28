@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useUser } from "../Context/UserContext";
+import styles from "./CatalogueItemModal.module.scss";
 
 function CatalogueItemModal({ id, onUpdate }) {
   const { authFetch } = useUser();
@@ -12,16 +13,13 @@ function CatalogueItemModal({ id, onUpdate }) {
   // fetch the item info
   async function fetchItemInformation() {
     try {
-      const url = new URL(`http://localhost:8080/api/catalogue/items/${id}`);
-      const response = await authFetch(url.toString());
-
+      const response = await authFetch(`/api/catalogue/items/${id}`);
       if (!response.ok) throw new Error("Failed to fetch item " + id);
 
       const data = await response.json();
       setItem(data);
       setLoading(false);
       calculateTimeLeftDHMS(data.auctionEndTime);
-
       return data;
     } catch (err) {
       console.error(err);
@@ -59,6 +57,7 @@ function CatalogueItemModal({ id, onUpdate }) {
   const handlePlaceBid = () => {
     placeBid();
   };
+
   // we need to keep polling the bid status since kafka can take some time.
   async function pollBidStatus(bidId, timeout = 10000, interval = 500) {
     setBidMessage("Loading...");
@@ -66,9 +65,7 @@ function CatalogueItemModal({ id, onUpdate }) {
 
     while (Date.now() - start < timeout) {
       try {
-        const bidResponse = await authFetch(
-          `http://localhost:8080/api/bidding/bids/${bidId}`
-        );
+        const bidResponse = await authFetch(`/api/bidding/bids/${bidId}`);
         const bidData = await bidResponse.json();
 
         if (!bidResponse.ok)
@@ -98,34 +95,28 @@ function CatalogueItemModal({ id, onUpdate }) {
 
   async function placeBid() {
     if (!bidAmount || isNaN(bidAmount)) {
-      // some sort of front end validation here
       setBidMessage("Enter a valid bid amount");
       return;
     }
 
     try {
-      const response = await authFetch(
-        `http://localhost:8080/api/bidding/bid`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            auctionID: item.auctionId,
-            bidRequest: parseFloat(bidAmount),
-          }),
-        }
-      );
+      const response = await authFetch(`/api/bidding/bid`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          auctionID: item.auctionId,
+          bidRequest: parseFloat(bidAmount),
+        }),
+      });
 
       const data = await response.json();
 
       if (!response.ok || data.isSuccess == false) {
-        // is bid immedietly unsuccessful?
         setBidMessage(`Bid failed: ${data.message}`);
         return;
       }
 
-      // otherwise, the bid attempt has been sent successfully. we need to poll the bid request now to check its status if it was accepted by the backend
-
+      // otherwise, the bid attempt has been sent successfully.
       setBidAmount("");
 
       const bidResponse = await pollBidStatus(data.bidId);
@@ -142,13 +133,6 @@ function CatalogueItemModal({ id, onUpdate }) {
           onUpdate(updatedItem);
         }
       }
-      // onUpdate(
-      //   {
-      //   ...item,
-      //   currentBiddingPrice: item.currentBiddingPrice,
-      //   highestBidderID: item.highestBidderID,
-      //   }
-      // );
     } catch (err) {
       console.error(err);
       setBidMessage("Error placing bid");
@@ -157,9 +141,9 @@ function CatalogueItemModal({ id, onUpdate }) {
 
   useEffect(() => {
     fetchItemInformation();
-  }, [id]); // initial update of item info
+  }, [id]);
 
-  // upaate the item countdown every second
+  // update the item countdown every second
   useEffect(() => {
     const interval = setInterval(() => {
       if (item) calculateTimeLeftDHMS(item.auctionEndTime);
@@ -172,16 +156,7 @@ function CatalogueItemModal({ id, onUpdate }) {
   if (!item) return <p>Item not found.</p>;
 
   return (
-    <div
-      style={{
-        maxWidth: "600px",
-        margin: "20px auto",
-        padding: "20px",
-        border: "1px solid #ccc",
-        borderRadius: "8px",
-        backgroundColor: "white",
-      }}
-    >
+    <div className={styles.modal}>
       <h1>{item.itemName}</h1>
       <p>{item.itemDescription}</p>
       <p>
@@ -195,27 +170,20 @@ function CatalogueItemModal({ id, onUpdate }) {
         <strong>Time Left:</strong> {timeLeft}
       </p>
 
-      <div style={{ display: "flex", marginTop: "20px", gap: "10px" }}>
+      <div className={styles.row}>
         <input
           type="number"
           placeholder="Your bid"
           value={bidAmount}
           onChange={(e) => setBidAmount(e.target.value)}
-          style={{
-            flex: 1,
-            padding: "8px",
-            borderRadius: "4px",
-            border: "1px solid #ccc",
-          }}
+          className={styles.input}
         />
-        <button
-          onClick={handlePlaceBid}
-          style={{ padding: "8px 16px", borderRadius: "4px" }}
-        >
+        <button onClick={handlePlaceBid} className={styles.primaryBtn}>
           Place Bid
         </button>
       </div>
-      {bidMessage && <p style={{ marginTop: "10px" }}>{bidMessage}</p>}
+
+      {bidMessage && <p className={styles.message}>{bidMessage}</p>}
     </div>
   );
 }
