@@ -1,5 +1,6 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
+import styles from "./PayNow.module.scss";
 
 // pay now page
 function PayNow() {
@@ -22,25 +23,16 @@ function PayNow() {
 
   const submitPayment = async () => {
     // submit payment info
-    // go to reciept page...
+    // navigate(`/receipt/${id}`);
   };
 
   return (
-    <div style={{ maxWidth: "400px", margin: "40px auto" }}>
+    <div className={styles.container}>
       <h1>Pay for Item {id}</h1>
 
-      <div
-        style={{
-          border: "1px solid #ddd",
-          borderRadius: "8px",
-          padding: "15px",
-          marginTop: "20px",
-          marginBottom: "25px",
-          background: "#f9f9f9",
-        }}
-      >
+      <div className={styles.summary}>
         <h2>Order Summary</h2>
-        <div style={{ marginTop: "10px" }}>
+        <div className={styles.summaryDetails}>
           <p>
             Item Price: <strong>${itemPrice}</strong>
           </p>
@@ -48,50 +40,47 @@ function PayNow() {
             Shipping: <strong>${shippingCost}</strong>
           </p>
           <hr />
-          <p style={{ fontSize: "18px" }}>
+          <p className="total">
             Total: <strong>${total}</strong>
           </p>
         </div>
       </div>
 
-      <div style={{ display: "flex", flexDirection: "column", gap: "15px" }}>
-        <div>
+      <div className={styles.form}>
+        <div className={styles.field}>
           <label>Card Number</label>
           <input
+            className={styles.input}
             type="text"
             placeholder="1234 5678 1234 5678"
             value={cardNumber}
             onChange={(e) => setCardNumber(e.target.value)}
-            style={{ width: "100%", padding: "10px", marginTop: "5px" }}
           />
         </div>
 
-        <div>
+        <div className={styles.field}>
           <label>Security Code (CVV)</label>
           <input
+            className={styles.input}
             type="text"
             placeholder="123"
             value={cvv}
             onChange={(e) => setCvv(e.target.value)}
-            style={{ width: "100%", padding: "10px", marginTop: "5px" }}
           />
         </div>
 
-        <div>
+        <div className={styles.field}>
           <label>Expiry Date (MM/YY)</label>
           <input
+            className={styles.input}
             type="text"
             placeholder="08/27"
             value={expiry}
             onChange={(e) => setExpiry(e.target.value)}
-            style={{ width: "100%", padding: "10px", marginTop: "5px" }}
           />
         </div>
 
-        <button
-          onClick={submitPayment}
-          style={{ padding: "12px", marginTop: "20px", fontSize: "16px" }}
-        >
+        <button onClick={submitPayment} className={styles.button}>
           Submit Payment
         </button>
       </div>
