@@ -9,6 +9,7 @@ import java.util.List;
 
 import javax.crypto.SecretKey;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.http.HttpStatus;
@@ -19,8 +20,11 @@ import org.springframework.web.server.ServerWebExchange;
 @Component // to inject
 public class JwtAuthenticationFilter  implements GatewayFilter {
 
-    private final SecretKey key = Keys.hmacShaKeyFor("6ce0128b814365a2592f3dd44042f83649908c3672db59ef192b56e711e4c649".getBytes()); // temp - use env. this is the same as in user service's jwt 
-    
+    private final SecretKey key;
+	 
+    public JwtAuthenticationFilter(@Value("${jwt.secret}") String secret) {
+	    this.key = Keys.hmacShaKeyFor(secret.getBytes());
+    }
     private static final List<String> PUBLIC_ENDPOINTS = List.of( // this may not be the best way to do this, but we need certain endpoints to be exposed publicly without authorization (for example, forgot password, log in, etc).
     	    "/api/authentication/login",
     	    "/api/account/signup",
@@ -76,6 +80,7 @@ public class JwtAuthenticationFilter  implements GatewayFilter {
 
             return chain.filter(mutatedExchange);
         } catch (Exception e) {
+        	System.out.println("rejected.");
             exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
             return exchange.getResponse().setComplete();
         }
