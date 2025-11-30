@@ -1,0 +1,35 @@
+spring:
+  application:
+    name: user-app-service
+  jwt:
+    secret: ${JWT_SECRET}
+    expiration-ms: $${JWT_EXPIRATION_MS:3600000}
+
+  data:
+    mongodb:
+      uri: mongodb://root:${MONGO_PASSWORD}@user-db:27017/userdb?authSource=admin
+      database: userdb
+
+  kafka:
+    bootstrap-servers: kafka:9092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+
+  security:
+    oauth2:
+      client:
+        registration:
+          github:
+            client-id: ${GITHUB_CLIENT_ID}
+            client-secret: ${GITHUB_CLIENT_SECRET}
+            redirect-uri: http://localhost:8080/login/oauth2/code/github
+            scope:
+              - read:user
+              - user:email
+        provider:
+          github:
+            authorization-uri: https://github.com/login/oauth/authorize
+            token-uri: https://github.com/login/oauth/access_token
+            user-info-uri: https://api.github.com/user
+            user-name-attribute: id

@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -88,6 +89,25 @@ public class AccountManagerController {
 		        _userService.createUser(user);
 
 		        return ResponseEntity.ok("New user, "+ user.getUsername() +" successfully created!");
+		    } catch (IllegalArgumentException e) {
+		        return ResponseEntity
+		                .status(HttpStatus.BAD_REQUEST)
+		                .body(e.getMessage());
+		    }
+		
+	}
+	
+	@PutMapping("/profile")
+	public ResponseEntity<?> updateUserProfile(@RequestBody CreateUserProfileRequest createProfileRequest, @RequestHeader(value = "X-User-Id", required = false) String userId){
+		// attempt to save updated user to db
+		// im reusing the other dto, and just checking for nulls :)
+		 try {
+			 if (userId == null || userId.isBlank()) {
+				 return ResponseEntity .badRequest().body("Missing user id header.");}
+
+		        _userService.updateUser(createProfileRequest, userId);
+			
+		        return ResponseEntity.ok("User successfully updated!");
 		    } catch (IllegalArgumentException e) {
 		        return ResponseEntity
 		                .status(HttpStatus.BAD_REQUEST)

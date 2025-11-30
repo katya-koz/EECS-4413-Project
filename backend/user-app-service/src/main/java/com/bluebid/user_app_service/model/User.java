@@ -21,6 +21,15 @@ public class User {
 	private String city;
 	private String postalCode;
 	private String country;
+	private String oauthUserId; // github or google oauth2 id
+
+	public String getOauthUserId() {
+	    return oauthUserId;
+	}
+	
+	public void setOauthUserId(String oauthUserId) {
+	    this.oauthUserId = oauthUserId;
+	}
 
 	
 	public String getId() {

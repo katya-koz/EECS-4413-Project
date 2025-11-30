@@ -6,6 +6,7 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import com.bluebid.user_app_service.dto.BidInitiatedEvent;
+import com.bluebid.user_app_service.dto.CreateUserProfileRequest;
 import com.bluebid.user_app_service.dto.PaymentInitiatedEvent;
 import com.bluebid.user_app_service.dto.UserInfoValidationFailureEvent;
 import com.bluebid.user_app_service.dto.UserInfoValidationSuccessEvent;
@@ -177,5 +178,87 @@ public class UserService {
 		
 		return "Password has been successfully reset for " +user.getUsername()+". Recovery token is now invalid.";
 	}
+
+
+	public User findOrCreateUserByOAuthIdAndEmail(String oauthUserId, String email, String username) {
+	    if (oauthUserId == null || oauthUserId.isEmpty()) {
+	        throw new IllegalArgumentException("OAuth user ID cannot be null or empty.");
+	    }
+
+	    // check if user with same oauthuserid exists
+	    Optional<User> userOpt = _userRepository.findByOauthUserId(oauthUserId);
+	    if (userOpt.isPresent()) {
+	        return userOpt.get();
+	    }
+
+	    // check if user with same email exists
+	    if (email != null && !email.isEmpty()) {
+	        Optional<User> emailUserOpt = _userRepository.findByEmail(email);
+	        if (emailUserOpt.isPresent()) {
+	            User emailUser = emailUserOpt.get();
+	            emailUser.setOauthUserId(oauthUserId);
+	            _userRepository.save(emailUser);
+	            return emailUser;
+	        }
+	    }
+
+	    // create new user
+	    User newUser = new User();
+	    newUser.setOauthUserId(oauthUserId);
+	    newUser.setEmail(email);
+	    if(username != null ) newUser.setUsername(username); // may be null but we will take care of that later
+	    newUser.setDateRegistered(LocalDateTime.now());
+
+	    // save new user
+	    _userRepository.save(newUser);
+
+	    return newUser;
+	}
+
+
+	public void updateUser(CreateUserProfileRequest createProfileRequest, String uid) {
+		// fetch existing user 
+	    Optional<User> optionalUser = _userRepository.findById(uid);
+	    if (optionalUser.isEmpty()) {
+	        throw new RuntimeException("User not found");
+	    }
+
+	    User user = optionalUser.get();
+
+	    // update only if fields are non null 
+	    if (createProfileRequest.getEmail() != null) {
+	        user.setEmail(createProfileRequest.getEmail());
+	    }
+	    if (createProfileRequest.getUsername() != null) {
+	        user.setUsername(createProfileRequest.getUsername());
+	    }
+	    if (createProfileRequest.getPassword() != null) {
+	        user.setPassword(createProfileRequest.getPassword()); // consider hashing
+	    }
+	    if (createProfileRequest.getFirstName() != null) {
+	        user.setFirstName(createProfileRequest.getFirstName());
+	    }
+	    if (createProfileRequest.getLastName() != null) {
+	        user.setLastName(createProfileRequest.getLastName());
+	    }
+	    if (createProfileRequest.getStreetName() != null) {
+	        user.setStreetName(createProfileRequest.getStreetName());
+	    }
+	    if (createProfileRequest.getStreetNum() != null) {
+	        user.setStreetNum(createProfileRequest.getStreetNum());
+	    }
+	    if (createProfileRequest.getCity() != null) {
+	        user.setCity(createProfileRequest.getCity());
+	    }
+	    if (createProfileRequest.getPostalCode() != null) {
+	        user.setPostalCode(createProfileRequest.getPostalCode());
+	    }
+	    if (createProfileRequest.getCountry() != null) {
+	        user.setCountry(createProfileRequest.getCountry());
+	    }
+
+	    _userRepository.save(user);
+	}
+
 	
 }

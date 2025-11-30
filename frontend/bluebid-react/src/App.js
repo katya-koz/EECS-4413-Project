@@ -9,6 +9,7 @@ import Catalogue from "./CataloguePage/Catalogue";
 import CatalogueView from "./CataloguePage/CatalogueItemPage";
 import SignIn from "./SignInPage/SignIn";
 import SignUp from "./SignUpPage/SignUp";
+import OAuthSuccess from "./OAuth2Page/OAuth2Success";
 import Home from "./HomePage/Home";
 import PayNow from "./PayNowPage/PayNow";
 import Receipt from "./PayNowPage/Reciept";
@@ -26,7 +27,7 @@ function AppRoutes() {
   return (
     <>
       <Routes location={state?.backgroundLocation || location}>
-        <Route path="/signin" element={<SignIn />} />
+        <Route path="/login" element={<SignIn />} />
         <Route path="/signup" element={<SignUp />} />
         <Route path="/reset-password" element={<ResetPasswordRequestPage />} />
         <Route
@@ -74,6 +75,8 @@ function AppRoutes() {
             </Layout>
           }
         />
+
+        <Route path="/oauth-success/" element={<OAuthSuccess />} />
 
         <Route
           path="/auction/new-auction"

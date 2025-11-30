@@ -44,7 +44,7 @@ export function UserProvider({ children }) {
 
     clientRef.current.onConnect = async () => {
       const auctions = await getAuctions();
-      auctions.forEach((a) => subscribeToAuction(a.id));
+      if (auctions != null) auctions.forEach((a) => subscribeToAuction(a.id));
     };
 
     clientRef.current.onStompError = (frame) => {
@@ -61,11 +61,13 @@ export function UserProvider({ children }) {
 
   // get the user's bids
   async function getAuctions() {
-    if (!user) return;
+    if (!user || !token) return;
     const res = await authFetch("http://localhost:8080/api/auction/auctions/");
-
-    const response = await res.json();
-    return response;
+    if (res.ok) {
+      const response = await res.json();
+      return response;
+    }
+    return;
   }
 
   useEffect(() => {
@@ -84,19 +86,19 @@ export function UserProvider({ children }) {
   }, [expiresAt]);
 
   useEffect(() => {
-    if (!expiresAt) {
-      // log out if there's no 'expires at'
-      logout();
-      return;
-    }
+    // if (!expiresAt) {
+    //   // log out if there's no 'expires at'
+    //   logout();
+    //   return;
+    // }
 
     const now = Date.now();
 
-    if (now >= expiresAt) {
-      // log out if token has expired
-      logout();
-      return;
-    }
+    // if (now >= expiresAt) {
+    //   // log out if token has expired
+    //   logout();
+    //   return;
+    // }
 
     const timeout = setTimeout(() => {
       // automatically log out on token expiry
@@ -115,12 +117,11 @@ export function UserProvider({ children }) {
   };
 
   const logout = () => {
-    // clear local storage
+    // clear local storage, temporariliy commented out
     setToken(null);
     setUser(null);
     setExpiresAt(null);
-
-    navigate("/signin");
+    navigate("/login");
   };
 
   // automatically applies jwt to header (Authorization Bearer), and correct content type
@@ -167,50 +168,3 @@ export function UserProvider({ children }) {
 export function useUser() {
   return useContext(UserContext);
 }
-
-/*
-  useEffect(() => {
-    if (!user) return;
-
-    const connectAuctions = async () => {
-      const auctions = await getAuctions();
-
-      const client = new Client({
-        brokerURL: "ws://localhost:8080/ws",
-        reconnectDelay: 5000,
-      });
-
-      client.onConnect = () => {
-        auctions.forEach((a) => {
-          console.log(`subbed to /topic/auction/${a.id}`);
-
-          client.subscribe(`/topic/auction/${a.id}`, (message) => {
-            const data = JSON.parse(message.body);
-            setNotifications((prev) => [...prev, data]);
-          });
-        });
-      };
-
-      client.onStompError = (frame) => {
-        console.error("STOMP error", frame);
-      };
-
-      client.activate();
-
-      return () => client.deactivate();
-    };
-
-    connectAuctions();
-  }, [user]);
-
-  async function getAuctions() {
-    if (!user) return;
-    const res = await authFetch("http://localhost:8080/api/auction/auctions/");
-
-    const response = await res.json();
-
-    console.log(response);
-    return response;
-  }
- 
- */

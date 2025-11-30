@@ -33,7 +33,7 @@ function NavBar() {
         </Link>
 
         <Link
-          to="/signin"
+          to="/login"
           onClick={logout}
           style={{ color: "white", textDecoration: "none" }}
         >

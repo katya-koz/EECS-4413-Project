@@ -1,8 +1,21 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useUser } from "../Context/UserContext";
+import { useLocation } from "react-router-dom";
+
+// http://localhost:3000/login?oauthUserId=119365237&email=null
+// user is redirected to that url after a successful oauth response.
+// we need to post login again with the oauthuserid to finish logging in.
 
 function SignIn() {
+  //const location = useLocation();
+  //const query = new URLSearchParams(location.search);
+
+  // const uid = query.get("uid");
+  // const uname = query.get("uname");
+  // const jwt = query.get("jwt");
+  // console.log(uid, uname, jwt);
+
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
@@ -70,6 +83,68 @@ function SignIn() {
         >
           Sign In
         </h2>
+
+        <button
+          onClick={() =>
+            (window.location.href =
+              "http://localhost:8080/oauth2/authorization/github")
+          }
+          style={{
+            width: "100%",
+            padding: "12px",
+            marginBottom: "10px",
+            borderRadius: "8px",
+            border: "1px solid #333",
+            background: "black",
+            color: "white",
+            fontWeight: "bold",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: "10px",
+            cursor: "pointer",
+          }}
+        >
+          <i className="bi bi-github"></i>
+          Sign in with GitHub
+        </button>
+
+        {/* <button
+          onClick={() =>
+            (window.location.href =
+              "http://localhost:8080/api/auth/oauth/google")
+          }
+          style={{
+            width: "100%",
+            padding: "12px",
+            borderRadius: "8px",
+            border: "1px solid #ccc",
+            background: "white",
+            color: "black",
+            fontWeight: "bold",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: "10px",
+            cursor: "pointer",
+            marginBottom: "20px",
+          }}
+        >
+          <i className="bi bi-google"></i>
+          Sign in with Google
+        </button> */}
+
+        <div
+          style={{
+            textAlign: "center",
+            margin: "10px 0",
+            color: "#888",
+            fontSize: "14px",
+          }}
+        >
+          ─── OR ───
+        </div>
+
         <form onSubmit={handleSubmit} style={{ display: "grid", gap: "15px" }}>
           <input
             type="username"
@@ -82,6 +157,7 @@ function SignIn() {
               border: "1px solid #ccc",
             }}
           />
+
           <input
             type="password"
             placeholder="Password"
@@ -93,6 +169,7 @@ function SignIn() {
               border: "1px solid #ccc",
             }}
           />
+
           <button
             type="button"
             onClick={() => navigate("/reset-password")}
@@ -106,10 +183,10 @@ function SignIn() {
               padding: 0,
               marginTop: "-6px",
             }}
-            aria-label="Forgot password? Click here to reset it."
           >
             Forgot password?
           </button>
+
           <button
             type="submit"
             style={{

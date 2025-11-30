@@ -63,6 +63,18 @@ public class GatewayAppServiceRoute {
                 	    .path("/ws/**")
                 	    .uri("ws://auction-service:8080") // added route for websocket
                 	)
+                .route("oauth2_route", r -> r
+                	    .path("/oauth2/**")
+                	    .filters(f -> f
+                	        .rewritePath("/oauth2/(?<segment>.*)", "/oauth2/${segment}"))
+                	    .uri("http://user-service:8080")) // route for oauth2. if youre reading this, i toiled over oauth2 not working for 6 hours
+                										// only to realize it was because i forgot to add the route....
+                
+                .route("oauth2_route", r -> r
+                	    .path("/login/oauth2/**")
+                	    .filters(f -> f
+                	        .rewritePath("/oauth2/(?<segment>.*)", "/oauth2/${segment}"))
+                	    .uri("http://user-service:8080"))
                 .build();
     }
 

@@ -1,4 +1,4 @@
-package com.bluebid.user_app_service.security;
+package com.bluebid.gateway_app_service.security;
 
 
 import io.jsonwebtoken.Claims;
@@ -13,34 +13,28 @@ import javax.crypto.SecretKey;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import com.bluebid.user_app_service.dto.TokenResponse;
 
 @Component
 public class JWTTokenManager {
 	
-    private final SecretKey key;
-    private final long expirationMs;
+	private final SecretKey key;
+	private final long expirationMs;
 	 
-	
-
-    public JWTTokenManager(
-            @Value("${jwt.secret}") String secret,
-            @Value("${jwt.expiration-ms}") long expirationMs
-    ) {
-        this.key = Keys.hmacShaKeyFor(secret.getBytes());
-        this.expirationMs = expirationMs;
+    public JWTTokenManager(@Value("${jwt.secret}") String secret, @Value("${jwt.expiration-ms}") long expirationMs) {
+	    this.key = Keys.hmacShaKeyFor(secret.getBytes());
+	    this.expirationMs = expirationMs;
     }
 	
 	// generate a token with the user's username
 	//changed to generate with userid instead
-	public TokenResponse generateToken(String userId) {
+	public String generateToken(String userId) {
 		Date expiry = new Date(System.currentTimeMillis() + expirationMs);
-		return new TokenResponse(Jwts.builder()
+		return Jwts.builder()
         .subject(userId)
         .issuedAt(new Date())
         .expiration(expiry)
         .signWith(key)  
-        .compact(), expiry);
+        .compact();
 	}
 	
 	//validate a token by checking the signature and expiration
