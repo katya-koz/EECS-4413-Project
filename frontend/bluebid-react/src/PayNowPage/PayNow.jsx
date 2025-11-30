@@ -1,6 +1,7 @@
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { useUser } from "../Context/UserContext";
+import "./PayNow.scss";
 
 function PayNow() {
   const { id } = useParams();
@@ -18,16 +19,31 @@ function PayNow() {
   const [cardNumber, setCardNumber] = useState("");
   const [cvv, setCvv] = useState("");
   const [expiryMonth, setExpiryMonth] = useState("01");
-  const [expiryYear, setExpiryYear] = useState(new Date().getFullYear().toString());
+  const [expiryYear, setExpiryYear] = useState(
+    new Date().getFullYear().toString()
+  );
   const [checked, setChecked] = useState(false);
   const validMonths = [
-    "01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"
+    "01",
+    "02",
+    "03",
+    "04",
+    "05",
+    "06",
+    "07",
+    "08",
+    "09",
+    "10",
+    "11",
+    "12",
   ];
   const { authFetch } = useUser();
 
   const currentYear = new Date().getFullYear();
-  const years = Array.from({ length: 10 }, (_, i) => (currentYear + i).toString());
-  
+  const years = Array.from({ length: 10 }, (_, i) =>
+    (currentYear + i).toString()
+  );
+
   const handleChange = (e) => {
     const isChecked = e.target.checked;
     setChecked(isChecked);
@@ -44,7 +60,9 @@ function PayNow() {
   useEffect(() => {
     async function getAuctionDetails() {
       try {
-        const response = await authFetch(`http://localhost:8080/api/auction/auctions/${id}`);
+        const response = await authFetch(
+          `http://localhost:8080/api/auction/auctions/${id}`
+        );
 
         if (response.ok) {
           const data = await response.json();
@@ -64,7 +82,6 @@ function PayNow() {
     if (id) {
       getAuctionDetails();
     }
-
   }, [id]);
 
   const total = itemPrice + shippingCost;
@@ -72,24 +89,27 @@ function PayNow() {
 
   const submitPayment = async () => {
     const paymentRequest = {
-      "cardNumber": cardNumber,
-      "expiryMonth": expiryMonth,
-      "expiryYear": expiryYear,
-      "securityCode": cvv,
-      "itemPrice": itemPrice,
-      "sellerID": sellerID,
-      "catalogueID": catalogueID,
-      "isExpedited": isExpedited,
-      "shippingCost": shippingCost,
-      "paymentTime": new Date().toISOString().slice(0, 19)
+      cardNumber: cardNumber,
+      expiryMonth: expiryMonth,
+      expiryYear: expiryYear,
+      securityCode: cvv,
+      itemPrice: itemPrice,
+      sellerID: sellerID,
+      catalogueID: catalogueID,
+      isExpedited: isExpedited,
+      shippingCost: shippingCost,
+      paymentTime: new Date().toISOString().slice(0, 19),
     };
 
     try {
-      const response = await authFetch("http://localhost:8080/api/payment/payment", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(paymentRequest)
-      });
+      const response = await authFetch(
+        "http://localhost:8080/api/payment/payment",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(paymentRequest),
+        }
+      );
 
       if (response.ok) {
         const responseData = await response.json();
@@ -98,13 +118,17 @@ function PayNow() {
       } else {
         alert("Payment failed. Please check your details and try again!");
       }
-
     } catch (error) {
       console.error("Payment error: ", error);
     }
   };
 
-  if (loading) return <p style={{ textAlign: "center", marginTop: "50px" }}>Loading payment details...</p>;
+  if (loading)
+    return (
+      <p style={{ textAlign: "center", marginTop: "50px" }}>
+        Loading payment details...
+      </p>
+    );
 
   return (
     <div style={styles.pageContainer}>
@@ -113,7 +137,7 @@ function PayNow() {
 
         <div style={styles.summaryBox}>
           <h2 style={styles.subHeading}>Order Summary</h2>
-          
+
           <div style={styles.summaryRow}>
             <span>Item Price:</span>
             <strong>${itemPrice.toFixed(2)}</strong>
@@ -173,8 +197,10 @@ function PayNow() {
                 onChange={(e) => setExpiryMonth(e.target.value)}
                 style={styles.select}
               >
-                {validMonths.map(m => (
-                  <option key={m} value={m}>{m}</option>
+                {validMonths.map((m) => (
+                  <option key={m} value={m}>
+                    {m}
+                  </option>
                 ))}
               </select>
 
@@ -183,8 +209,10 @@ function PayNow() {
                 onChange={(e) => setExpiryYear(e.target.value)}
                 style={styles.select}
               >
-                {years.map(y => (
-                  <option key={y} value={y}>{y}</option>
+                {years.map((y) => (
+                  <option key={y} value={y}>
+                    {y}
+                  </option>
                 ))}
               </select>
             </div>
@@ -193,8 +221,8 @@ function PayNow() {
           <button
             onClick={submitPayment}
             style={styles.button}
-            onMouseOver={(e) => e.target.style.backgroundColor = "#0056b3"}
-            onMouseOut={(e) => e.target.style.backgroundColor = "#007bff"}
+            onMouseOver={(e) => (e.target.style.backgroundColor = "#0056b3")}
+            onMouseOut={(e) => (e.target.style.backgroundColor = "#007bff")}
           >
             Submit Payment
           </button>
@@ -211,7 +239,6 @@ const styles = {
     justifyContent: "center",
     paddingTop: "60px",
     paddingBottom: "60px",
-
   },
   card: {
     width: "100%",

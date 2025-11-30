@@ -1,0 +1,45 @@
+.container {
+  max-width: 900px;
+  margin: 20px auto;
+  padding: 10px;
+}
+
+.title {
+  margin: 0 0 8px 0;
+}
+
+.sectionTitle {
+  margin: 20px 0 10px 0;
+}
+
+.empty {
+  color: #6b7280;
+  margin: 6px 0 12px 0;
+}
+
+.card {
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  margin-bottom: 10px;
+  background: #fff;
+}
+
+.cardTitle {
+  margin: 0 0 4px 0;
+}
+
+.payBtn {
+  display: inline-block;
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  background: #fff;
+  cursor: pointer;
+  text-decoration: none;
+  color: inherit;
+}
+.payBtn:hover {
+  border-color: #007bff;
+  color: #007bff;
+}/*# sourceMappingURL=Home.css.map */

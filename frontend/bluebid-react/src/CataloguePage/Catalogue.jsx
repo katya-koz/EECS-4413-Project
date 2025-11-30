@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useUser } from "../Context/UserContext";
 import CatalogueItemCard from "./CatalogueItemCard";
 import CatalogueItemPage from "./CatalogueItemPage";
+import "./style/Catalogue.scss";
 
 function Catalogue() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -12,7 +13,6 @@ function Catalogue() {
   const { authFetch } = useUser();
 
   const [timer, setTimer] = useState(null);
-
   const [modalItemId, setModalItemId] = useState(null);
 
   const fetchItems = async (query = "", pageNumber = 0) => {
@@ -66,7 +66,7 @@ function Catalogue() {
   };
 
   return (
-    <div style={{ maxWidth: "900px", margin: "20px auto", padding: "10px" }}>
+    <div className="cataloguePage">
       <h1>Catalogue</h1>
 
       <input
@@ -74,27 +74,13 @@ function Catalogue() {
         placeholder="Search items..."
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
-        style={{
-          width: "100%",
-          padding: "10px",
-          marginBottom: "20px",
-          borderRadius: "6px",
-          border: "1px solid #ccc",
-        }}
+        className="searchInput"
       />
 
-      {loading && <p>Loading...</p>}
+      {loading && <p className="loadingText">Loading...</p>}
 
       {items.length > 0 ? (
-        <div
-          className="grid"
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fill, minmax(250px, 1fr))",
-            gap: "16px",
-            marginTop: "20px",
-          }}
-        >
+        <div className="grid">
           {items.map((item) => (
             <div key={item.id} onClick={() => setModalItemId(item.id)}>
               <CatalogueItemCard item={item} />
@@ -102,41 +88,25 @@ function Catalogue() {
           ))}
         </div>
       ) : (
-        !loading && <p>No items found.</p>
+        !loading && <p className="noItems">No items found.</p>
       )}
 
-      <div style={{ marginTop: "20px", textAlign: "center" }}>
+      <div className="pager">
         <i
-          disabled={page === 0 || loading}
-          style={{ marginRight: "10px" }}
-          onClick={handlePrevPage}
           className="bi bi-arrow-left"
+          onClick={handlePrevPage}
+          aria-disabled={page === 0 || loading}
         ></i>
         <i
-          disabled={page === 0 || loading}
-          style={{ marginRight: "10px" }}
-          onClick={handleNextPage}
           className="bi bi-arrow-right"
+          onClick={handleNextPage}
+          aria-disabled={!hasMore || loading}
         ></i>
       </div>
 
       {modalItemId && (
-        <div
-          style={{
-            position: "fixed",
-            top: 0,
-            left: 0,
-            width: "100vw",
-            height: "100vh",
-            backgroundColor: "rgba(0,0,0,0.5)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            zIndex: 999,
-          }}
-          onClick={() => setModalItemId(null)}
-        >
-          <div onClick={(e) => e.stopPropagation()}>
+        <div className="modalOverlay" onClick={() => setModalItemId(null)}>
+          <div className="modalContent" onClick={(e) => e.stopPropagation()}>
             <CatalogueItemPage
               id={modalItemId}
               onUpdate={(updatedItem) => {

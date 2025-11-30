@@ -1,0 +1,56 @@
+.auction-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  flex-direction: column;
+}
+
+.auction-card {
+  width: 100%;
+  max-width: 500px;
+  padding: 30px;
+  border: 1px solid #ccc;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.auction-title {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+
+.auction-form {
+  display: grid;
+  gap: 15px;
+}
+
+.auction-input {
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.auction-flex {
+  display: flex;
+  gap: 10px;
+}
+
+.auction-button {
+  padding: 12px;
+  border-radius: 8px;
+  background-color: #007bff;
+  color: white;
+  font-weight: bold;
+  border: none;
+  cursor: pointer;
+}
+
+.error-message {
+  color: red;
+  margin-top: 15px;
+  font-weight: bold;
+}

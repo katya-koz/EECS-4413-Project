@@ -1,0 +1,56 @@
+.catalogueItemPage {
+  max-width: 700px;
+  margin: 30px auto;
+  padding: 25px;
+  border-radius: 12px;
+  background: white;
+  border: 1px solid #ddd;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+.catalogueItemPage .backButton {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.2rem;
+}
+.catalogueItemPage .itemTitle {
+  margin-top: 10px;
+  font-size: 1.8rem;
+}
+.catalogueItemPage .itemDescription {
+  margin: 10px 0;
+}
+.catalogueItemPage .bidRow {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+}
+.catalogueItemPage .bidRow .bidInput {
+  flex: 1;
+  padding: 8px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+.catalogueItemPage .bidRow .bidButton {
+  padding: 10px 16px;
+  border-radius: 6px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  font-weight: bold;
+  cursor: pointer;
+}
+.catalogueItemPage .sellerNotice {
+  margin-top: 10px;
+  font-style: italic;
+}
+.catalogueItemPage .bidMessage {
+  margin-top: 10px;
+  font-weight: bold;
+  color: #d9534f;
+}
+.catalogueItemPage .loadingText,
+.catalogueItemPage .notFoundText {
+  text-align: center;
+  margin-top: 20px;
+}/*# sourceMappingURL=CatalogueItemPage.css.map */

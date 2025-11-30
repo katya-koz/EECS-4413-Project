@@ -1,7 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useUser } from "../Context/UserContext";
-import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useToast } from "../Context/ToastContext";
+import "./NewAuction.scss";
 
 function NewAuction() {
   const [newAuctionForm, setNewAuctionForm] = useState({
@@ -35,10 +35,8 @@ function NewAuction() {
     if (data.submitSuccess === false) {
       setErrorMessage(data);
     } else {
-      setErrorMessage(data.message); // not error message, will change later
-      // get the catalogue item id to navigate to pop up the modal
+      setErrorMessage(data.message);
       for (let i = 0; i < 10; i++) {
-        // kafka stream needs some time to populate catalogueid field. we are polling until we get it.
         const res = await authFetch(
           `http://localhost:8080/api/auction/auctions/${data.auctionId}`
         );
@@ -46,10 +44,10 @@ function NewAuction() {
 
         if (auction.catalogueID) {
           showToast(`Auction created successfully for ${auction.itemName}!`);
-          return; // success
+          return;
         }
 
-        await new Promise((resolve) => setTimeout(resolve, 200)); // retry every 200 ms
+        await new Promise((resolve) => setTimeout(resolve, 200));
       }
     }
   }
@@ -64,73 +62,34 @@ function NewAuction() {
   };
 
   return (
-    <div
-      style={{
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        padding: "20px",
-        flexDirection: "column",
-      }}
-    >
-      <div
-        style={{
-          width: "100%",
-          maxWidth: "500px",
-          padding: "30px",
-          border: "1px solid #ccc",
-          borderRadius: "12px",
-          boxShadow: "0 4px 10px rgba(0,0,0,0.1)",
-        }}
-      >
-        <h2
-          style={{ fontSize: "24px", fontWeight: "bold", marginBottom: "20px" }}
-        >
-          Post a New Item for Auction
-        </h2>
-        <form
-          onSubmit={handleSubmitNewAuction}
-          style={{ display: "grid", gap: "15px" }}
-        >
+    <div className="auction-container">
+      <div className="auction-card">
+        <h2 className="auction-title">Post a New Item for Auction</h2>
+        <form onSubmit={handleSubmitNewAuction} className="auction-form">
           <input
-            type="itemName"
+            type="text"
             name="itemName"
             placeholder="Item Name"
             value={newAuctionForm.itemName}
             onChange={handleChange}
-            style={{
-              padding: "10px",
-              borderRadius: "6px",
-              border: "1px solid #ccc",
-            }}
+            className="auction-input"
           />
-
           <input
-            type="itemDescription"
+            type="text"
             name="itemDescription"
             placeholder="Item Description"
             value={newAuctionForm.itemDescription}
             onChange={handleChange}
-            style={{
-              padding: "10px",
-              borderRadius: "6px",
-              border: "1px solid #ccc",
-            }}
+            className="auction-input"
           />
-
-          <div style={{ display: "flex", gap: "10px" }}>
+          <div className="auction-flex">
             <input
               type="text"
               name="basePrice"
               placeholder="Starting Bid"
               value={newAuctionForm.basePrice}
               onChange={handleChange}
-              style={{
-                flex: 1,
-                padding: "10px",
-                borderRadius: "6px",
-                border: "1px solid #ccc",
-              }}
+              className="auction-input"
             />
             <input
               type="text"
@@ -138,42 +97,17 @@ function NewAuction() {
               placeholder="Length of Auction (seconds for test)"
               value={newAuctionForm.seconds}
               onChange={handleChange}
-              style={{
-                flex: 1,
-                padding: "10px",
-                borderRadius: "6px",
-                border: "1px solid #ccc",
-              }}
+              className="auction-input"
             />
           </div>
-
-          <button
-            type="submit"
-            style={{
-              padding: "12px",
-              borderRadius: "8px",
-              backgroundColor: "#007bff",
-              color: "white",
-              fontWeight: "bold",
-              border: "none",
-              cursor: "pointer",
-            }}
-          >
+          <button type="submit" className="auction-button">
             Post New Item
           </button>
         </form>
       </div>
-
-      <p type="error-message">{errorMessage}</p>
+      <p className="error-message">{errorMessage}</p>
     </div>
   );
 }
 
 export default NewAuction;
-
-// successful response:
-// {
-//     "message": "New auction request has successfully been submitted.",
-//     "auctionId": "6926215ac55558b3adbbd35b",
-//     "submitSuccess": true
-// }

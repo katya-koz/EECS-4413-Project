@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useUser } from "../Context/UserContext";
 import { useNavigate } from "react-router-dom";
+import "./SignUp.scss";
 
 function SignUp() {
   const [form, setForm] = useState({
@@ -27,17 +28,24 @@ function SignUp() {
     handleSignUp();
   };
 
+  const handleBack = (e) => {
+    e.preventDefault();
+    navigate("/login");
+  };
+
   async function handleSignUp() {
-    const username = form.username;
-    const password = form.password;
-    const firstName = form.firstName;
-    const lastName = form.lastName;
-    const streetName = form.streetName;
-    const streetNum = form.streetNum;
-    const city = form.city;
-    const postalCode = form.postalCode;
-    const country = form.country;
-    const email = form.email;
+    const {
+      username,
+      password,
+      firstName,
+      lastName,
+      streetName,
+      streetNum,
+      city,
+      postalCode,
+      country,
+      email,
+    } = form;
 
     const res = await fetch("http://localhost:8080/api/account/signup", {
       method: "POST",
@@ -62,12 +70,11 @@ function SignUp() {
       return;
     }
 
-    // if account was created successfully, log user in.
     handleLogin();
   }
+
   async function handleLogin() {
-    const username = form.username;
-    const password = form.password;
+    const { username, password } = form;
     const res = await fetch("http://localhost:8080/api/authentication/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -81,77 +88,40 @@ function SignUp() {
     }
 
     const data = await res.json();
-
     login(data.token, { username: data.username }, data.expiresAt);
-    // navigate to home page
     navigate("/");
   }
 
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        padding: "20px",
-      }}
-    >
-      <div
-        style={{
-          width: "100%",
-          maxWidth: "500px",
-          padding: "30px",
-          border: "1px solid #ccc",
-          borderRadius: "12px",
-          boxShadow: "0 4px 10px rgba(0,0,0,0.1)",
-        }}
-      >
-        <h2
-          style={{ fontSize: "24px", fontWeight: "bold", marginBottom: "20px" }}
-        >
-          Create Account
-        </h2>
-        <form onSubmit={handleSubmit} style={{ display: "grid", gap: "15px" }}>
+    <div className="signup-container">
+      <div className="signup-card">
+        <h2 className="signup-title">Create Account</h2>
+        <form onSubmit={handleSubmit} className="signup-form">
           <input
             type="email"
             name="email"
             placeholder="Email"
             value={form.email}
             onChange={handleChange}
-            style={{
-              padding: "10px",
-              borderRadius: "6px",
-              border: "1px solid #ccc",
-            }}
+            className="signup-input"
           />
-
           <input
-            type="username"
+            type="text"
             name="username"
             placeholder="Username / Display name"
             value={form.username}
             onChange={handleChange}
-            style={{
-              padding: "10px",
-              borderRadius: "6px",
-              border: "1px solid #ccc",
-            }}
+            className="signup-input"
           />
 
-          <div style={{ display: "flex", gap: "10px" }}>
+          <div className="signup-flex">
             <input
               type="text"
               name="firstName"
               placeholder="First Name"
               value={form.firstName}
               onChange={handleChange}
-              style={{
-                flex: 1,
-                padding: "10px",
-                borderRadius: "6px",
-                border: "1px solid #ccc",
-              }}
+              className="signup-input"
             />
             <input
               type="text"
@@ -159,12 +129,7 @@ function SignUp() {
               placeholder="Last Name"
               value={form.lastName}
               onChange={handleChange}
-              style={{
-                flex: 1,
-                padding: "10px",
-                borderRadius: "6px",
-                border: "1px solid #ccc",
-              }}
+              className="signup-input"
             />
           </div>
 
@@ -174,14 +139,10 @@ function SignUp() {
             placeholder="Password"
             value={form.password}
             onChange={handleChange}
-            style={{
-              padding: "10px",
-              borderRadius: "6px",
-              border: "1px solid #ccc",
-            }}
+            className="signup-input"
           />
 
-          <h3 style={{ marginTop: "10px" }}>Shipping Information</h3>
+          <h3 className="shipping-title">Shipping Information</h3>
 
           <input
             type="text"
@@ -189,26 +150,17 @@ function SignUp() {
             placeholder="Country"
             value={form.country}
             onChange={handleChange}
-            style={{
-              padding: "10px",
-              borderRadius: "6px",
-              border: "1px solid #ccc",
-            }}
+            className="signup-input"
           />
 
-          <div style={{ display: "flex", gap: "10px" }}>
+          <div className="signup-flex">
             <input
               type="text"
               name="city"
               placeholder="City"
               value={form.city}
               onChange={handleChange}
-              style={{
-                flex: 1,
-                padding: "10px",
-                borderRadius: "6px",
-                border: "1px solid #ccc",
-              }}
+              className="signup-input"
             />
             <input
               type="text"
@@ -216,12 +168,7 @@ function SignUp() {
               placeholder="Postal Code"
               value={form.postalCode}
               onChange={handleChange}
-              style={{
-                flex: 1,
-                padding: "10px",
-                borderRadius: "6px",
-                border: "1px solid #ccc",
-              }}
+              className="signup-input"
             />
           </div>
 
@@ -231,43 +178,27 @@ function SignUp() {
             placeholder="Street Name"
             value={form.streetName}
             onChange={handleChange}
-            style={{
-              padding: "10px",
-              borderRadius: "6px",
-              border: "1px solid #ccc",
-            }}
+            className="signup-input"
           />
-
           <input
             type="text"
             name="streetNum"
             placeholder="Street #"
             value={form.streetNum}
             onChange={handleChange}
-            style={{
-              padding: "10px",
-              borderRadius: "6px",
-              border: "1px solid #ccc",
-            }}
+            className="signup-input"
           />
 
-          <button
-            type="submit"
-            style={{
-              padding: "12px",
-              borderRadius: "8px",
-              backgroundColor: "#007bff",
-              color: "white",
-              fontWeight: "bold",
-              border: "none",
-              cursor: "pointer",
-            }}
-          >
+          <button type="submit" className="signup-button">
             Sign Up
           </button>
         </form>
+        <button onClick={handleBack} className="signup-button">
+          Back
+        </button>
       </div>
     </div>
   );
 }
+
 export default SignUp;

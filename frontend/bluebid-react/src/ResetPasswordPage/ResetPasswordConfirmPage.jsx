@@ -1,19 +1,8 @@
 import { useMemo, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import "./ResetPasswordConfirm.scss";
 
 const API_BASE = "http://localhost:8080";
-
-async function postJSON(path, body) {
-  const res = await fetch(API_BASE + path, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(body),
-  });
-  const data = await res.json().catch(() => ({}));
-  if (!res.ok)
-    throw new Error(data?.message || `Request failed (${res.status})`);
-  return data;
-}
 
 export default function ResetPasswordConfirmPage() {
   const location = useLocation();
@@ -29,31 +18,28 @@ export default function ResetPasswordConfirmPage() {
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
 
-  const valid =
-    newPassword.length >= 8 &&
-    /[A-Za-z]/.test(newPassword) &&
-    /\d/.test(newPassword) &&
-    newPassword === confirm &&
-    token.trim().length > 0;
+  // const valid =
+  //   newPassword.length >= 8 &&
+  //   /[A-Za-z]/.test(newPassword) &&
+  //   /\d/.test(newPassword) &&
+  //   newPassword === confirm &&
+  //   token.trim().length > 0;
 
   async function handleSubmit(e) {
     e.preventDefault();
     setError("");
     setMessage("");
+    setBusy(true);
     try {
       const response = await fetch(
         `http://localhost:8080/api/account/reset-password/${token}`,
         {
           method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ newPassword }),
         }
       );
-
       const data = await response.json();
-
       setMessage(data.message);
     } catch (e) {
       setError(e.message);
@@ -63,162 +49,77 @@ export default function ResetPasswordConfirmPage() {
   }
 
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        padding: "20px",
-      }}
-    >
-      <div
-        style={{
-          width: "100%",
-          maxWidth: "400px",
-          padding: "30px",
-          border: "1px solid #ccc",
-          borderRadius: "12px",
-          boxShadow: "0 4px 10px rgba(0,0,0,0.1)",
-          background: "#fff",
-        }}
-      >
-        <h2
-          style={{ fontSize: "24px", fontWeight: "bold", marginBottom: "12px" }}
-        >
-          Set a New Password
-        </h2>
-        <form onSubmit={handleSubmit} style={{ display: "grid", gap: "12px" }}>
-          <label style={{ fontWeight: 600 }}>
+    <div className="reset-container">
+      <div className="reset-card">
+        <h2 className="reset-title">Set a New Password</h2>
+        <form onSubmit={handleSubmit} className="reset-form">
+          <label className="reset-label">
             Token
             <input
               type="text"
               value={token}
               onChange={(e) => setToken(e.target.value)}
               placeholder="Paste Reset Token Here"
-              style={{
-                padding: "10px",
-                borderRadius: "6px",
-                border: "1px solid #ccc",
-              }}
+              className="reset-input"
               required
             />
           </label>
-          <label style={{ fontWeight: 600 }}>
+          <label className="reset-label">
             New password
             <input
               type="password"
               value={newPassword}
               onChange={(e) => setNewPassword(e.target.value)}
               placeholder="••••••••"
-              style={{
-                padding: "10px",
-                borderRadius: "6px",
-                border: "1px solid #ccc",
-              }}
+              className="reset-input"
               required
             />
           </label>
-          <label style={{ fontWeight: 600 }}>
+          <label className="reset-label">
             Confirm Password
             <input
               type="password"
               value={confirm}
               onChange={(e) => setConfirm(e.target.value)}
               placeholder="••••••••"
-              style={{
-                padding: "10px",
-                borderRadius: "6px",
-                border: "1px solid #ccc",
-              }}
+              className="reset-input"
               required
             />
           </label>
 
-          <ul
-            style={{ margin: "0 0 4px 18px", color: "#666", fontSize: "13px" }}
-          >
-            <li style={{ color: newPassword.length >= 8 ? "#0f5132" : "#666" }}>
+          {/* <ul className="reset-password-criteria">
+            <li className={newPassword.length >= 8 ? "valid" : ""}>
               At least 8 characters
             </li>
-            <li
-              style={{
-                color: /[A-Za-z]/.test(newPassword) ? "#0f5132" : "#666",
-              }}
-            >
+            <li className={/[A-Za-z]/.test(newPassword) ? "valid" : ""}>
               Contains a letter
             </li>
-            <li style={{ color: /\d/.test(newPassword) ? "#0f5132" : "#666" }}>
+            <li className={/\d/.test(newPassword) ? "valid" : ""}>
               Contains a number
             </li>
-            <li
-              style={{
-                color: confirm && newPassword === confirm ? "#0f5132" : "#666",
-              }}
-            >
+            <li className={confirm && newPassword === confirm ? "valid" : ""}>
               Passwords match
             </li>
-          </ul>
+          </ul> */}
 
           <button
             type="submit"
-            //disabled={!valid || busy}
-            style={{
-              padding: "12px",
-              borderRadius: "8px",
-              background: "#007bff",
-              color: "#fff",
-              fontWeight: "bold",
-              border: "none",
-              cursor: "pointer",
-            }}
+            className="reset-button"
+            // disabled={!valid || busy}
           >
             {busy ? "Saving…" : "Update Password"}
           </button>
         </form>
 
-        {message && (
-          <div
-            style={{
-              marginTop: "12px",
-              color: "#0f5132",
-              background: "#d1e7dd",
-              border: "1px solid #badbcc",
-              padding: "10px 12px",
-              borderRadius: "8px",
-            }}
-          >
-            {message}
-          </div>
-        )}
-        {error && (
-          <div
-            style={{
-              marginTop: "12px",
-              color: "#842029",
-              background: "#f8d7da",
-              border: "1px solid #f5c2c7",
-              padding: "10px 12px",
-              borderRadius: "8px",
-            }}
-          >
-            {error}
-          </div>
-        )}
+        {message && <div className="reset-message success">{message}</div>}
+        {error && <div className="reset-message error">{error}</div>}
 
         <button
           type="button"
-          onClick={() => navigate("/signin")}
-          style={{
-            marginTop: "12px",
-            background: "transparent",
-            border: "none",
-            color: "#007bff",
-            textDecoration: "underline",
-            cursor: "pointer",
-          }}
+          className="reset-back"
+          onClick={() => navigate("/login")}
         >
-          Back to Sign In
+          Back to Log In
         </button>
       </div>
     </div>

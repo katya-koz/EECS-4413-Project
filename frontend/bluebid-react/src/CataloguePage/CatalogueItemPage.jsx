@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useUser } from "../Context/UserContext";
-import { useParams } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
+import "./style/CatalogueItemPage.scss";
 
 function CatalogueItemPage() {
   const { id } = useParams();
@@ -12,6 +12,7 @@ function CatalogueItemPage() {
   const [bidAmount, setBidAmount] = useState("");
   const [bidMessage, setBidMessage] = useState("");
   const navigate = useNavigate();
+
   // fetch info
   async function fetchItemInformation() {
     try {
@@ -35,7 +36,7 @@ function CatalogueItemPage() {
   }
 
   function calculateTimeLeft(auctionEndTime) {
-    const end = new Date(auctionEndTime + "Z"); // z converts to utc
+    const end = new Date(auctionEndTime + "Z");
     const now = new Date();
 
     const diff =
@@ -140,7 +141,6 @@ function CatalogueItemPage() {
 
       const updatedItem = await fetchItemInformation();
       setBidMessage("Bid successfully placed!");
-      // subscribe to auction
       subscribeToAuction(item.auctionId);
     } catch (err) {
       console.error(err);
@@ -159,34 +159,17 @@ function CatalogueItemPage() {
     return () => clearInterval(interval);
   }, [item]);
 
-  if (loading) return <p>Loading...</p>;
-  if (!item) return <p>Item not found.</p>;
+  if (loading) return <p className="loadingText">Loading...</p>;
+  if (!item) return <p className="notFoundText">Item not found.</p>;
 
   return (
-    <div
-      style={{
-        maxWidth: "700px",
-        margin: "30px auto",
-        padding: "25px",
-        borderRadius: "12px",
-        background: "white",
-        border: "1px solid #ddd",
-        boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-      }}
-    >
-      <i
-        style={{
-          textDecoration: "none",
-          background: "none",
-          border: "none",
-          cursor: "pointer",
-        }}
-        onClick={() => navigate(-1)}
-        className="bi bi-arrow-left"
-      ></i>
+    <div className="catalogueItemPage">
+      <button className="backButton" onClick={() => navigate(-1)}>
+        <i className="bi bi-arrow-left"></i>
+      </button>
 
-      <h1 style={{ marginTop: "10px" }}>{item.itemName}</h1>
-      <p>{item.itemDescription}</p>
+      <h1 className="itemTitle">{item.itemName}</h1>
+      <p className="itemDescription">{item.itemDescription}</p>
 
       <p>
         <strong>Current Price:</strong> ${item.currentBiddingPrice.toFixed(2)}
@@ -201,43 +184,25 @@ function CatalogueItemPage() {
       </p>
 
       {item.sellerID !== user.userid && (
-        <div style={{ display: "flex", marginTop: "20px", gap: "10px" }}>
+        <div className="bidRow">
           <input
             type="number"
             value={bidAmount}
             placeholder="Your bid"
             onChange={(e) => setBidAmount(e.target.value)}
-            style={{
-              flex: 1,
-              padding: "8px",
-              borderRadius: "6px",
-              border: "1px solid #ccc",
-            }}
+            className="bidInput"
           />
-
-          <button
-            onClick={placeBid}
-            style={{
-              padding: "10px 16px",
-              borderRadius: "6px",
-              backgroundColor: "#007bff",
-              color: "white",
-              border: "none",
-              fontWeight: "bold",
-            }}
-          >
+          <button className="bidButton" onClick={placeBid}>
             Place Bid
           </button>
         </div>
       )}
 
       {item.sellerID === user.userid && (
-        <p style={{ marginTop: "10px" }}>You posted this item.</p>
+        <p className="sellerNotice">You posted this item.</p>
       )}
 
-      {bidMessage && (
-        <p style={{ marginTop: "10px", fontWeight: "bold" }}>{bidMessage}</p>
-      )}
+      {bidMessage && <p className="bidMessage">{bidMessage}</p>}
     </div>
   );
 }

@@ -1,14 +1,14 @@
 import { useState, useEffect } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import "./style/CatalogueItemCard.scss";
 
 function CatalogueItemCard({ item }) {
   const navigate = useNavigate();
-  const location = useLocation();
   const [timeLeft, setTimeLeft] = useState("");
 
   const endTime = new Date(item.auctionEndTime + "Z");
 
-  // calc the time left in days/hours/min/sec format
+  // Calculate remaining time
   function calculateTimeLeftDHMS() {
     const now = new Date();
     let diff = endTime - now;
@@ -22,17 +22,17 @@ function CatalogueItemCard({ item }) {
     diff -= days * (1000 * 60 * 60 * 24);
 
     const hours = Math.floor(diff / (1000 * 60 * 60));
-    diff -= hours * (1000 * 60 * 60);
+    diff -= hours * 60 * 60 * 1000;
 
     const minutes = Math.floor(diff / (1000 * 60));
-    diff -= minutes * (1000 * 60);
+    diff -= minutes * 60 * 1000;
 
     const seconds = Math.floor(diff / 1000);
+
     setTimeLeft(`${days}d ${hours}h ${minutes}m ${seconds}s`);
   }
 
   useEffect(() => {
-    // update time left every second
     const interval = setInterval(() => {
       calculateTimeLeftDHMS();
     }, 1000);
@@ -42,24 +42,25 @@ function CatalogueItemCard({ item }) {
 
   return (
     <div
+      className="catalogueItemCard"
       onClick={() => navigate(`/catalogue/items/${item.id}`)}
-      className="cursor-pointer p-4 border rounded-xl shadow-md hover:shadow-lg transition bg-white"
     >
-      <h2 className="text-lg font-semibold">{item.itemName}</h2>
+      <h2 className="itemName">{item.itemName}</h2>
 
-      <p className="mt-2 text-gray-700">
-        <span className="font-medium">Current Price:</span> $
+      <p className="itemPrice">
+        <span className="label">Current Price:</span> $
         {item.currentBiddingPrice.toFixed(2)}
       </p>
 
-      <p className="text-gray-700">
-        <span className="font-medium">Auction Type:</span> Forward
+      <p className="itemType">
+        <span className="label">Auction Type:</span> Forward
       </p>
 
-      <p className="text-gray-800 mt-1">
-        <span className="font-medium">Time Left:</span> {timeLeft}
+      <p className="itemTimeLeft">
+        <span className="label">Time Left:</span> {timeLeft}
       </p>
     </div>
   );
 }
+
 export default CatalogueItemCard;

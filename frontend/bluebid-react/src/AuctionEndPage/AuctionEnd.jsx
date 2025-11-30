@@ -1,10 +1,9 @@
-import { useNavigate } from "react-router-dom";
-import { useLocation } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
+import "./AuctionEnd.scss";
 
 function AuctionEnd() {
   const navigate = useNavigate();
   const location = useLocation();
-
   const { auctionID, finalPrice } = location.state || {};
 
   const handleRedirect = () => {
@@ -13,13 +12,16 @@ function AuctionEnd() {
 
   if (!auctionID) {
     return (
-      <div style={styles.container}>
-        <div style={styles.card}>
-          <h2 style={{ color: "#d9534f" }}>No Auction Selected</h2>
-          <p style={styles.text}>
+      <div className="auctionEnd-container">
+        <div className="auctionEnd-card">
+          <h2 className="auctionEnd-error">No Auction Selected</h2>
+          <p className="auctionEnd-text">
             It looks like you navigated here directly or refreshed the page.
           </p>
-          <button onClick={() => navigate("/")} style={styles.secondaryButton}>
+          <button
+            onClick={() => navigate("/")}
+            className="auctionEnd-button secondary"
+          >
             Return Home
           </button>
         </div>
@@ -28,107 +30,32 @@ function AuctionEnd() {
   }
 
   return (
-    <div style={styles.container}>
-      <div style={styles.card}>
-        <h1 style={styles.heading}>🎉 You Won!</h1>
+    <div className="auctionEnd-container">
+      <div className="auctionEnd-card">
+        <h1 className="auctionEnd-heading">🎉 You Won!</h1>
 
-        <p style={styles.text}>
+        <p className="auctionEnd-text">
           The auction is over. You have the winning bid for Auction
           <strong> #{auctionID}</strong>.
         </p>
 
-        <div style={styles.priceBox}>
-          <span style={styles.priceLabel}>Final Price</span>
-          <span style={styles.priceValue}>
+        <div className="auctionEnd-priceBox">
+          <span className="auctionEnd-priceLabel">Final Price</span>
+          <span className="auctionEnd-priceValue">
             ${Number(finalPrice || 0).toFixed(2)}
           </span>
         </div>
 
-        <p style={{ color: "#666", fontSize: "14px", marginBottom: "25px" }}>
+        <p className="auctionEnd-subtext">
           Please complete your payment to claim this item.
         </p>
 
-        <button
-          onClick={handleRedirect}
-          style={styles.primaryButton}
-          onMouseOver={(e) => (e.target.style.backgroundColor = "#0056b3")}
-          onMouseOut={(e) => (e.target.style.backgroundColor = "#007bff")}
-        >
+        <button onClick={handleRedirect} className="auctionEnd-button primary">
           Pay Now
         </button>
       </div>
     </div>
   );
 }
-// to do: move to seperate scss file :o
-const styles = {
-  container: {
-    maxWidth: "500px",
-    margin: "60px auto",
-    padding: "0 20px",
-  },
-  card: {
-    background: "#fff",
-    border: "1px solid #ddd",
-    borderRadius: "12px",
-    padding: "30px",
-    textAlign: "center",
-    boxShadow: "0 4px 12px rgba(0,0,0,0.05)",
-  },
-  heading: {
-    color: "#2c3e50",
-    marginBottom: "15px",
-    marginTop: "0",
-  },
-  text: {
-    fontSize: "16px",
-    lineHeight: "1.5",
-    color: "#555",
-    marginBottom: "20px",
-  },
-  priceBox: {
-    background: "#f9f9f9",
-    padding: "20px",
-    borderRadius: "8px",
-    marginBottom: "20px",
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    gap: "5px",
-  },
-  priceLabel: {
-    textTransform: "uppercase",
-    fontSize: "12px",
-    letterSpacing: "1px",
-    color: "#888",
-    fontWeight: "bold",
-  },
-  priceValue: {
-    fontSize: "32px",
-    fontWeight: "bold",
-    color: "#28a745",
-  },
-  primaryButton: {
-    width: "100%",
-    padding: "14px",
-    borderRadius: "8px",
-    backgroundColor: "#007bff",
-    color: "white",
-    fontSize: "16px",
-    fontWeight: "bold",
-    border: "none",
-    cursor: "pointer",
-    transition: "background 0.2s",
-  },
-  secondaryButton: {
-    marginTop: "15px",
-    padding: "10px 20px",
-    borderRadius: "8px",
-    backgroundColor: "transparent",
-    border: "1px solid #ccc",
-    color: "#555",
-    cursor: "pointer",
-  },
-};
 
 export default AuctionEnd;

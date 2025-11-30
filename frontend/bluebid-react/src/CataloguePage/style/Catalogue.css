@@ -1,0 +1,72 @@
+.cataloguePage {
+  max-width: 900px;
+  margin: 20px auto;
+  padding: 10px;
+}
+
+.catalogueTitle {
+  font-size: 2rem;
+  margin-bottom: 20px;
+}
+
+.searchInput {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 20px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+.loadingText,
+.noItemsText {
+  text-align: center;
+  font-size: 1rem;
+  margin-top: 20px;
+}
+
+.catalogueGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 16px;
+  margin-top: 20px;
+}
+
+.catalogueItemWrapper {
+  cursor: pointer;
+}
+
+.pager {
+  margin-top: 20px;
+  text-align: center;
+}
+.pager i {
+  margin-right: 10px;
+  cursor: pointer;
+  font-size: 1.5rem;
+}
+.pager i[aria-disabled=true] {
+  opacity: 0.3;
+  pointer-events: none;
+}
+
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
+
+.modalContent {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 12px;
+  max-width: 90%;
+  max-height: 90%;
+  overflow-y: auto;
+}/*# sourceMappingURL=Catalogue.css.map */

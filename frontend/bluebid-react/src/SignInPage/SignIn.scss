@@ -1,0 +1,108 @@
+.signInPage {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+
+.signInCard {
+  width: 100%;
+  max-width: 400px;
+  padding: 30px;
+  border: 1px solid #ccc;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.signInCard h2 {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.loginMessage {
+  color: red;
+  font-size: 14px;
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+.oauthBtn {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 10px;
+  border-radius: 8px;
+  border: 1px solid #333;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  font-weight: bold;
+  cursor: pointer;
+
+  &.github {
+    background: black;
+    color: white;
+  }
+
+  &.google {
+    background: white;
+    color: black;
+    border-color: #ccc;
+    margin-bottom: 20px;
+  }
+}
+
+/* Divider text */
+.orDivider {
+  text-align: center;
+  margin: 10px 0;
+  color: #888;
+  font-size: 14px;
+}
+
+/* Form layout */
+.signInForm {
+  display: grid;
+  gap: 15px;
+
+  input {
+    padding: 10px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+  }
+
+  button {
+    cursor: pointer;
+    border-radius: 8px;
+    font-weight: bold;
+  }
+
+  .forgotPasswordBtn {
+    justify-self: end;
+    background: transparent;
+    border: none;
+    color: #007bff;
+    text-decoration: underline;
+    padding: 0;
+    margin-top: -6px;
+  }
+
+  .submitBtn {
+    padding: 12px;
+    border: none;
+    background-color: #007bff;
+    color: white;
+  }
+
+  .createAccountBtn {
+    margin-top: 15px;
+    padding: 10px;
+    width: 100%;
+    border: 1px solid #007bff;
+    background: white;
+    color: #007bff;
+  }
+}

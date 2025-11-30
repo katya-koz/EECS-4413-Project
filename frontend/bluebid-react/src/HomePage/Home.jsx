@@ -1,7 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useUser } from "../Context/UserContext";
 import { Link } from "react-router-dom";
-
+import styles from "./Home.scss";
 function Home() {
   const [activeAuctions, setActiveAuctions] = useState([]);
   const [wonItems, setWonItems] = useState([]);
@@ -27,16 +27,8 @@ function Home() {
       {activeAuctions.length === 0 && <p>You haven't bid on anything yet.</p>}
 
       {activeAuctions.map((item) => (
-        <div
-          key={item.id}
-          style={{
-            padding: "12px",
-            border: "1px solid #ddd",
-            borderRadius: "8px",
-            marginBottom: "10px",
-          }}
-        >
-          <h3>{item.itemName}</h3>
+        <div key={item.id} className={styles.card}>
+          <h3 className={styles.cardTitle}>{item.itemName}</h3>
           {/* <p>Winning Bid: ${item.finalPrice}</p> */}
           {/* 
           <Link to={`/pay/${item.id}`}>
@@ -50,21 +42,13 @@ function Home() {
 
       {wonItems.length === 0 && <p>You haven't posted anything yet.</p>}
 
-      {wonItems.map((item) => (
-        <div
-          key={item.id}
-          style={{
-            padding: "12px",
-            border: "1px solid #ddd",
-            borderRadius: "8px",
-            marginBottom: "10px",
-          }}
-        >
-          <h3>{item.name}</h3>
-          <p>Winning Bid: ${item.finalPrice}</p>
 
-          <Link to={`/pay/${item.id}`}>
-            <button style={{ padding: "8px 12px" }}>Pay Now</button>
+      {wonItems.map((item) => (
+        <div key={item.id} className={styles.card}>
+          <h3 className={styles.cardTitle}>{item.name}</h3>
+          <p>Winning Bid: ${item.finalPrice}</p>
+          <Link to={`/pay/${item.id}`} className={styles.payBtn}>
+            Pay Now
           </Link>
         </div>
       ))} */}

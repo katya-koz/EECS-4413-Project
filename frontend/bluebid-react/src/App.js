@@ -51,6 +51,15 @@ function AppRoutes() {
             </Layout>
           }
         />
+
+        <Route
+          path="/auction/auction-end"
+          element={
+            <Layout>
+              <AuctionEnd />
+            </Layout>
+          }
+        ></Route>
         <Route
           path="/catalogue/items/:id"
           element={
@@ -87,17 +96,15 @@ function AppRoutes() {
             </Layout>
           }
         />
-		
-		<Route
-		path="/auction/auction-end"
-		element={
-			<Layout>
-			<AuctionEnd />
-			</Layout>
-		}
-		/>
-		
-	
+
+        <Route
+          path="/auction/auction-end"
+          element={
+            <Layout>
+              <AuctionEnd />
+            </Layout>
+          }
+        />
       </Routes>
 
       {/* {state?.backgroundLocation && (

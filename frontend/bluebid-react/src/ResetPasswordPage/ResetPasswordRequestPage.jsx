@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import "./ResetPasswordRequest.scss";
 
 const API_BASE = "http://localhost:8080";
 
@@ -47,37 +48,15 @@ export default function ResetPasswordRequestPage() {
   }
 
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        padding: "20px",
-      }}
-    >
-      <div
-        style={{
-          width: "100%",
-          maxWidth: "400px",
-          padding: "30px",
-          border: "1px solid #ccc",
-          borderRadius: "12px",
-          boxShadow: "0 4px 10px 	rgba(0,0,0,0.1)",
-          background: "#fff",
-        }}
-      >
-        <h2
-          style={{ fontSize: "24px", fontWeight: "bold", marginBottom: "12px" }}
-        >
-          Reset Your Password
-        </h2>
-        <p style={{ marginTop: "-6px", marginBottom: "16px", color: "#555" }}>
+    <div className="reset-container">
+      <div className="reset-card">
+        <h2 className="reset-title">Reset Your Password</h2>
+        <p className="reset-subtitle">
           Enter your account email. We’ll return a reset token.
         </p>
 
-        <form onSubmit={handleSubmit} style={{ display: "grid", gap: "12px" }}>
-          <label style={{ fontWeight: 600 }}>
+        <form onSubmit={handleSubmit} className="reset-form">
+          <label className="reset-label">
             Email
             <input
               type="email"
@@ -85,14 +64,10 @@ export default function ResetPasswordRequestPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              style={{
-                padding: "10px",
-                borderRadius: "6px",
-                border: "1px solid #ccc",
-              }}
+              className="reset-input"
             />
           </label>
-          <label style={{ fontWeight: 600 }}>
+          <label className="reset-label">
             Username
             <input
               type="username"
@@ -100,93 +75,34 @@ export default function ResetPasswordRequestPage() {
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               required
-              style={{
-                padding: "10px",
-                borderRadius: "6px",
-                border: "1px solid #ccc",
-              }}
+              className="reset-input"
             />
           </label>
-          <button
-            type="submit"
-            disabled={busy}
-            style={{
-              padding: "12px",
-              borderRadius: "8px",
-              background: "#007bff",
-              color: "#fff",
-              fontWeight: "bold",
-              border: "none",
-              cursor: "pointer",
-            }}
-          >
+          <button type="submit" disabled={busy} className="reset-button">
             {busy ? "Requesting…" : "Request Reset Token"}
           </button>
         </form>
 
-        {error && (
-          <div
-            style={{
-              marginTop: "12px",
-              color: "#842029",
-              background: "#f8d7da",
-              border: "1px solid #f5c2c7",
-              padding: "10px 12px",
-              borderRadius: "8px",
-            }}
-          >
-            {error}
-          </div>
-        )}
+        {error && <div className="reset-message error">{error}</div>}
 
         {token && (
-          <div style={{ marginTop: "12px" }}>
-            <div
-              style={{
-                fontSize: 14,
-                color: "#0f5132",
-                background: "#d1e7dd",
-                border: "1px solid #badbcc",
-                padding: "10px 12px",
-                borderRadius: "8px",
-              }}
-            >
+          <div className="reset-token-section">
+            <div className="reset-message success">
               Token received:
-              <code
-                style={{
-                  display: "block",
-                  marginTop: 6,
-                  wordBreak: "break-all",
-                }}
-              >
-                {token}
-              </code>
+              <code className="reset-token">{token}</code>
             </div>
-            <div style={{ display: "flex", gap: 8, marginTop: 10 }}>
+            <div className="reset-token-actions">
               <button
                 type="button"
                 onClick={() => navigator.clipboard?.writeText(token)}
-                style={{
-                  padding: "10px 12px",
-                  borderRadius: "8px",
-                  border: "1px solid #ccc",
-                  background: "#fff",
-                  cursor: "pointer",
-                }}
+                className="reset-copy-button"
               >
                 Copy token
               </button>
               <button
                 type="button"
                 onClick={goToConfirm}
-                style={{
-                  padding: "10px 12px",
-                  borderRadius: "8px",
-                  background: "#111827",
-                  color: "#fff",
-                  border: "none",
-                  cursor: "pointer",
-                }}
+                className="reset-go-button"
               >
                 Go to confirm page
               </button>
@@ -196,15 +112,8 @@ export default function ResetPasswordRequestPage() {
 
         <button
           type="button"
-          onClick={() => navigate("/signin")}
-          style={{
-            marginTop: "12px",
-            background: "transparent",
-            border: "none",
-            color: "#007bff",
-            textDecoration: "underline",
-            cursor: "pointer",
-          }}
+          onClick={() => navigate("/login")}
+          className="reset-back"
         >
           Back to Sign In
         </button>
