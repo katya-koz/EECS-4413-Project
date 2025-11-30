@@ -1,15 +1,21 @@
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation} from "react-router-dom";
 import { useState, useEffect } from "react";
-
+import { useUser } from "../Context/UserContext";
+;
 // pay now page
 function PayNow() {
   const { id } = useParams();
-  const [itemPrice, setItemPrice] = useState(0);
+  const location = useLocation();
+  const passedPrice = location.state?.finalPrice || 0;
+  const [itemPrice, setItemPrice] = useState(passedPrice);
+  const [itemName, setItemName] = useState("");
+  
   const [shippingCost, setShippingCost] = useState(5);
   const [loading, setLoading] = useState(true);
   const [sellerID, setSellerID] = useState("");
   const [catalogueID, setCatalogueID] = useState("");
   const [isExpedited, setIsExpidited] = useState(false);
+  
 
   const [cardNumber, setCardNumber] = useState("");
   const [cvv, setCvv] = useState("");
@@ -19,6 +25,8 @@ function PayNow() {
   const validMonths = [
 	"01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"
   ];
+  const {authFetch} = useUser();
+  
   
   const currentYear = new Date().getFullYear();
   const years = Array.from({ length : 10 }, (_, i) => (currentYear + i).toString());
@@ -40,16 +48,17 @@ function PayNow() {
     // fetch values here, set to temp for now
     async function getAuctionDetails() {
 		try{
-			const response = await fetch(`http://localhost:8080/api/auction/auctions/${id}`);
+			const response = await authFetch(`http://localhost:8080/api/auction/auctions/${id}`);
 			
 			if (response.ok) {
 				const data = await response.json();
-				
+				console.log("AUCTION DATA:", data);
 				//set values here
-				setItemPrice(data.itemPrice);
+				setItemPrice(itemPrice);
 				//setShippingCost(data.shippingCost);
 				setSellerID(data.sellerID);
 				setCatalogueID(data.catalogueID);
+				setItemName(data.itemName);
 			}
 		} catch (error) {
 			console.log("failed to fetch auction item");
@@ -83,18 +92,23 @@ function PayNow() {
 	//attempt to submit payment
 	
 	try {
-	        const response = await fetch("http://localhost:8080/api/payment/payment", {
+		
+		
+	        const response = await authFetch("http://localhost:8080/api/payment/payment", {
 	            method: "POST",
 	            headers: { "Content-Type": "application/json" },
 	            body: JSON.stringify(paymentRequest)
+				
+				
 	        });
 			
 			if (response.ok)
 				{
-					const responseData = await response.json();
 					
+					const responseData = await response.json();
+										
 					const paymentID = responseData.paymentId;
-					navigate(`/receipt/${paymentID}`);
+					navigate(`/receipt/${paymentID}`, { state: { itemName: itemName } });
 				}
 				else
 				{
@@ -114,7 +128,7 @@ function PayNow() {
 
   return (
     <div style={{ maxWidth: "400px", margin: "40px auto" }}>
-      <h1>Pay for Item {id}</h1>
+      <h1>Pay for {itemName}</h1>
 
       <div
         style={{
