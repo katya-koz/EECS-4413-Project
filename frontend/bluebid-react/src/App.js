@@ -19,6 +19,7 @@ import { UserProvider } from "./Context/UserContext";
 import NewAuction from "./NewAuctionPage/NewAuction";
 import { ToastProvider } from "./Context/ToastContext";
 import "bootstrap-icons/font/bootstrap-icons.css";
+import AuctionEnd from "./AuctionEndPage/AuctionEnd";
 
 function AppRoutes() {
   const location = useLocation();
@@ -86,6 +87,17 @@ function AppRoutes() {
             </Layout>
           }
         />
+		
+		<Route
+		path="/auction/auction-end"
+		element={
+			<Layout>
+			<AuctionEnd />
+			</Layout>
+		}
+		/>
+		
+	
       </Routes>
 
       {/* {state?.backgroundLocation && (
