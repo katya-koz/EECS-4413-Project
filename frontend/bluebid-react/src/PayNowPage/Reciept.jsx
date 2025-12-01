@@ -1,74 +1,156 @@
-import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useUser } from "../Context/UserContext";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 
 function Receipt() {
   const { id } = useParams();
   const { authFetch } = useUser();
   const navigate = useNavigate();
-  const location = useLocation();
-  
-  const { itemName } = location.state || {};
 
   const [receipt, setReceipt] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  useEffect(() => {
-    async function getReceipt() {
-      try {
-        const response = await authFetch(`http://localhost:8080/api/payment/receipt/${id}`);
+  const pollingRef = useRef(null);
 
-        if (response.ok) {
-          const data = await response.json();
-          console.log("RECEIPT DETAILS", data);
-          setReceipt(data);
-        } else {
-          setError("Could not load receipt");
-        }
-      } catch (err) {
-        setError("Network error");
-      } finally {
-        setLoading(false);
+  async function fetchReceipt() {
+    try {
+      const response = await authFetch(
+        `http://localhost:8080/api/payment/receipt/${id}`
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+        setReceipt(data);
+      } else {
+        setError("Could not load receipt");
       }
+    } catch (err) {
+      setError("Network error");
+    }
+  }
+
+  useEffect(() => {
+    if (!id) return;
+
+    async function initialLoad() {
+      await fetchReceipt();
+      setLoading(false);
     }
 
-    if (id) {
-      getReceipt();
-    }
-  }, [id, authFetch]);
+    initialLoad();
+  }, [id]);
 
-  if (loading) return <p style={{ textAlign: "center", marginTop: "50px" }}>Loading receipt...</p>;
+  useEffect(() => {
+    if (!receipt) return;
+
+    const missingInfo =
+      !receipt.buyerCity ||
+      !receipt.buyerCountry ||
+      !receipt.buyerStreetName ||
+      !receipt.buyerPostalCode ||
+      !receipt.itemName; // also check for itemName
+
+    if (!missingInfo) {
+      if (pollingRef.current) clearInterval(pollingRef.current);
+      return;
+    }
+
+    pollingRef.current = setInterval(async () => {
+      await fetchReceipt();
+      setReceipt((newReceipt) => {
+        const stillMissing =
+          !newReceipt.buyerCity ||
+          !newReceipt.buyerCountry ||
+          !newReceipt.buyerStreetName ||
+          !newReceipt.buyerPostalCode ||
+          !newReceipt.itemName;
+
+        if (!stillMissing && pollingRef.current) {
+          clearInterval(pollingRef.current);
+        }
+
+        return newReceipt;
+      });
+    }, 4000);
+
+    return () => {
+      if (pollingRef.current) clearInterval(pollingRef.current);
+    };
+  }, [receipt]);
+
+  if (loading)
+    return (
+      <p style={{ textAlign: "center", marginTop: "50px" }}>
+        Loading receipt...
+      </p>
+    );
 
   if (error || !receipt) {
     return (
       <div style={styles.pageContainer}>
         <div style={styles.card}>
-          <h2 style={{ color: "#d9534f", textAlign: "center" }}>No receipt found</h2>
+          <h2 style={{ color: "#d9534f", textAlign: "center" }}>
+            No receipt found
+          </h2>
           <p style={{ textAlign: "center", color: "#666" }}>ID: {id}</p>
           <p style={{ textAlign: "center", color: "#d9534f" }}>{error}</p>
-          <button onClick={() => navigate("/")} style={styles.secondaryButton}>Go Home</button>
+          <button onClick={() => navigate("/")} style={styles.secondaryButton}>
+            Go Home
+          </button>
         </div>
       </div>
     );
   }
 
   const totalPrice = receipt.itemCost + receipt.shippingCost;
+  const isFailed = receipt.failureReason != null;
+
+  const shippingReady =
+    receipt.buyerCity &&
+    receipt.buyerCountry &&
+    receipt.buyerStreetName &&
+    receipt.buyerPostalCode;
 
   return (
     <div style={styles.pageContainer}>
       <div style={styles.card}>
-        <div style={styles.iconContainer}>
-          <i className="bi bi-check-circle-fill" style={styles.successIcon}></i>
-        </div>
-        
-        <h1 style={styles.heading}>Payment Successful</h1>
-        <p style={styles.subText}>Here is your payment receipt.</p>
+        {!isFailed && (
+          <div style={styles.iconContainer}>
+            <i
+              className="bi bi-check-circle-fill"
+              style={styles.successIcon}
+            ></i>
+          </div>
+        )}
+
+        {isFailed && (
+          <div style={styles.iconContainer}>
+            <i className="bi bi-x-circle-fill" style={styles.failureIcon}></i>
+          </div>
+        )}
+        <h1 style={styles.heading}>
+          {isFailed ? "Payment Unsuccessful" : "Payment Successful"}
+        </h1>
+
+        {isFailed && (
+          <p
+            style={{
+              color: "#d9534f",
+              marginBottom: "20px",
+              fontWeight: "600",
+            }}
+          >
+            {receipt.failureReason}
+          </p>
+        )}
 
         <div style={styles.detailsBox}>
           <div style={styles.row}>
             <span style={styles.label}>Item</span>
-            <span style={styles.value}>{itemName || "Unknown Item"}</span>
+            <span style={styles.value}>
+              {receipt.itemName || "Fetching item name..."}
+            </span>
           </div>
 
           <div style={styles.row}>
@@ -78,13 +160,68 @@ function Receipt() {
 
           <div style={styles.row}>
             <span style={styles.label}>Date</span>
-            <span style={styles.value}>{new Date(receipt.timestamp).toLocaleString()}</span>
+            <span style={styles.value}>
+              {new Date(receipt.timestamp + "Z").toLocaleString()}
+            </span>
           </div>
-          
+
+          <div style={styles.divider}></div>
+
+          <h3 style={{ marginTop: "10px", marginBottom: "10px" }}>Shipping</h3>
+
+          {!shippingReady ? (
+            <p style={{ color: "#888" }}>Fetching shipping details...</p>
+          ) : (
+            <>
+              <div style={styles.row}>
+                <span style={styles.label}>Name</span>
+                <span style={styles.value}>
+                  {receipt.buyerFirstName} {receipt.buyerLastName}
+                </span>
+              </div>
+
+              <div style={styles.row}>
+                <span style={styles.label}>Address</span>
+                <span style={styles.value}>
+                  {receipt.buyerStreetNum} {receipt.buyerStreetName},{" "}
+                  {receipt.buyerCity}, {receipt.buyerCountry}
+                </span>
+              </div>
+
+              <div style={styles.row}>
+                <span style={styles.label}>Postal Code</span>
+                <span style={styles.value}>{receipt.buyerPostalCode}</span>
+              </div>
+            </>
+          )}
+
+          <div style={styles.divider}></div>
+
+          <h3 style={{ marginTop: "10px", marginBottom: "10px" }}>
+            Price Breakdown
+          </h3>
+
+          <div style={styles.row}>
+            <span style={styles.label}>Item Cost</span>
+            <span style={styles.value}>${receipt.itemCost.toFixed(2)}</span>
+          </div>
+
+          <div style={styles.row}>
+            <span style={styles.label}>Shipping Cost</span>
+            <span style={styles.value}>${receipt.shippingCost.toFixed(2)}</span>
+          </div>
+
+          <div style={styles.row}>
+            <span style={styles.label}>Shipping</span>
+            <span style={styles.value}>
+              {receipt.isExpedited ? "Expedited" : "Standard"}
+            </span>
+          </div>
+
           <div style={styles.divider}></div>
 
           <div style={styles.totalRow}>
-            <span>Amount Paid</span>
+            <span>Total</span>
             <span style={styles.totalValue}>${totalPrice.toFixed(2)}</span>
           </div>
         </div>
@@ -92,8 +229,8 @@ function Receipt() {
         <button
           onClick={() => navigate("/")}
           style={styles.button}
-          onMouseOver={(e) => e.target.style.backgroundColor = "#0056b3"}
-          onMouseOut={(e) => e.target.style.backgroundColor = "#007bff"}
+          onMouseOver={(e) => (e.target.style.backgroundColor = "#0056b3")}
+          onMouseOut={(e) => (e.target.style.backgroundColor = "#007bff")}
         >
           Return to Home
         </button>
@@ -121,23 +258,10 @@ const styles = {
     height: "fit-content",
     textAlign: "center",
   },
-  iconContainer: {
-    marginBottom: "20px",
-  },
-  successIcon: {
-    fontSize: "48px",
-    color: "#28a745",
-  },
   heading: {
     color: "#2c3e50",
     marginBottom: "10px",
-    marginTop: "0",
     fontSize: "28px",
-  },
-  subText: {
-    color: "#666",
-    fontSize: "16px",
-    marginBottom: "30px",
   },
   detailsBox: {
     backgroundColor: "#f8f9fa",
@@ -202,7 +326,10 @@ const styles = {
     borderRadius: "6px",
     cursor: "pointer",
     color: "#555",
-  }
+  },
+
+  successIcon: { fontSize: "48px", color: "#28a745" },
+  failureIcon: { fontSize: "48px", color: "#c91515ff" },
 };
 
 export default Receipt;

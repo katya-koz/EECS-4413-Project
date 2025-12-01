@@ -18,6 +18,8 @@ public interface BidRepository extends MongoRepository<Bid, String>{
 	List<Bid> findByAuctionIDAndIsValidTrueOrderByAmountDesc(String auctionId);
 	
 	List<Bid> findByBidderIDAndIsValid(String userId, boolean isValid);
+
+
 	
 
 }

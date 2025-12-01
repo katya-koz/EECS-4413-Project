@@ -1,6 +1,11 @@
 package com.bluebid.auction_app_service.controller;
 
 
+import java.util.List;
+
+import org.springframework.hateoas.CollectionModel;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.Link;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -17,11 +22,6 @@ import com.bluebid.auction_app_service.service.AuctionService;
 @Validated
 public class AuctionController {
 
-	//  @Autowired AuctionRepository Repo;
-	//  @Autowired AuctionService auctionService;
-	//  @Autowired NotificationService notificationService;
-	// maybe we use these for dep inj?
-
 	private final AuctionService _auctionService;
 	private static final int MAX_CHAR_LIMIT = 400;
 
@@ -32,23 +32,84 @@ public class AuctionController {
 	
 
 	@GetMapping("/auctions/")
-	public ResponseEntity<?> getUserAuctions( @RequestHeader(value = "X-User-Id", required = false) String userId){
-		// get auctions that a userr is currently bidding on
-		if (userId == null || userId.isBlank()) {
-			 return ResponseEntity.badRequest().body("Missing user id header.");
+	public ResponseEntity<?> getUserAuctions(@RequestHeader(value = "X-User-Id", required = false) String userId) {
+	    if (userId == null || userId.isBlank()) {
+	        return ResponseEntity.badRequest().body("Missing user id header.");
+	    }
 
-		 }
-		
-		return ResponseEntity.ok(_auctionService.getUserAuction(userId));
+	    List<Auction> auctions = _auctionService.getUserAuction(userId);
 
+	    String base = "http://localhost:8080/api";
+
+	    List<EntityModel<Auction>> auctionModels = auctions.stream().map(auction -> {
+	        EntityModel<Auction> model = EntityModel.of(auction);
+	        model.add(Link.of(base + "/auction/auctions/" + auction.getId()).withSelfRel());
+	        model.add(Link.of(base + "/bidding/bids/auction/" + auction.getId()).withRel("bids"));
+	        model.add(Link.of(base + "/bidding/bid").withRel("place-bid"));
+	        if (auction.getCatalogueID() != null) {
+	            model.add(Link.of(base + "/catalogue/items/" + auction.getCatalogueID()).withRel("catalogue-item"));
+	        }
+	        return model;
+	    }).toList();
+
+	    CollectionModel<EntityModel<Auction>> collection = CollectionModel.of(
+	            auctionModels,
+	            Link.of(base + "/auction/auctions/").withSelfRel()
+	    );
+
+	    return ResponseEntity.ok(collection);
+	}
+	
+	@GetMapping("/auctions/to-pay") // auctions a user has won that they have yet to pay for
+	public ResponseEntity<?> getUserWonToPayAuctions(
+	        @RequestHeader(value = "X-User-Id", required = false) String userId) {
+
+	    if (userId == null || userId.isBlank()) {
+	        return ResponseEntity.badRequest().body("Missing user id header.");
+	    }
+
+	    List<Auction> auctions = _auctionService.getUserWonAuctions(userId); // get only won-but-not-paid
+
+	    String base = "http://localhost:8080/api";
+
+	    List<EntityModel<Auction>> auctionModels = auctions.stream().map(auction -> {
+	        EntityModel<Auction> model = EntityModel.of(auction);
+
+	        // self link to the auction
+	        model.add(Link.of(base + "/auction/auctions/" + auction.getId()).withSelfRel());
+
+	        // link to the catalogue item
+	        if (auction.getCatalogueID() != null) {
+	            model.add(Link.of(base + "/catalogue/items/" + auction.getCatalogueID())
+	                    .withRel("catalogue-item"));
+	        }
+
+	        // link to payment endpoint for this auction
+	        model.add(Link.of(base + "/payment")
+	                .withRel("pay-now")
+	                .withType("POST"));
+
+	        return model;
+	    }).toList();
+
+	    CollectionModel<EntityModel<Auction>> collection = CollectionModel.of(
+	            auctionModels,
+	            Link.of(base + "/auction/auctions/to-pay").withSelfRel()
+	    );
+
+	    return ResponseEntity.ok(collection);
 	}
 
-
 	@PostMapping("/new-auction")
-	public ResponseEntity<?> startNewAuction(@RequestBody NewAuctionRequest newAuctionRequest,
-		@RequestHeader(value = "X-User-Id", required = false) String sellerId){
+	public ResponseEntity<?> startNewAuction(
+	        @RequestBody NewAuctionRequest newAuctionRequest,
+	        @RequestHeader(value = "X-User-Id", required = false) String sellerId) {
 
-		if (sellerId == null || sellerId.isBlank()) {
+	    if (sellerId == null || sellerId.isBlank()) {
+	        return ResponseEntity.badRequest().body("Missing user id header.");
+	    }
+
+	    if (sellerId == null || sellerId.isBlank()) {
 			 return ResponseEntity .badRequest().body("Missing user id header.");
 
 		 }
@@ -110,35 +171,58 @@ public class AuctionController {
 					.body("Auction duration cannot be longer than 10 days."); // same limit as ebay
 			
 		}
-		
 
+	    try {
+	        auctionID = _auctionService.initiateAuction(
+	                newAuctionRequest.getItemName(),
+	                newAuctionRequest.getItemDescription(),
+	                sellerId,
+	                newAuctionRequest.getBasePrice(),
+	                newAuctionRequest.getSeconds()
+	        );
+	    } catch (IllegalArgumentException e) {
+	        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+	    }
 
-		//attempt to initiate auction
-		try
-		{
-			auctionID = _auctionService.initiateAuction(itemName, itemDescription, sellerId,basePrice, secondsDuration);
-		}
-		
-		catch(IllegalArgumentException e)
-		{
-			return ResponseEntity
-					.status(HttpStatus.BAD_REQUEST)
-					.body(e.getMessage());
+	    NewAuctionResponse response = new NewAuctionResponse(
+	            "New auction request has successfully been submitted.",
+	            auctionID,
+	            true
+	    );
 
-		}
+	    String base = "http://localhost:8080/api";
 
-		 return ResponseEntity.ok(new NewAuctionResponse("New auction request has successfully been submitted.", auctionID, true));
+	    EntityModel<NewAuctionResponse> model = EntityModel.of(response);
+	    model.add(Link.of(base + "/auction/auctions/" + auctionID).withRel("auction"));
+	    model.add(Link.of(base + "/auction/auctions/").withRel("all-auctions"));
+	    model.add(Link.of(base + "/bidding/bid").withRel("place-bid"));
+
+	    return ResponseEntity.ok(model);
 	}
+
+
+	
 	
 	
 	@GetMapping("/auctions/{auctionid}")
 	public ResponseEntity<?> getAuction(@PathVariable String auctionid) {
-	    Auction receipt = _auctionService.getAuctionById(auctionid);
-	    if (receipt != null) {
-	        return ResponseEntity.ok(receipt);
-	    } else {
+	    Auction auction = _auctionService.getAuctionById(auctionid);
+	    if (auction == null) {
 	        return ResponseEntity.notFound().build();
 	    }
+
+	    EntityModel<Auction> model = EntityModel.of(auction);
+	    String base = "http://localhost:8080/api";
+
+	    model.add(Link.of(base + "/auction/auctions/" + auctionid).withSelfRel());
+	    model.add(Link.of(base + "/auction/auctions/").withRel("all-auctions"));
+	    model.add(Link.of(base + "/bidding/bids/auction/" + auctionid).withRel("bids"));
+	    model.add(Link.of(base + "/bidding/bid").withRel("place-bid"));
+	    if (auction.getId() != null) {
+	        model.add(Link.of(base + "/catalogue/items/" + auction.getId()).withRel("catalogue-item"));
+	    }
+
+	    return ResponseEntity.ok(model);
 	}
 
 }

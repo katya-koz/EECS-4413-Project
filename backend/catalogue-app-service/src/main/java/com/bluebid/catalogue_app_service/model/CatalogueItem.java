@@ -15,7 +15,6 @@ public class CatalogueItem {
     private String highestBidderID;
     private String itemName;
     private double currentBiddingPrice;
-//    private String auctionType;
     private LocalDateTime auctionStartDate;
     private LocalDateTime auctionEndDate;  
     private double shippingCost;
@@ -26,20 +25,7 @@ public class CatalogueItem {
     private Boolean isActive;
     private String auctionId;
 
-    
-//    public CatalogueItem(String itemName, LocalDateTime auctionEnd) {
-//    	this.itemName = itemName;
-//    	this.auctionEndDate = auctionEnd;
-//    	
-//    }
-    
     public CatalogueItem() {};
-//    public CatalogueItem(String itemName, String itemDescription, String sellerID, double basePrice) {
-//		this.itemName = itemName;
-//		this.itemDescription = itemDescription;
-//		this.sellerID = sellerID;
-//		currentBiddingPrice = basePrice;
-//	}
 
 	public String getId() {
 		return id;
@@ -82,14 +68,6 @@ public class CatalogueItem {
         this.currentBiddingPrice = currentBiddingPrice;
     }
 
-//    public String getAuctionType() {
-//        return auctionType;
-//    }
-//
-//    public void setAuctionType(String auctionType) {
-//        this.auctionType = auctionType;
-//    }
-//
     public LocalDateTime getAuctionEndTime() {
         return auctionEndDate;
     }

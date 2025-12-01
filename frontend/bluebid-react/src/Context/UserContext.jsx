@@ -32,11 +32,9 @@ export function UserProvider({ children }) {
     subscribedAuctions.current.add(auctionId);
   };
 
-  // TO DO: we need to store the auctions we are already subscribed to, so that we dont subscribe to the same topic multiple times
   useEffect(() => {
     if (!user) return;
 
-    // Create the client only once
     clientRef.current = new Client({
       brokerURL: "ws://localhost:8080/ws",
       reconnectDelay: 5000,
@@ -61,13 +59,15 @@ export function UserProvider({ children }) {
 
   // get the user's bids
   async function getAuctions() {
-    if (!user || !token) return;
+    if (!user || !token) return [];
+
     const res = await authFetch("http://localhost:8080/api/auction/auctions/");
-    if (res.ok) {
-      const response = await res.json();
-      return response;
-    }
-    return;
+
+    if (!res.ok) return [];
+
+    const data = await res.json();
+
+    return (data._embedded && data._embedded.auctionList) || [];
   }
 
   useEffect(() => {

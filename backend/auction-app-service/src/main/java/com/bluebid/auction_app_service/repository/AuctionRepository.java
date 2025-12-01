@@ -14,4 +14,10 @@ public interface AuctionRepository extends MongoRepository<Auction, String> {
 
 	Optional<Auction> findByIdAndStatus(String auctionID, boolean b);
 
+	List<Auction> findAllByStatus(boolean b);
+
+	Optional<Auction> findByIdAndStatusAndAuctionStatus(String auctionID, boolean b, String string);
+
+	Optional<Auction> findByCatalogueID(String catalogueId);
+
 }

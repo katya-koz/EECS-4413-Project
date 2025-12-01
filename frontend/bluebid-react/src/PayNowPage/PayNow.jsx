@@ -6,15 +6,21 @@ import "./PayNow.scss";
 function PayNow() {
   const { id } = useParams();
   const location = useLocation();
-  const passedPrice = location.state?.finalPrice || 0;
-  const [itemPrice, setItemPrice] = useState(passedPrice);
+  const [itemPrice, setItemPrice] = useState(0);
   const [itemName, setItemName] = useState("");
+  const [paymentError, setPaymentError] = useState("");
 
-  const [shippingCost, setShippingCost] = useState(5);
+  const [shippingCost, setShippingCost] = useState(0);
+  const [standardShippingCost, setStandardShippingCost] = useState(0);
+  const [expeditedShippingCost, setExpeditedShippingCost] = useState(0);
+
+  const [standardShippingDays, setStandardShippingDays] = useState(0);
+  const [expeditedShippingDays, setExpeditedShippingDays] = useState(0);
+
   const [loading, setLoading] = useState(true);
   const [sellerID, setSellerID] = useState("");
   const [catalogueID, setCatalogueID] = useState("");
-  const [isExpedited, setIsExpidited] = useState(false);
+  const [isExpedited, setIsExpedited] = useState(false);
 
   const [cardNumber, setCardNumber] = useState("");
   const [cvv, setCvv] = useState("");
@@ -22,7 +28,12 @@ function PayNow() {
   const [expiryYear, setExpiryYear] = useState(
     new Date().getFullYear().toString()
   );
-  const [checked, setChecked] = useState(false);
+
+  const [isWinner, setIsWinner] = useState(true);
+
+  const { authFetch, user } = useUser();
+  const navigate = useNavigate();
+
   const validMonths = [
     "01",
     "02",
@@ -37,25 +48,11 @@ function PayNow() {
     "11",
     "12",
   ];
-  const { authFetch } = useUser();
 
   const currentYear = new Date().getFullYear();
   const years = Array.from({ length: 10 }, (_, i) =>
     (currentYear + i).toString()
   );
-
-  const handleChange = (e) => {
-    const isChecked = e.target.checked;
-    setChecked(isChecked);
-
-    if (isChecked) {
-      setShippingCost(10);
-      setIsExpidited(true);
-    } else {
-      setShippingCost(5);
-      setIsExpidited(false);
-    }
-  };
 
   useEffect(() => {
     async function getAuctionDetails() {
@@ -66,16 +63,48 @@ function PayNow() {
 
         if (response.ok) {
           const data = await response.json();
-          console.log("AUCTION DATA:", data);
+          console.log(data);
+
           setItemPrice(data.itemPrice || itemPrice);
           setSellerID(data.sellerID);
           setCatalogueID(data.catalogueID);
           setItemName(data.itemName);
+
+          if (data.catalogueID) {
+            await fetchCatalogueItem(data.catalogueID);
+          }
         }
       } catch (error) {
         console.log("failed to fetch auction item");
       } finally {
         setLoading(false);
+      }
+    }
+
+    async function fetchCatalogueItem(catalogueID) {
+      try {
+        const res = await authFetch(
+          `http://localhost:8080/api/catalogue/items/${catalogueID}`
+        );
+
+        if (res.ok) {
+          const catData = await res.json();
+
+          setStandardShippingCost(catData.shippingCost);
+          setExpeditedShippingCost(catData.expeditedShippingCost);
+
+          setStandardShippingDays(catData.shippingDays);
+          setExpeditedShippingDays(catData.expeditedShippingDays);
+
+          setShippingCost(catData.shippingCost);
+          setItemPrice(catData.currentBiddingPrice);
+          setIsExpedited(false);
+          const isWinner =
+            catData.highestBidderID === user.userid ? true : false;
+          setIsWinner(isWinner);
+        }
+      } catch (err) {
+        console.log("Failed to fetch catalogue item");
       }
     }
 
@@ -85,9 +114,10 @@ function PayNow() {
   }, [id]);
 
   const total = itemPrice + shippingCost;
-  const navigate = useNavigate();
 
   const submitPayment = async () => {
+    setPaymentError(""); // clear old errors
+
     const paymentRequest = {
       cardNumber: cardNumber,
       expiryMonth: expiryMonth,
@@ -98,7 +128,7 @@ function PayNow() {
       catalogueID: catalogueID,
       isExpedited: isExpedited,
       shippingCost: shippingCost,
-      paymentTime: new Date().toISOString().slice(0, 19),
+      //paymentTime: new Date().toISOString().slice(0, 19),
     };
 
     try {
@@ -111,15 +141,23 @@ function PayNow() {
         }
       );
 
-      if (response.ok) {
-        const responseData = await response.json();
+      const responseData = await response.json();
+      console.log("PAYMENT RESPONSE:", responseData);
+
+      if (responseData.paymentSuccess) {
         const paymentID = responseData.paymentId;
+
+        setPaymentError("");
+
         navigate(`/receipt/${paymentID}`, { state: { itemName: itemName } });
       } else {
-        alert("Payment failed. Please check your details and try again!");
+        setPaymentError(
+          responseData.message || "Payment failed. Please try again."
+        );
       }
     } catch (error) {
-      console.error("Payment error: ", error);
+      console.error("Payment error:", error);
+      setPaymentError("A network or server error occurred.");
     }
   };
 
@@ -129,7 +167,24 @@ function PayNow() {
         Loading payment details...
       </p>
     );
-
+  if (!isWinner)
+    return (
+      <div style={styles.pageContainer}>
+        <div style={styles.card}>
+          <h1 style={styles.heading}>{itemName || "Item"}</h1>
+          <p
+            style={{
+              color: "#d9534f",
+              textAlign: "center",
+              fontWeight: "600",
+              marginTop: "30px",
+            }}
+          >
+            You are not the winner of this auction and cannot make a payment.
+          </p>
+        </div>
+      </div>
+    );
   return (
     <div style={styles.pageContainer}>
       <div style={styles.card}>
@@ -143,17 +198,43 @@ function PayNow() {
             <strong>${itemPrice.toFixed(2)}</strong>
           </div>
 
-          <div style={styles.checkboxContainer}>
-            <label style={styles.checkboxLabel}>
-              <input
-                type="checkbox"
-                checked={checked}
-                onChange={handleChange}
-                style={{ marginRight: "10px", accentColor: "#007bff" }}
-              />
-              Expedited Shipping (Add $5.00)
-            </label>
-          </div>
+          <label style={styles.radioLabel}>
+            <input
+              type="radio"
+              name="shipping"
+              checked={!isExpedited}
+              onChange={() => {
+                setIsExpedited(false);
+                setShippingCost(standardShippingCost);
+              }}
+              style={styles.radio}
+            />
+            <div>
+              <strong>Standard Shipping</strong> — ${standardShippingCost}
+              <div style={{ fontSize: "13px", color: "#666" }}>
+                {standardShippingDays} days
+              </div>
+            </div>
+          </label>
+
+          <label style={styles.radioLabel}>
+            <input
+              type="radio"
+              name="shipping"
+              checked={isExpedited}
+              onChange={() => {
+                setIsExpedited(true);
+                setShippingCost(expeditedShippingCost);
+              }}
+              style={styles.radio}
+            />
+            <div>
+              <strong>Expedited Shipping</strong> — ${expeditedShippingCost}
+              <div style={{ fontSize: "13px", color: "#666" }}>
+                {expeditedShippingDays} days
+              </div>
+            </div>
+          </label>
 
           <div style={styles.summaryRow}>
             <span>Shipping:</span>
@@ -226,6 +307,19 @@ function PayNow() {
           >
             Submit Payment
           </button>
+
+          {paymentError && (
+            <p
+              style={{
+                marginTop: "10px",
+                color: "#d9534f",
+                textAlign: "center",
+                fontWeight: "500",
+              }}
+            >
+              {paymentError}
+            </p>
+          )}
         </div>
       </div>
     </div>
@@ -279,20 +373,23 @@ const styles = {
     color: "#555",
     fontSize: "15px",
   },
-  checkboxContainer: {
-    margin: "15px 0",
-    padding: "10px",
+  shippingContainer: {
     backgroundColor: "#fff",
-    borderRadius: "6px",
     border: "1px solid #e1e4e8",
+    borderRadius: "8px",
+    padding: "15px",
+    margin: "15px 0",
   },
-  checkboxLabel: {
+  radioLabel: {
     display: "flex",
-    alignItems: "center",
+    alignItems: "flex-start",
+    gap: "10px",
+    marginBottom: "12px",
     cursor: "pointer",
-    fontSize: "14px",
-    color: "#555",
-    fontWeight: "500",
+  },
+  radio: {
+    marginTop: "4px",
+    cursor: "pointer",
   },
   totalRow: {
     display: "flex",

@@ -2,6 +2,8 @@ package com.bluebid.payment_app_service.controller;
 
 import java.time.LocalDateTime;
 
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.Link;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -26,18 +28,17 @@ public class PaymentController {
 		this._paymentService= paymentService;
 	}
 	
+	
 	@PostMapping("/payment")
 	public ResponseEntity<?> attemptPayment(
-				@RequestBody AttemptPaymentRequest attemptPaymentRequest,
-				@RequestHeader(value = "X-User-Id", required = false) String userId
-			){
-		
-		 if (userId == null || userId.isBlank()) {
-			 return ResponseEntity .badRequest().body("Missing user id header.");
+	        @RequestBody AttemptPaymentRequest attemptPaymentRequest,
+	        @RequestHeader(value = "X-User-Id", required = false) String userId) {
 
-		 }
-	
-		String cardNumber = attemptPaymentRequest.getCardNumber();
+	    if (userId == null || userId.isBlank()) {
+	        return ResponseEntity.badRequest().body("Missing user id header.");
+	    }
+
+	    String cardNumber = attemptPaymentRequest.getCardNumber();
 		String expiryMonth = attemptPaymentRequest.getExpiryMonth();
 		String expiryYear = attemptPaymentRequest.getExpiryYear();
 		String cvv = attemptPaymentRequest.getSecurityCode();
@@ -55,46 +56,68 @@ public class PaymentController {
 		            .badRequest()
 		            .body("Payment information contains non numeric characters.");
 		}
-		
-		//validate that the amount is not negative or too humongous 
-	  
-        if(amount < 0 || amount > Double.MAX_VALUE || shippingCost < 0 || shippingCost > Double.MAX_VALUE ) {
-        	return ResponseEntity
-		            .badRequest()
-		            .body("Payment and/or shipping amount is not valid.");
-        }
-	   
-        String paymentId = _paymentService.isValidPaymentInfo(cardNumber, expiryMonth, expiryYear, cvv, userId, sellerID, catID, time, isExpedited, amount, shippingCost);
-        
-        if (paymentId != null) {
-            return ResponseEntity.ok(new PaymentResponse(
-                "The payment was successfully submitted!",
-                amount + shippingCost,
-                true,
-                paymentId 
-            ));
-        } else {
-            return ResponseEntity.ok(new PaymentResponse(
-                "The payment was unsuccessful. Credentials invalid.",
-                amount + shippingCost,
-                false,
-                null
-            ));
-        }
-		
-		
-        
+
+		 String paymentId = _paymentService.isValidPaymentInfo(cardNumber, expiryMonth, expiryYear, cvv, userId, sellerID, catID, time, isExpedited, amount, shippingCost);
+
+	    PaymentResponse response;
+	    String base = "http://localhost:8080/api";
+
+	    if (paymentId != null) {
+	        response = new PaymentResponse(
+	                "The payment was successfully submitted!",
+	                attemptPaymentRequest.getItemPrice() + attemptPaymentRequest.getShippingCost(),
+	                true,
+	                paymentId
+	        );
+	    } else {
+	        response = new PaymentResponse(
+	                "The payment was unsuccessful. Credentials invalid.",
+	                attemptPaymentRequest.getItemPrice() + attemptPaymentRequest.getShippingCost(),
+	                false,
+	                null
+	        );
+	    }
+
+	    EntityModel<PaymentResponse> model = EntityModel.of(response);
+
+	    model.add(Link.of(base + "/payment/payment").withSelfRel());
+
+	    // if succeeded add the receipt link
+	    if (paymentId != null) {
+	        model.add(Link.of(base + "/payment/receipt/" + paymentId).withRel("receipt"));
+	    }
+
+	    // link to catalogue item that was won
+	    if (attemptPaymentRequest.getCatalogueID() != null) {
+	        model.add(Link.of(base + "/catalogue/items/" + attemptPaymentRequest.getCatalogueID())
+	                .withRel("catalogue-item"));
+	    }
+
+
+	    return ResponseEntity.ok(model);
 	}
 	
 	
 	@GetMapping("/receipt/{receiptId}")
 	public ResponseEntity<?> getReceipt(@PathVariable String receiptId) {
 	    Receipt receipt = _paymentService.getReceiptById(receiptId);
-	    if (receipt != null) {
-	        return ResponseEntity.ok(receipt);
-	    } else {
+	    if (receipt == null) {
 	        return ResponseEntity.notFound().build();
 	    }
+
+	    String base = "http://localhost:8080/api";
+
+	    EntityModel<Receipt> model = EntityModel.of(receipt);
+	    model.add(Link.of(base + "/payment/receipt/" + receiptId).withSelfRel());
+
+	    // link to catalogue item
+	    if (receipt.getItemId() != null) {
+	        model.add(Link.of(base + "/catalogue/items/" + receipt.getItemId())
+	                .withRel("catalogue-item"));
+	    }
+
+	    return ResponseEntity.ok(model);
 	}
+
 
 }

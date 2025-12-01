@@ -12,6 +12,7 @@ import com.bluebid.user_app_service.security.JWTTokenManager;
 import com.bluebid.user_app_service.service.UserService;
 
 import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.server.SecurityWebFilterChain;
@@ -21,7 +22,9 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 
 @Configuration
+@EnableWebFluxSecurity
 public class SecurityConfig {
+	
 	
 	@Bean
     public BCryptPasswordEncoder passwordEncoder() {
@@ -70,7 +73,7 @@ public class SecurityConfig {
 	                    TokenResponse token = jwtManager.generateToken(user.getId());
 
 	                    String redirectUrl = String.format(
-	                    	    "http://localhost:3000/oauth-success?uid=%s&uname=%s&email=%s&jwt=%s&expires=%s&hasname=%s&hasshipinfo=%s",
+	                    	    "http://localhost:3000/oauth-success?uid=%s&uname=%s&email=%s&jwt=%s&expires=%s&hasname=%s&hasshipinfo=%s", // on success, redirect here for the front end
 	                    	    URLEncoder.encode(user.getId(), StandardCharsets.UTF_8),
 	                    	    URLEncoder.encode(user.getUsername(), StandardCharsets.UTF_8),
 	                    	    URLEncoder.encode(email == null ? "" : email, StandardCharsets.UTF_8), // email may be null (with github)
@@ -90,19 +93,7 @@ public class SecurityConfig {
 	}
 
 
-//    @Bean
-//    public CorsConfigurationSource corsConfigurationSource() {
-//
-//        CorsConfiguration config = new CorsConfiguration();
-//        config.setAllowedOrigins(Arrays.asList("http://localhost:3000"));
-//        config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-//        config.setAllowedHeaders(Arrays.asList("*"));
-//
-//        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-//        source.registerCorsConfiguration("/**", config);
-//
-//        return source;
-//    }
+
 }
 
 

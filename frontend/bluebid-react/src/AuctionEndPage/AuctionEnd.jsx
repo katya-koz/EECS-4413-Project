@@ -1,10 +1,16 @@
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation, useSearchParams } from "react-router-dom";
 import "./AuctionEnd.scss";
 
 function AuctionEnd() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { auctionID, finalPrice } = location.state || {};
+  const [searchParams] = useSearchParams();
+
+  const stateAuctionID = location.state?.auctionID;
+  const stateFinalPrice = location.state?.finalPrice;
+
+  const auctionID = stateAuctionID || searchParams.get("auctionID");
+  const finalPrice = stateFinalPrice || searchParams.get("finalPrice");
 
   const handleRedirect = () => {
     navigate(`/pay/${auctionID}`, { state: { finalPrice: finalPrice } });

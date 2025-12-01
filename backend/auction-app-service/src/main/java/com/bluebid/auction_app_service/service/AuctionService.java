@@ -130,6 +130,25 @@ public class AuctionService {
 	public Bid getBidById(String bidId) {
 		return _bidRepository.findById(bidId).orElse(null);
 	}
+	
+   //####################################### SET AUCTION TO 'PAID' ON SUCCESSFUL PAYMENT #######################################
+
+	
+	
+	@KafkaListener(topics = "catalogue.payment-item-validation-success-topic", groupId = "auction-catalogue-payment-success-group", containerFactory = "itemValidationSuccessListenerFactory")
+	public void handleCatalogueReserveSuccess( ItemValidationSuccessEvent event) {
+		String catalogueId = event.getCatalogueID();
+		
+		Optional<Auction> auctionOptional = _auctionRepository.findByCatalogueID(catalogueId);
+		
+		Auction auction = auctionOptional.get();
+		
+		//update the status
+		auction.setAuctionStatus("paid");
+		
+		//save
+		_auctionRepository.save(auction);
+	}
 
 	//####################################### POST NEW AUCTION #######################################
 	
@@ -271,6 +290,40 @@ public class AuctionService {
 		}
 		
 		return userAuctions;
+	}
+	public List<Auction> getUserWonAuctions(String userId) {
+	    // get all auctions where user has placed a bid
+	    List<Bid> userBids = _bidRepository.findByBidderIDAndIsValid(userId, true);
+	    List<Auction> userAuctions = new ArrayList<>();
+
+	    for (Bid b : userBids) {
+	    	
+	        // skip if we already added this auction
+	        if (userAuctions.stream().anyMatch(a -> a.getId().equals(b.getAuctionID()))) {
+	            continue;
+	        }
+
+	        // get the auction
+	        Optional<Auction> auctionOpt = _auctionRepository.findByIdAndStatusAndAuctionStatus(b.getAuctionID(), false, "closed"); // false status means the auction is over. closed means unpaid.
+	        if (auctionOpt.isEmpty()) continue;
+
+	        Auction auction = auctionOpt.get();
+
+	        // get all valid bids for this auction
+	        List<Bid> allBidsForAuction = _bidRepository.findByAuctionIDAndIsValidTrueOrderByAmountDesc(b.getAuctionID());
+
+	        // find the highest bid
+	       if(allBidsForAuction.size() > 0 ) {
+	    	   Bid highestBid = allBidsForAuction.get(0);
+
+		        // only add if the user has the highest bid
+		        if (highestBid.getBidderID().equals(userId)) {
+		            userAuctions.add(auction);
+		        }
+	        }
+	    }
+
+	    return userAuctions;
 	}
 	
 
