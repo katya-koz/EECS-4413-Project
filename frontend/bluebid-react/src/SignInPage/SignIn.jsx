@@ -2,110 +2,142 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useUser } from "../Context/UserContext";
 import "./SignIn.scss";
+import { validateFields } from "./SignInValidations";
 
 function SignIn() {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [message, setMessage] = useState("");
+	const [username, setUsername] = useState("");
+	const [password, setPassword] = useState("");
+	const [message, setMessage] = useState("");
 
-  const { login } = useUser();
-  const navigate = useNavigate();
+	const [errors, setErrors] = useState({});
 
-  useEffect(() => {
-    if (login.username != null) {
-      // redirect logic if already logged in
-    }
-  }, [login]);
 
-  async function handleLogin() {
-    setMessage("");
+	const { login } = useUser();
+	const navigate = useNavigate();
 
-    const res = await fetch("http://localhost:8080/api/authentication/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ username, password }),
-    });
+	useEffect(() => {
+		if (login.username != null) {
+			// redirect logic if already logged in
+		}
+	}, [login]);
 
-    const data = await res.json();
+	async function handleLogin() {
+		setMessage("");
 
-    if (!res.ok || !data.token) {
-      // show error from backend
-      setMessage(data.message || "Login failed");
-      return;
-    }
+		const res = await fetch("http://localhost:8080/api/authentication/login", {
+			method: "POST",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify({ username, password }),
+		});
 
-    // successful login
-    login(
-      data.token,
-      { username: data.username, userid: data.userId },
-      data.expiresAt
-    );
-    navigate("/");
-  }
+		const data = await res.json();
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    handleLogin();
-  };
+		if (!res.ok || !data.token) {
+			// show error from backend
+			setMessage(data.message || "Login failed");
+			return;
+		}
 
-  return (
-    <div className="signInPage">
-      <div className="signInCard">
-        <h2>Sign In</h2>
+		// successful login
+		login(
+			data.token,
+			{ username: data.username, userid: data.userId },
+			data.expiresAt
+		);
+		navigate("/");
+	}
 
-        <button
-          onClick={() =>
-            (window.location.href =
-              "http://localhost:8080/oauth2/authorization/github")
-          }
-          className="oauthBtn github"
-        >
-          <i className="bi bi-github"></i>
-          Sign in with GitHub
-        </button>
+	const handleSubmit = (e) => {
+		e.preventDefault();
 
-        <div className="orDivider">─── OR ───</div>
+		//validations
+		const formData = { username };
+		const validationErrors = validateFields(formData);
 
-        <form onSubmit={handleSubmit} className="signInForm">
-          <input
-            type="username"
-            placeholder="Username"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-          />
+		if (Object.keys(validationErrors).length > 0) {
+			setErrors(validationErrors);
+			return;
+		}
+		setErrors({});
+		handleLogin();
+	};
 
-          <input
-            type="password"
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
 
-          {message && <p className="loginMessage">{message}</p>}
+	return (
+		<div className="signInPage">
+			<div className="signInCard">
+				<h2>Sign In</h2>
 
-          <button
-            type="button"
-            onClick={() => navigate("/reset-password")}
-            className="forgotPasswordBtn"
-          >
-            Forgot password?
-          </button>
+				<button
+					onClick={() =>
+					(window.location.href =
+						"http://localhost:8080/oauth2/authorization/github")
+					}
+					className="oauthBtn github"
+				>
+					<i className="bi bi-github"></i>
+					Sign in with GitHub
+				</button>
 
-          <button type="submit" className="submitBtn">
-            Sign In
-          </button>
+				<div className="orDivider">─── OR ───</div>
 
-          <button
-            type="button"
-            onClick={() => navigate("/signup")}
-            className="createAccountBtn"
-          >
-            Create Account
-          </button>
-        </form>
-      </div>
-    </div>
-  );
+				<form onSubmit={handleSubmit} className="signInForm">
+
+					<div className="input-group">
+						<input
+							type="username"
+							placeholder="Username"
+							value={username}
+							onChange={(e) => {
+								setUsername(e.target.value);
+								
+								if (errors.username) setErrors({ ...errors, username: null });
+							}}
+							
+							style={{ borderColor: errors.username ? "red" : "" }}
+						
+						/>
+						{/*display validations.js error*/}
+						{errors.username && (
+							<span className="error-text" style={{ color: "red", fontSize: "12px" }}>
+								{errors.username}
+							</span>
+						)}
+					</div>
+
+					<input
+						type="password"
+						placeholder="Password"
+						value={password}
+						onChange={(e) => setPassword(e.target.value)}
+						required
+					/>
+
+					{message && <p className="loginMessage">{message}</p>}
+
+					<button
+						type="button"
+						onClick={() => navigate("/reset-password")}
+						className="forgotPasswordBtn"
+					>
+						Forgot password?
+					</button>
+
+					<button type="submit" className="submitBtn">
+						Sign In
+					</button>
+
+					<button
+						type="button"
+						onClick={() => navigate("/signup")}
+						className="createAccountBtn"
+					>
+						Create Account
+					</button>
+				</form>
+			</div>
+		</div>
+	);
 }
 
 export default SignIn;
