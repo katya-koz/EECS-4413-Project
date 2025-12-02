@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useUser } from "../Context/UserContext";
 import "./SignIn.scss";
-import { validateFields } from "./SignInValidations";
+import { validateFields } from "./SignInValidations.js";
 
 function SignIn() {
 	const [username, setUsername] = useState("");
@@ -51,7 +51,7 @@ function SignIn() {
 		e.preventDefault();
 
 		//validations
-		const formData = { username };
+		const formData = { username, password };
 		const validationErrors = validateFields(formData);
 
 		if (Object.keys(validationErrors).length > 0) {
@@ -94,7 +94,7 @@ function SignIn() {
 								if (errors.username) setErrors({ ...errors, username: null });
 							}}
 							
-							style={{ borderColor: errors.username ? "red" : "" }}
+							style={{  width: "95%", borderColor: errors.username ? "red" : "" }}
 						
 						/>
 						{/*display validations.js error*/}
@@ -106,12 +106,23 @@ function SignIn() {
 					</div>
 
 					<input
-						type="password"
-						placeholder="Password"
-						value={password}
-						onChange={(e) => setPassword(e.target.value)}
-						required
+					    type="password"
+					    placeholder="Password"
+					    value={password}
+					    onChange={(e) => {
+					        setPassword(e.target.value);
+					        // clear password error when user types
+					        if (errors.password) setErrors({ ...errors, password: null });
+					    }}
+					    style={{ borderColor: errors.password ? "red" : "" }}
+					    
 					/>
+					{/*display validations.js error*/}
+					{errors.password && (
+					    <span className="error-text" style={{ color: "red", fontSize: "12px" }}>
+					        {errors.password}
+					    </span>
+					)}
 
 					{message && <p className="loginMessage">{message}</p>}
 

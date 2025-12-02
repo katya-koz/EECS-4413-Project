@@ -2,203 +2,324 @@ import { useState } from "react";
 import { useUser } from "../Context/UserContext";
 import { useNavigate } from "react-router-dom";
 import "./SignUp.scss";
+import { validateFields } from "./SignUpValidations.js";
 
 function SignUp() {
-  const [form, setForm] = useState({
-    email: "",
-    firstName: "",
-    lastName: "",
-    password: "",
-    country: "",
-    city: "",
-    postalCode: "",
-    streetName: "",
-    streetNum: "",
-    username: "",
-  });
-  const navigate = useNavigate();
-  const { login } = useUser();
+	const [form, setForm] = useState({
+		email: "",
+		firstName: "",
+		lastName: "",
+		password: "",
+		country: "",
+		city: "",
+		postalCode: "",
+		streetName: "",
+		streetNum: "",
+		username: "",
+	});
+	const navigate = useNavigate();
+	const { login } = useUser();
+	const [errors, setErrors] = useState({});
 
-  const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  };
+	const handleChange = (e) => {
+		const { name, value } = e.target;
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    handleSignUp();
-  };
+		setForm({
+			...form,
+			[name]: value,
+		});
 
-  const handleBack = (e) => {
-    e.preventDefault();
-    navigate("/login");
-  };
 
-  async function handleSignUp() {
-    const {
-      username,
-      password,
-      firstName,
-      lastName,
-      streetName,
-      streetNum,
-      city,
-      postalCode,
-      country,
-      email,
-    } = form;
+		if (errors[name]) {
+			setErrors({
+				...errors,
+				[name]: null
+			});
+		}
+	};
 
-    const res = await fetch("http://localhost:8080/api/account/signup", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        username,
-        password,
-        firstName,
-        lastName,
-        streetName,
-        streetNum,
-        city,
-        postalCode,
-        country,
-        email,
-      }),
-    });
+	const handleSubmit = (e) => {
+		e.preventDefault();
 
-    if (!res.ok) {
-      const message = await res.text();
-      console.error("Create account failed: " + message);
-      return;
-    }
+		const formData = {
+			...form
+		};
+		const validationErrors = validateFields(formData);
 
-    handleLogin();
-  }
+		if (Object.keys(validationErrors).length > 0) {
+			setErrors(validationErrors);
+			return;
+		}
+		setErrors({});
 
-  async function handleLogin() {
-    const { username, password } = form;
-    const res = await fetch("http://localhost:8080/api/authentication/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ username, password }),
-    });
 
-    if (!res.ok) {
-      const data = await res.json();
-      console.error("Login failed: " + data.message);
-      return;
-    }
+		handleSignUp();
+	};
 
-    const data = await res.json();
-    login(data.token, { username: data.username }, data.expiresAt);
-    navigate("/");
-  }
+	const handleBack = (e) => {
+		e.preventDefault();
+		navigate("/login");
+	};
 
-  return (
-    <div className="signup-container">
-      <div className="signup-card">
-        <h2 className="signup-title">Create Account</h2>
-        <form onSubmit={handleSubmit} className="signup-form">
-          <input
-            type="email"
-            name="email"
-            placeholder="Email"
-            value={form.email}
-            onChange={handleChange}
-            className="signup-input"
-          />
-          <input
-            type="text"
-            name="username"
-            placeholder="Username / Display name"
-            value={form.username}
-            onChange={handleChange}
-            className="signup-input"
-          />
+	async function handleSignUp() {
+		const {
+			username,
+			password,
+			firstName,
+			lastName,
+			streetName,
+			streetNum,
+			city,
+			postalCode,
+			country,
+			email,
+		} = form;
 
-          <div className="signup-flex">
-            <input
-              type="text"
-              name="firstName"
-              placeholder="First Name"
-              value={form.firstName}
-              onChange={handleChange}
-              className="signup-input"
-            />
-            <input
-              type="text"
-              name="lastName"
-              placeholder="Last Name"
-              value={form.lastName}
-              onChange={handleChange}
-              className="signup-input"
-            />
-          </div>
+		const res = await fetch("http://localhost:8080/api/account/signup", {
+			method: "POST",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify({
+				username,
+				password,
+				firstName,
+				lastName,
+				streetName,
+				streetNum,
+				city,
+				postalCode,
+				country,
+				email,
+			}),
+		});
 
-          <input
-            type="password"
-            name="password"
-            placeholder="Password"
-            value={form.password}
-            onChange={handleChange}
-            className="signup-input"
-          />
+		if (!res.ok) {
+			const message = await res.text();
+			console.error("Create account failed: " + message);
+			return;
+		}
 
-          <h3 className="shipping-title">Shipping Information</h3>
+		handleLogin();
+	}
 
-          <input
-            type="text"
-            name="country"
-            placeholder="Country"
-            value={form.country}
-            onChange={handleChange}
-            className="signup-input"
-          />
+	async function handleLogin() {
+		const { username, password } = form;
+		const res = await fetch("http://localhost:8080/api/authentication/login", {
+			method: "POST",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify({ username, password }),
+		});
 
-          <div className="signup-flex">
-            <input
-              type="text"
-              name="city"
-              placeholder="City"
-              value={form.city}
-              onChange={handleChange}
-              className="signup-input"
-            />
-            <input
-              type="text"
-              name="postalCode"
-              placeholder="Postal Code"
-              value={form.postalCode}
-              onChange={handleChange}
-              className="signup-input"
-            />
-          </div>
+		if (!res.ok) {
+			const data = await res.json();
+			console.error("Login failed: " + data.message);
+			return;
+		}
 
-          <input
-            type="text"
-            name="streetName"
-            placeholder="Street Name"
-            value={form.streetName}
-            onChange={handleChange}
-            className="signup-input"
-          />
-          <input
-            type="text"
-            name="streetNum"
-            placeholder="Street #"
-            value={form.streetNum}
-            onChange={handleChange}
-            className="signup-input"
-          />
+		const data = await res.json();
+		login(data.token, { username: data.username }, data.expiresAt);
+		navigate("/");
+	}
 
-          <button type="submit" className="signup-button">
-            Sign Up
-          </button>
-        </form>
-        <button onClick={handleBack} className="signup-button">
-          Back
-        </button>
-      </div>
-    </div>
-  );
+	return (
+		<div className="signup-container">
+			<div className="signup-card">
+				<h2 className="signup-title">Create Account</h2>
+				<form onSubmit={handleSubmit} className="signup-form">
+
+					<div className="input-group">
+						<input
+							type="text"
+							name="email"
+							placeholder="Email"
+							value={form.email}
+							onChange={handleChange}
+							className="signup-input"
+							style={{ borderColor: errors.email ? "red" : "" }}
+						/>
+						{errors.email && (
+							<span className="error-text" style={{ color: "red", fontSize: "12px" }}>
+								{errors.email}
+							</span>
+						)}
+					</div>
+
+					<div className="input-group">
+						<input
+							type="text"
+							name="username"
+							placeholder="Username / Display name"
+							value={form.username}
+							onChange={handleChange}
+							className="signup-input"
+							style={{ borderColor: errors.username ? "red" : "" }}
+						/>
+						{errors.username && (
+							<span className="error-text" style={{ color: "red", fontSize: "12px" }}>
+								{errors.username}
+							</span>
+						)}
+					</div>
+
+					<div className="signup-flex">
+						<div className="input-group" style={{ flex: 1 }}>
+							<input
+								type="text"
+								name="firstName"
+								placeholder="First Name"
+								value={form.firstName}
+								onChange={handleChange}
+								className="signup-input"
+								style={{ borderColor: errors.firstName ? "red" : "" }}
+							/>
+							{errors.firstName && (
+								<span className="error-text" style={{ color: "red", fontSize: "12px" }}>
+									{errors.firstName}
+								</span>
+							)}
+						</div>
+
+						<div className="input-group" style={{ flex: 1 }}>
+							<input
+								type="text"
+								name="lastName"
+								placeholder="Last Name"
+								value={form.lastName}
+								onChange={handleChange}
+								className="signup-input"
+								style={{ borderColor: errors.lastName ? "red" : "" }}
+							/>
+							{errors.lastName && (
+								<span className="error-text" style={{ color: "red", fontSize: "12px" }}>
+									{errors.lastName}
+								</span>
+							)}
+						</div>
+					</div>
+
+					<div className="input-group">
+						<input
+							type="password"
+							name="password"
+							placeholder="Password"
+							value={form.password}
+							onChange={handleChange}
+							className="signup-input"
+							style={{ borderColor: errors.password ? "red" : "" }}
+						/>
+						{errors.password && (
+							<span className="error-text" style={{ color: "red", fontSize: "12px" }}>
+								{errors.password}
+							</span>
+						)}
+					</div>
+
+					<h3 className="shipping-title">Shipping Information</h3>
+
+					<div className="input-group">
+						<input
+							type="text"
+							name="country"
+							placeholder="Country"
+							value={form.country}
+							onChange={handleChange}
+							className="signup-input"
+							style={{ borderColor: errors.country ? "red" : "" }}
+						/>
+						{errors.country && (
+							<span className="error-text" style={{ color: "red", fontSize: "12px" }}>
+								{errors.country}
+							</span>
+						)}
+					</div>
+
+					<div className="signup-flex">
+						<div className="input-group" style={{ flex: 1 }}>
+							<input
+								type="text"
+								name="city"
+								placeholder="City"
+								value={form.city}
+								onChange={handleChange}
+								className="signup-input"
+								style={{ borderColor: errors.city ? "red" : "" }}
+							/>
+							{errors.city && (
+								<span className="error-text" style={{ color: "red", fontSize: "12px" }}>
+									{errors.city}
+								</span>
+							)}
+						</div>
+						<div className="input-group" style={{ flex: 1 }}>
+							<input
+								type="text"
+								name="postalCode"
+								placeholder="Postal Code"
+								value={form.postalCode}
+								onChange={handleChange}
+								className="signup-input"
+								style={{ borderColor: errors.postalCode ? "red" : "" }}
+							/>
+							{errors.postalCode && (
+								<span className="error-text" style={{ color: "red", fontSize: "12px" }}>
+									{errors.postalCode}
+								</span>
+							)}
+						</div>
+					</div>
+
+					<div className="input-group">
+						<input
+							type="text"
+							name="streetName"
+							placeholder="Street Name"
+							value={form.streetName}
+							onChange={handleChange}
+							className="signup-input"
+							style={{ borderColor: errors.streetName ? "red" : "" }}
+						/>
+						{errors.streetName && (
+							<span className="error-text" style={{ color: "red", fontSize: "12px" }}>
+								{errors.streetName}
+							</span>
+						)}
+					</div>
+
+					<div className="input-group">
+						<input
+							type="text"
+							name="streetNum"
+							placeholder="Street #"
+							value={form.streetNum}
+							onChange={handleChange}
+							className="signup-input"
+							style={{ borderColor: errors.streetNum ? "red" : "" }}
+						/>
+						{errors.streetNum && (
+							<span className="error-text" style={{ color: "red", fontSize: "12px" }}>
+								{errors.streetNum}
+							</span>
+						)}
+					</div>
+
+					<div style={{ marginTop: "20px", display: "flex", flexDirection: "column", gap: "10px" }}>
+
+						<button type="submit" className="signup-button">
+							Sign Up
+						</button>
+
+						<button
+							type="button"
+							onClick={handleBack}
+							className="signup-button"
+							style={{ backgroundColor: "#6c757d" }} 
+						>
+							Back
+						</button>
+					</div>
+
+				</form>
+			</div>
+		</div>
+	);
 }
-
 export default SignUp;
