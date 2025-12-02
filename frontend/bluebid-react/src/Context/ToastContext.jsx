@@ -23,6 +23,7 @@ export function ToastProvider({ children }) {
 
   useEffect(() => {
     if (!notifications.length) return;
+    if (!user || !user.userid) return;
 
     const latest = notifications[notifications.length - 1];
     const isWinner = latest.winnerId === user.userid;
@@ -38,7 +39,7 @@ export function ToastProvider({ children }) {
         `Auction for ${latest.auction.itemName} has finished with a final bid of $${latest.finalPrice}. User #${latest.winnerId} has won the bid!`
       );
     }
-  }, [notifications, user.userid]);
+  }, [notifications, user?.userid]);
 
   return (
     <ToastContext.Provider value={{ showToast }}>

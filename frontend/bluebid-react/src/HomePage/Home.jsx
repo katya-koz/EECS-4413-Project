@@ -29,7 +29,7 @@ function Home() {
     }
   }
 
-  // Fetch auctions the user has won and needs to pay
+  // fetch auctions the user has won and needs to pay
   async function getUserWonItems() {
     try {
       const res = await authFetch(
