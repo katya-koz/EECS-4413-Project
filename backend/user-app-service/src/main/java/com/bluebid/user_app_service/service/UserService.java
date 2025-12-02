@@ -55,7 +55,7 @@ public class UserService {
 	
 	public User validateCredentials(String username, String password) {
 		User user = _userRepository.findByUsername(username).orElseThrow(() -> new RuntimeException("User not found"));
-
+		
 		if (!_passwordEncoder.matches(password, user.getPassword())) {
 		    throw new RuntimeException("Invalid credentials");
 		}
