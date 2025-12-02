@@ -1,4 +1,14 @@
 services:
+  #FRONT END
+  frontend:
+    build:
+      context: ./frontend/bluebid-react
+      dockerfile: Dockerfile
+    ports:
+      - "3000:80" #using localhost 3000. nginx listens on 80 by default
+    container_name: react-frontend
+    restart: always
+
   ## KAFKA
   kafka:
     image: confluentinc/cp-kafka:latest

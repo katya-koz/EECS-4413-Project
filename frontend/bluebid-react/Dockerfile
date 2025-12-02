@@ -1,3 +1,4 @@
+#https://medium.com/@alinaseri/dockerize-react-applications-with-nginx-17f752deb54
 FROM node:20 AS build
 WORKDIR /app
 
@@ -8,10 +9,10 @@ COPY . .
 
 RUN npm run build
 
+FROM nginx:alpine
 
-FROM nginx:1.27
-
-RUN rm -rf /usr/share/nginx/html/*
+# RUN rm -rf /usr/share/nginx/html/*
+COPY ./nginx/nginx.conf /etc/nginx/conf.d/default.conf
 
 COPY --from=build /app/build /usr/share/nginx/html
 
