@@ -14,7 +14,22 @@ function NavBar() {
         color: "white",
       }}
     >
-      <h1 style={{ margin: 0, fontSize: "20px" }}>BlueBid</h1>
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "row",
+          alignItems: "center",
+          gap: "10px",
+        }}
+      >
+        <img
+          src="/logo.png" // public/logo.png
+          alt="BlueBid Logo"
+          style={{ height: "40px", width: "40px" }}
+        />
+        <h1 style={{ margin: 0, fontSize: "20px" }}>BlueBid</h1>
+      </div>
+
       <div style={{ display: "flex", gap: "15px" }}>
         <Link to="/" style={{ color: "white", textDecoration: "none" }}>
           Home
